@@ -2,6 +2,8 @@
 
 Small demo space SHMUP for the Dreamcast. Uses KallistiOS and SH4ZAM.
 
+The code here should not be considered as a reference for anything good. It's god awful and is the product of hacking around to get used to KOS, SH4ZAM and the PVR.
+
 ## Build Instructions
 
 > git submodule update --init --recursive
