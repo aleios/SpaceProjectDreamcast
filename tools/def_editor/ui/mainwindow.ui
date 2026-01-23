@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SPJ Def Editor</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="pageGameSettings" name="tab">
+       <attribute name="title">
+        <string>Game Settings</string>
+       </attribute>
+      </widget>
+      <widget class="pageProjectiles" name="tab_2">
+       <attribute name="title">
+        <string>Projectiles</string>
+       </attribute>
+      </widget>
+      <widget class="pageEnemies" name="tab_3">
+       <attribute name="title">
+        <string>Enemies</string>
+       </attribute>
+      </widget>
+      <widget class="pageAnimations" name="tab_4">
+       <attribute name="title">
+        <string>Animations</string>
+       </attribute>
+      </widget>
+      <widget class="pageLevelEditor" name="tab_5">
+       <attribute name="title">
+        <string>Levels</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="btnSave">
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionPaths"/>
+   </widget>
+   <addaction name="menuSettings"/>
+  </widget>
+  <action name="actionPaths">
+   <property name="text">
+    <string>Paths</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pageGameSettings</class>
+   <extends>QWidget</extends>
+   <header>pagegamesettings.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pageProjectiles</class>
+   <extends>QWidget</extends>
+   <header>pageprojectiles.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pageEnemies</class>
+   <extends>QWidget</extends>
+   <header>pageenemies.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pageAnimations</class>
+   <extends>QWidget</extends>
+   <header>pageanimations.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pageLevelEditor</class>
+   <extends>QWidget</extends>
+   <header>pageleveleditor.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
