@@ -1,0 +1,11 @@
+*.cdi
+*.elf
+*.img
+*.o
+*.log
+.vscode
+__pycache__
+staging
+romdisk/*
+build
+.idea
