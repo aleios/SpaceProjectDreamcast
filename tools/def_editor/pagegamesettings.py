@@ -23,6 +23,7 @@ class pageGameSettings(QWidget, Ui_pageGameSettings):
         self.fieldMapper.addMapping(self.sbMaxLives, 0, b"value")
         self.fieldMapper.addMapping(self.sbMaxHealth, 1, b"value")
         self.fieldMapper.addMapping(self.sbMoveSpeed, 2, b"value")
+        self.fieldMapper.setCurrentIndex(0)
 
         self.sbMaxLives.valueChanged.connect(self.fieldMapper.submit)
         self.sbMaxHealth.valueChanged.connect(self.fieldMapper.submit)

@@ -343,7 +343,7 @@ class GameSettingsData:
     player_speed: float = 0.2
     weapons: list = field(default_factory=list)
     playlist: list = field(default_factory=list)
-    modified: bool = False
+    modified: bool = True
 
     def to_dict(self):
         d = asdict(self)
@@ -383,9 +383,10 @@ class GameSettingsModel(QAbstractTableModel):
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
             field_name = self.fields[index.column()]
-            target_type = type(getattr(self.data_obj, field_name))
+            attr = getattr(self.data_obj, field_name)
+            target_type = type(attr)
             new_val = target_type(value)
-            if getattr(self.data_obj, field_name) != new_val:
+            if attr != new_val:
                 setattr(self.data_obj, field_name, new_val)
                 self.data_obj.modified = True
                 self.dataChanged.emit(index, index, [Qt.ItemDataRole.EditRole])
