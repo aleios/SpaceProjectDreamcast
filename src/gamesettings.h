@@ -50,10 +50,16 @@ SHZ_FORCE_INLINE int gamesettings_total_weapons() {
 }
 
 SHZ_FORCE_INLINE weaponset_t* gamesettings_get_weaponset(int index) {
+    if (SHZ_UNLIKELY(index < 0 || index >= g_gamesettings.total_weapons)) {
+        return nullptr;
+    }
     return &g_gamesettings.weapons[index];
 }
 
 SHZ_FORCE_INLINE emitter_t* gamesettings_get_emitter(weaponset_t* set, int index) {
+    if (!set || index < 0 || index >= set->total_emitters) {
+        return nullptr;
+    }
     return &set->emitters[index];
 }
 

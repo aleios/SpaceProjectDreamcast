@@ -182,21 +182,20 @@ void player_step(player_t* player, float delta_time) {
     player->firing = acc.firing;
 
     weaponset_t* set = gamesettings_get_weaponset(g_gamestate.weaponset);
-    for (int i = 0; i < set->total_emitters; ++i) {
+    int num_emitters = set ? set->total_emitters : 0;
+    for (int i = 0; i < num_emitters; ++i) {
         emitter_t* emitter = gamesettings_get_emitter(set, i);
+        if (SHZ_UNLIKELY(!emitter)) {
+            continue;
+        }
 
         emitter->runtime.fire_timer -= delta_time;
-        //printf("Fire timer: %f for %d\n", emitter->runtime.fire_timer, i);
         if (player->firing && emitter->runtime.fire_timer <= 0.0f) {
             shz_vec2_t pos = player->transform.pos;
             pos = shz_vec2_add(pos, emitter->offset);
             projectilepool_spawn(gamestate_player_projpool(), emitter, pos, emitter->start_angle);
             emitter->runtime.fire_timer = emitter->delay;
         }
-    }
-
-    if (player->fire_timer > 0.0f) {
-        player->fire_timer -= delta_time;
     }
 
     animator_step(&player->animator, delta_time);

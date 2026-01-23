@@ -11,7 +11,6 @@ typedef struct Player {
     float speed;
 
     bool firing;
-    float fire_timer;
 
     animator_t animator;
     animationclip_t* clip_idle;
