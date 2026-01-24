@@ -127,11 +127,13 @@ class EventDialog(QDialog, Ui_eventDialog):
         cmd_type = cmd.get("type", "")
 
         if not cmd_type or cmd_type == "":
-            return
-
-        idx = self.cbCmd.findText(cmd_type)
-        if idx >= 0:
-            self.cbCmd.setCurrentIndex(idx)
+            # Default to first command type if not specified
+            cmd_type = self.cbCmd.itemText(0)
+            self.cbCmd.setCurrentIndex(0)
+        else:
+            idx = self.cbCmd.findText(cmd_type)
+            if idx >= 0:
+                self.cbCmd.setCurrentIndex(idx)
 
         mapper = self.mappers.get(cmd_type)
         if mapper:
@@ -160,6 +162,12 @@ class EventDialog(QDialog, Ui_eventDialog):
             self.stackedControls.setCurrentWidget(page)
         else:
             self.stackedControls.setCurrentWidget(self.emptypage)
+
+        mapper = self.mappers.get(text)
+        if mapper:
+            loader = mapper.get("load", None)
+            if loader:
+                loader(getattr(self, 'cmd', {}))
 
 
     def move_target_changed(self, txt):

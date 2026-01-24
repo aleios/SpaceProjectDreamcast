@@ -98,7 +98,17 @@ class pageEnemies(QWidget, Ui_pageEnemies):
             if matches or os.path.isfile(defsdb.assets_path + "/defs/enemy/" + val + ".json"):
                 QMessageBox.critical(self, "Error", "Error: Item already exists.")
             else:
-                defsdb.enemy_defs.add({ "name": val })
+                initial_data = { "name": val, "health": 1, "collision_radius": 1.0 }
+                if defsdb.animations.rowCount() > 0:
+                    anim_name = defsdb.animations.data(defsdb.animations.index(0, defsdb.AnimationModel.COL_NAME))
+                    initial_data["animation"] = anim_name
+                    
+                    clip_model = defsdb.animations.get_clip_list_model(0)
+                    if clip_model.rowCount() > 0:
+                        idle_key = clip_model.data(clip_model.index(0, defsdb.ClipListModel.COL_NAME))
+                        initial_data["idle_key"] = idle_key
+
+                defsdb.enemy_defs.add(initial_data)
 
     def selection_changed(self, new, prev):
         if new.isValid():
@@ -140,6 +150,7 @@ class pageEnemies(QWidget, Ui_pageEnemies):
 
     def add_cmd(self):
         dlg = EventDialog(self)
+        dlg.setData({})
         res = dlg.exec()
         if res:
             cmd = dlg.getData()

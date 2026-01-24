@@ -33,6 +33,7 @@ inline static bool readutil_readstr(file_t file, char out[static 1], size_t out_
     }
 
     if(str_len == 0) {
+        out[0] = '\0';
         return true;
     }
 

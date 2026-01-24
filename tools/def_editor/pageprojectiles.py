@@ -67,7 +67,17 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
             if matches or os.path.isfile(defsdb.assets_path + "/defs/projectile/" + val + ".json"):
                 QMessageBox.critical(self, "Error", "Error: Item already exists.")
             else:
-                defsdb.projectile_defs.add({ "name": val })
+                initial_data = { "name": val, "damage": 1 }
+                if defsdb.animations.rowCount() > 0:
+                    anim_name = defsdb.animations.data(defsdb.animations.index(0, defsdb.AnimationModel.COL_NAME))
+                    initial_data["animation"] = anim_name
+                    
+                    clip_model = defsdb.animations.get_clip_list_model(0)
+                    if clip_model.rowCount() > 0:
+                        animation_key = clip_model.data(clip_model.index(0, defsdb.ClipListModel.COL_NAME))
+                        initial_data["animation_key"] = animation_key
+
+                defsdb.projectile_defs.add(initial_data)
                 # TODO: Select new entry
 
     def selection_changed(self, new, prev):

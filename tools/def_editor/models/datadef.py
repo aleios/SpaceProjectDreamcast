@@ -127,6 +127,7 @@ class DefModel(QAbstractTableModel):
             col_type = col_info['type']
             if key not in data:
                 data[key] = col_type()
+        data['modified'] = True
         
         self.beginInsertRows(parent_index, row_count, row_count)
         self._data_list.append(data)
