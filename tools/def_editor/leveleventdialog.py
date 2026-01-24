@@ -103,7 +103,6 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
 
     def accept(self):
         self.save_event()
-        print('accepted: ', self.event)
         super().accept()
 
     mappers = {

@@ -84,7 +84,6 @@ class LevelsModel(QAbstractTableModel):
 
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
-            print("Setting data: ", value, " at ", index.row(), index.column())
             row = index.row()
             col = index.column()
             item = self.levels[row]
@@ -139,7 +138,6 @@ class LevelsModel(QAbstractTableModel):
             with open(file_path, "r") as f:
                 try:
                     data = json.load(f)
-                    print(data)
                     self.levels.append({
                         "name": name,
                         "initial_music": data.get("initial_music", ""),

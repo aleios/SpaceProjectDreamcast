@@ -105,7 +105,6 @@ class DefModel(QAbstractTableModel):
         for row, item in enumerate(self._data_list):
             if item.get('modified'):
                 path = os.path.join(base_path, f"{item['name']}.json")
-                print("Saving", path)
                 save_data = copy.deepcopy(item)
                 for k in META_KEYS: save_data.pop(k, None)
                 

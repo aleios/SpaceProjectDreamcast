@@ -10,6 +10,8 @@ class pageAnimations(QWidget, Ui_pageAnimations):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
 
+        self.stackedControls.setCurrentIndex(0)
+
         self.lvAnimations.setModel(defsdb.animations)
         self.lvAnimations.selectionModel().currentChanged.connect(self.selection_changed)
 
@@ -36,8 +38,11 @@ class pageAnimations(QWidget, Ui_pageAnimations):
 
             clip_model = defsdb.animations.get_clip_list_model(row)
             self.lvClips.setModel(clip_model)
+
+            self.stackedControls.setCurrentIndex(1)
         else:
             self.lvClips.setModel(None)
+            self.stackedControls.setCurrentIndex(0)
 
     def edit_clip(self, index):
         if not index.isValid():

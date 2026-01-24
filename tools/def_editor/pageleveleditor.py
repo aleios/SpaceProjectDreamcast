@@ -14,10 +14,11 @@ class pageLevelEditor(QWidget, Ui_pageLevelEditor):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
 
+        self.stackedControls.setCurrentIndex(0)
+
         self.btnNewLevel.pressed.connect(self.add_level)
 
         self.lvLevels.setModel(defsdb.levels)
-
         self.lvLevels.clicked.connect(self.level_clicked)
 
         self.events_model = LevelEventsModel()
@@ -46,6 +47,7 @@ class pageLevelEditor(QWidget, Ui_pageLevelEditor):
         level_data = defsdb.levels.levels[index.row()]
         self.events_model.set_events(level_data.get('events', []))
         self.gvLevelEditor.set_level(self.lvLevels.model(), index.row())
+        self.stackedControls.setCurrentIndex(1)
 
     def event_selection_changed(self, current):
         if not current.isValid():

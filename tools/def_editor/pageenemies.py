@@ -89,8 +89,6 @@ class pageEnemies(QWidget, Ui_pageEnemies):
             defsdb.enemy_defs.set_right_key(enemy_idx.row(), self.cbRightClip.currentText())
 
     def add_enemy(self):
-        print(defsdb.game_settings_model.data_obj)
-
         val, res = QInputDialog.getText(self, "Add enemy...", "Name")
 
         if res:

@@ -241,7 +241,6 @@ class LevelEditor(QGraphicsView):
             item_idx = -1
             if item:
                 # Edit event
-                print(f"Double clicked on item: {item.event}")
                 if self.model and self.level_row >= 0:
                     events = self.model.data(self.model.index(self.level_row, LevelsModel.COL_EVENTS), Qt.ItemDataRole.EditRole)
                     if events:
@@ -249,8 +248,6 @@ class LevelEditor(QGraphicsView):
                             item_idx = events.index(item.event)
                         except ValueError:
                             pass
-            else:
-                print("No item at mouse position")
 
             self.itemEdit.emit(item.event if item else {
                 "pos": [ev_pos.x(), self.viewport_to_world_y(ev_pos.y())]
@@ -259,7 +256,6 @@ class LevelEditor(QGraphicsView):
 
             scene_pos = self.mapToScene(event.pos())
             world_pos = self.current_pos + (480 - scene_pos.y())
-            print(f"World pos: {world_pos}")
 
     def contextMenuEvent(self, event):
         ev_pos = self.mapToScene(event.pos())

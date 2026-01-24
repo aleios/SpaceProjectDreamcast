@@ -331,7 +331,6 @@ class AnimationModel(QAbstractTableModel):
                     # Get atlas_width and atlas_height from texture dimensions
                     try:
                         tex_path = os.path.join(assets_path, f"sprites/{tex}.png")
-                        print(tex_path)
                         with Image.open(tex_path) as im:
                             atlas_width = im.width
                             atlas_height = im.height
@@ -691,7 +690,6 @@ def save_pending_defs():
 
     if game_settings.modified:
         path = assets_path + "/settings.json"
-        print("Saving", path)
         with open(path, "w") as f:
             json.dump(game_settings.to_dict(), f, indent=2, separators=(',', ': '))
         game_settings.modified = False

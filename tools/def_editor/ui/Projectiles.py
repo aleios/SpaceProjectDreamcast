@@ -107,7 +107,7 @@ class Ui_pageProjectiles(object):
         self.horizontalLayout.addWidget(self.controlStack)
 
         self.retranslateUi(pageProjectiles)
-        self.controlStack.setCurrentIndex(1)
+        self.controlStack.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(pageProjectiles)
 
     def retranslateUi(self, pageProjectiles):
