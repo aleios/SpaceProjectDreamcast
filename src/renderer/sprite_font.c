@@ -98,7 +98,7 @@ void spritefont_render(spritefont_t* font, const char* text, shz_vec2_t pos, uin
         }
 
         shz_vec4_t g = spritefont_get_glyph(font, text[i]);
-        render_textured_quad_direct(g, shz_vec4_init(pos.x, pos.y, font->cell_width, font->cell_height), 0.0, shz_vec2_init(0.0f,0.0f));
+        render_textured_quad_direct(g, shz_vec4_init(pos.x, pos.y, font->cell_width, font->cell_height), 0.0f, shz_vec2_init(0.0f,0.0f));
         pos.x += font->cell_width;
     }
 }
