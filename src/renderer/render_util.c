@@ -39,10 +39,10 @@ void render_textured_quad_direct(shz_vec4_t src, shz_vec4_t dst, float rotation,
     shz_vec4_t p4 = { .x = 0.0f,   .y = dst.w, .z = 0.01f, .w = 1.0f };
 
     // Transform vertices
-    shz_xmtrx_init_translation(-origin.x, -origin.y, 0.0f);
+    shz_xmtrx_init_translation(dst.x, dst.y, 0.0f);
     shz_xmtrx_apply_rotation_z(rotation);
-    shz_xmtrx_apply_translation(dst.x, dst.y, 1.0f);
-    
+    shz_xmtrx_translate(-origin.x, -origin.y, 0.0f);
+
     p1 = shz_xmtrx_transform_vec4(p1);
     p2 = shz_xmtrx_transform_vec4(p2);
     p3 = shz_xmtrx_transform_vec4(p3);
@@ -53,7 +53,7 @@ void render_textured_quad_direct(shz_vec4_t src, shz_vec4_t dst, float rotation,
     float u1 = src.z;
     float v1 = src.w;
 
-    // 
+    //
     pvr_sprite_txr_t* spr = render_target_sprite_txr();
 
     spr->flags = PVR_CMD_VERTEX_EOL;

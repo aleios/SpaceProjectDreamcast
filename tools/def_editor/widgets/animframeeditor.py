@@ -20,6 +20,7 @@ class AnimFrameEditor(QGraphicsView):
         self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
 
         self.selection_rect = None
+        self.origin_plus = []
 
     def set_texture(self, tex):
         scene = self._scene
@@ -66,12 +67,25 @@ class AnimFrameEditor(QGraphicsView):
             self.setDragMode(QGraphicsView.DragMode.NoDrag)
         super().mouseReleaseEvent(event)
 
-    def set_selection(self, x, y, w, h):
+    def set_selection(self, x, y, w, h, origin_x=None, origin_y=None):
 
-        if self.selection_rect in self._scene.items():
+        if self.selection_rect and self.selection_rect in self._scene.items():
             self._scene.removeItem(self.selection_rect)
+        
+        for item in self.origin_plus:
+            if item in self._scene.items():
+                self._scene.removeItem(item)
+        self.origin_plus.clear()
 
         pen = QPen(Qt.GlobalColor.red, 2)
         pen.setCosmetic(True)
         
         self.selection_rect = self._scene.addRect(x, y, w, h, pen)
+
+        if origin_x is not None and origin_y is not None:
+            plus_pen = QPen(Qt.GlobalColor.blue, 2)
+            plus_pen.setCosmetic(True)
+            size = 2
+            l1 = self._scene.addLine(x + origin_x - size, y + origin_y, x + origin_x + size, y + origin_y, plus_pen)
+            l2 = self._scene.addLine(x + origin_x, y + origin_y - size, x + origin_x, y + origin_y + size, plus_pen)
+            self.origin_plus = [l1, l2]

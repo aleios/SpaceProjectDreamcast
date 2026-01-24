@@ -53,6 +53,8 @@ class ClipDialog(QDialog, Ui_clipDialog):
         self.sbY.valueChanged.connect(self.update_editor_rect)
         self.sbW.valueChanged.connect(self.update_editor_rect)
         self.sbH.valueChanged.connect(self.update_editor_rect)
+        self.sbOriginX.valueChanged.connect(self.update_editor_rect)
+        self.sbOriginY.valueChanged.connect(self.update_editor_rect)
 
     def selection_changed(self, new, prev):
         if prev.isValid():
@@ -67,7 +69,9 @@ class ClipDialog(QDialog, Ui_clipDialog):
         y = self.sbY.value()
         w = self.sbW.value()
         h = self.sbH.value()
-        self.gvTexture.set_selection(x, y, w, h)
+        ox = self.sbOriginX.value()
+        oy = self.sbOriginY.value()
+        self.gvTexture.set_selection(x, y, w, h, ox, oy)
         self.frameFieldMapper.submit()
 
     def new_frame(self):
