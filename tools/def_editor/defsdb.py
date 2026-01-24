@@ -96,7 +96,7 @@ class ClipFramesModel(QAbstractTableModel):
             self.endMoveRows()
 
 class ClipListModel(QAbstractTableModel):
-    COL_NAME, COL_FPS, COL_ORIGIN_X, COL_ORIGIN_Y = range(4)
+    COL_NAME, COL_FPS, COL_LOOPMODE, COL_ORIGIN_X, COL_ORIGIN_Y = range(5)
 
     def __init__(self, parent_model, parent_row, data_override=None):
         super().__init__()
@@ -112,7 +112,7 @@ class ClipListModel(QAbstractTableModel):
         return len(self.clips)
     
     def columnCount(self, parent=QModelIndex()):
-        return 4
+        return 5
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid() or not (0 <= index.row() < len(self.clips)):
@@ -126,6 +126,8 @@ class ClipListModel(QAbstractTableModel):
                 return clip.get('name', "")
             if col == self.COL_FPS:
                 return clip.get('fps', 0.0)
+            if col == self.COL_LOOPMODE:
+                return clip.get('loop_mode', 0)
             if col == self.COL_ORIGIN_X:
                 return clip.get('origin', [0,0])[0]
             if col == self.COL_ORIGIN_Y:
@@ -143,6 +145,8 @@ class ClipListModel(QAbstractTableModel):
                 clip['name'] = str(value)
             elif col == self.COL_FPS:
                 clip['fps'] = float(value)
+            elif col == self.COL_LOOPMODE:
+                clip['loop_mode'] = int(value)
             elif col == self.COL_ORIGIN_X:
                 clip['origin'][0] = float(value)
             elif col == self.COL_ORIGIN_Y:
@@ -167,7 +171,8 @@ class ClipListModel(QAbstractTableModel):
 
     def add(self, name):
         self.beginInsertRows(QModelIndex(), len(self.clips), len(self.clips))
-        self.clips.append({ "name": name, "fps": 0.0, "frames": [], "origin": [0.0,0.0] })
+        global_origin = self.parent_model.get_global_origin(self.parent_row)
+        self.clips.append({ "name": name, "fps": 0.0, "loop_mode": 0, "frames": [], "origin": global_origin })
         self.endInsertRows()
         self.notify_changed()
 
@@ -236,6 +241,22 @@ class AnimationModel(QAbstractTableModel):
             
         return False
 
+    def get_global_origin(self, row: int):
+        x = self.data(self.index(row, self.COL_ORIGIN_X), Qt.ItemDataRole.EditRole)
+        y = self.data(self.index(row, self.COL_ORIGIN_Y), Qt.ItemDataRole.EditRole)
+        return [x, y]
+
+    @classmethod
+    def _normalize_clip_data(cls, name, v):
+        if not isinstance(v, dict):
+            v = {}
+        clip = { "name": name, **v }
+        clip.setdefault("fps", 0.0)
+        clip.setdefault("loop_mode", 0)
+        clip.setdefault("frames", [])
+        clip.setdefault("origin", [0.0,0.0])
+        return clip
+
     def load(self):
         self.beginResetModel()
         self._data_list = []
@@ -259,7 +280,7 @@ class AnimationModel(QAbstractTableModel):
                     
                     for k, v in data.items():
                         if k == '_meta': continue
-                        mapped_data["clips"].append({'name': k, **v})
+                        mapped_data["clips"].append(self._normalize_clip_data(k, v))
                     
                     self._data_list.append(mapped_data)
         self.endResetModel()

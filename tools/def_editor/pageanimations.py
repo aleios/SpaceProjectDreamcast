@@ -55,9 +55,13 @@ class pageAnimations(QWidget, Ui_pageAnimations):
             data_override=clips_data
         )
 
+        # Grab the global origin for the anim.
+        anim_row = self.fieldMapper.currentIndex()
+        global_origin = defsdb.animations.get_global_origin(anim_row)
+
         temp_clip_data = clips_data[clip_index]
         frames_model = defsdb.ClipFramesModel(temp_clip_data, clips_model_copy)
-        dlg = ClipDialog(clips_model_copy, clip_index, frames_model, self.tbTexture.text())
+        dlg = ClipDialog(clips_model_copy, clip_index, frames_model, global_origin, self.tbTexture.text())
         res = dlg.exec()
 
         if res:

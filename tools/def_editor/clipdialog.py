@@ -4,9 +4,11 @@ from ui.Clipdialog import Ui_clipDialog
 from tools.def_editor import defsdb
 
 class ClipDialog(QDialog, Ui_clipDialog):
-    def __init__(self, clips_model, clip_index, frames_model, texture, *args, **kwargs):
+    def __init__(self, clips_model, clip_index, frames_model, global_origin, texture, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+
+        self.global_origin = global_origin
 
         # Map clip data
         self.fieldMapper = QDataWidgetMapper(self)
@@ -16,6 +18,7 @@ class ClipDialog(QDialog, Ui_clipDialog):
 
         self.fieldMapper.addMapping(self.tbName, defsdb.ClipListModel.COL_NAME)
         self.fieldMapper.addMapping(self.sbFPS, defsdb.ClipListModel.COL_FPS)
+        self.fieldMapper.addMapping(self.cbLoopMode, defsdb.ClipListModel.COL_LOOPMODE, b"currentIndex")
         self.fieldMapper.addMapping(self.sbOriginX, defsdb.ClipListModel.COL_ORIGIN_X)
         self.fieldMapper.addMapping(self.sbOriginY, defsdb.ClipListModel.COL_ORIGIN_Y)
         self.fieldMapper.setCurrentIndex(clip_index)
@@ -86,4 +89,5 @@ class ClipDialog(QDialog, Ui_clipDialog):
             self.frames_model.shift_down(idx.row())
 
     def set_global_origin(self):
-        pass
+        self.sbOriginX.setValue(self.global_origin[0])
+        self.sbOriginY.setValue(self.global_origin[1])
