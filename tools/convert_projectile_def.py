@@ -10,6 +10,7 @@ def parse_proj_def(input_file, output_fname):
     animation = data.get("animation", "")
     animation_key = data.get("animation_key", "")
     damage = data.get("damage", 1)
+    rotates = data.get("rotates", False)
     
     with open(output_fname, "wb") as output_file:
         helpers.write_magicnum(output_file, 'PDEF')
@@ -17,6 +18,7 @@ def parse_proj_def(input_file, output_fname):
         helpers.write_str(output_file, animation)
         helpers.write_str(output_file, animation_key)
         helpers.write_ushort(output_file, damage)
+        helpers.write_ushort(output_file, rotates)
 
 
 def main():

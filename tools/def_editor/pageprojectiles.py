@@ -28,6 +28,7 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
 
         self.fieldMapper.addMapping(self.tbProjTexture, defsdb.ProjectileModel.COL_TEXTURE)
         self.fieldMapper.addMapping(self.sbDamage, defsdb.ProjectileModel.COL_DAMAGE)
+        self.fieldMapper.addMapping(self.cboxRotates, defsdb.ProjectileModel.COL_ROTATES)
 
         # Initial indices
         self.fieldMapper.setCurrentIndex(0)

@@ -47,8 +47,9 @@ bool projectiledef_init(projectiledef_t* def, const char* key) {
     def->clip = animation_get_clip(def->anim, name_buffer);
     fs_read(def_file, &def->damage, sizeof(uint16_t));
 
-    // TODO
-    def->sprite_rotates = true;
+    uint8_t rotates;
+    fs_read(def_file, &rotates, sizeof(rotates));
+    def->sprite_rotates = rotates > 0;
 
     return true;
 }
