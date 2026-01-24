@@ -15,6 +15,7 @@ typedef struct MenuOption {
     const char* label;
     void(*selected)();
     shz_vec2_t pos;
+    bool enabled;
 } menuoption_t;
 
 void mainmenu_start_select() {
@@ -49,14 +50,17 @@ menuoption_t menu_options[] = {
     {
         .label = "Start",
         .selected = mainmenu_start_select,
+        .enabled = false
     },
     {
         .label = "Select Level",
         .selected = mainmenu_level_select,
+        .enabled = true
     },
     {
         .label = "Options",
-        .selected = mainmenu_options_select
+        .selected = mainmenu_options_select,
+        .enabled = true
     },
 #ifdef BUILD_EDITOR
     {
@@ -70,18 +74,51 @@ size_t total_menu_options;
 spritefont_t* menu_font;
 cont_state_t prev_state;
 
-void mainmenu_next_option() {
-    if(current_menu_option < total_menu_options-1)
-        current_menu_option++;
+static bool mainmenu_any_enabled_option(void) {
+    for (size_t i = 0; i < total_menu_options; ++i) {
+        if (menu_options[i].enabled) return true;
+    }
+    return false;
 }
 
-void mainmenu_prev_option() {
-    if(current_menu_option > 0)
-        current_menu_option--;
+static void mainmenu_select_first_enabled(void) {
+    for (size_t i = 0; i < total_menu_options; ++i) {
+        if (menu_options[i].enabled) {
+            current_menu_option = (uint8_t)i;
+            return;
+        }
+    }
+    current_menu_option = 0; // fallback if everything is disabled
+}
+
+static void mainmenu_move_option(int direction) {
+    if (total_menu_options == 0)
+        return;
+    if (!mainmenu_any_enabled_option())
+        return;
+
+    size_t start = current_menu_option;
+
+    while (1) {
+        if (direction > 0) {
+            current_menu_option = (uint8_t)((current_menu_option + 1) % total_menu_options);
+        } else {
+            current_menu_option = (uint8_t)((current_menu_option + total_menu_options - 1) % total_menu_options);
+        }
+
+        if (menu_options[current_menu_option].enabled)
+            return;
+
+        if ((size_t)current_menu_option == start) {
+            return;
+        }
+    }
 }
 
 void mainmenu_select_option() {
-    menu_options[current_menu_option].selected();
+    if (menu_options[current_menu_option].enabled) {
+        menu_options[current_menu_option].selected();
+    }
 }
 
 void mainmenu_screen_init() {
@@ -107,6 +144,12 @@ void mainmenu_screen_init() {
         menu_options[i].pos = pen;
         pen.y += menu_font->cell_height;
     }
+
+    // Only enable 'Start' if there are level entries in the playlist.
+    if (g_gamesettings.total_levels > 0) {
+        menu_options[0].enabled = true;
+    }
+    mainmenu_select_first_enabled();
 }
 
 void mainmenu_screen_cleanup() {
@@ -114,7 +157,7 @@ void mainmenu_screen_cleanup() {
 }
 
 void mainmenu_screen_enter(void* data) {
-    current_menu_option = 0;
+    mainmenu_select_first_enabled();
     char mus_path[256];
     path_build_cd(mus_path, sizeof(mus_path), "music", "synth_kobra", "adx");
     soundengine_play_mus(mus_path, true);
@@ -132,19 +175,19 @@ void mainmenu_screen_step(float delta_time) {
         uint32_t pressed = state->buttons & ~prev_state.buttons;
 
         if(pressed & CONT_DPAD_DOWN) {
-            mainmenu_next_option();
+            mainmenu_move_option(1);
         }
         if(pressed & CONT_DPAD_UP) {
-            mainmenu_prev_option();
+            mainmenu_move_option(-1);
         }
 
         // TODO: Latch last 'states'
         const int threshold = 25;
         if((state->joyy > threshold) && !(prev_state.joyy > threshold)) {
-            mainmenu_next_option();
+            mainmenu_move_option(1);
         }
         if((state->joyy < -threshold) && !(prev_state.joyy < -threshold)) {
-            mainmenu_prev_option();
+            mainmenu_move_option(-1);
         }
 
         if(pressed & CONT_A) {
@@ -159,10 +202,10 @@ void mainmenu_screen_step(float delta_time) {
         kbd_state_t* state = maple_dev_status(kbd_dev);
 
         if(state->key_states[KBD_KEY_W].is_down && !state->key_states[KBD_KEY_W].was_down) {
-            mainmenu_prev_option();
+            mainmenu_move_option(-1);
         }
         if(state->key_states[KBD_KEY_S].is_down && !state->key_states[KBD_KEY_S].was_down) {
-            mainmenu_next_option();
+            mainmenu_move_option(1);
         }
     }
 }
@@ -173,6 +216,7 @@ void mainmenu_screen_render_op() {
 
 void mainmenu_screen_render_tr() {
     for(int i = 0; i < total_menu_options; ++i) {
-        spritefont_render(menu_font, menu_options[i].label, menu_options[i].pos, (current_menu_option == i) ? 0xFFFF0000 : 0xFFFFFFFF);
+        uint32_t col = (menu_options[i].enabled) ? ((current_menu_option == i) ? 0xFFFF0000 : 0xFFFFFFFF) : 0xFF333333;
+        spritefont_render(menu_font, menu_options[i].label, menu_options[i].pos, col);
     }
 }

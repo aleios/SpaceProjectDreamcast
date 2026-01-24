@@ -69,3 +69,7 @@ SHZ_FORCE_INLINE const char* gamesettings_get_level(int index) {
     }
     return g_gamesettings.playlist_levels[index];
 }
+
+SHZ_FORCE_INLINE int gamesettings_total_levels() {
+    return g_gamesettings.total_levels;
+}

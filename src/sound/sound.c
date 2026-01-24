@@ -182,9 +182,17 @@ uint32_t soundengine_get_sfx(const char* key) {
 }
 
 bool soundengine_play_sfx_ex(uint32_t handle, int volume) {
+    if (handle == SFXHND_INVALID) {
+        return false;
+    }
+
     return snd_sfx_play(handle, SHZ_MIN(volume, g_gamesettings.options.sfx_volume), 128) >= 0;
 }
 
 bool soundengine_play_sfx(uint32_t handle) {
+    if (handle == SFXHND_INVALID) {
+        return false;
+    }
+
     return snd_sfx_play(handle, g_gamesettings.options.sfx_volume, 128) >= 0;
 }
