@@ -30,7 +30,9 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
 
         if weapon_set:
             self.weapon_set = copy.deepcopy(weapon_set)
+            self.orig_name = weapon_set['name']
         else:
+            self.orig_name = ''
             self.weapon_set = { "name": "", "emitters": [] }
 
         self.tbName.setText(self.weapon_set.get('name', ''))
@@ -86,7 +88,7 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
         self.weapon_set['name'] = name
         if name == '':
             self._validation_error("Must pick a valid name")
-        elif [x for x in defsdb.game_settings.weapons if x['name'] == name]:
+        elif (self.orig_name is not None and name != self.orig_name) and [x for x in defsdb.game_settings.weapons if x['name'] == name]:
             self._validation_error(f"{name} already exists")
         else:
             self._clear_error()
