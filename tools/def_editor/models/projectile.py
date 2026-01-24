@@ -13,3 +13,9 @@ class ProjectileModel(DefModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__("projectile", self.MAP, *args, **kwargs)
+
+    def set_animation(self, row, anim):
+        self.setData(self.index(row, self.COL_ANIM), anim)
+
+    def set_animation_clip(self, row, clip):
+        self.setData(self.index(row, self.COL_ANIM_KEY), clip)

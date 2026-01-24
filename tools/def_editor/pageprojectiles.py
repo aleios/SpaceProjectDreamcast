@@ -27,9 +27,36 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
         self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
 
         self.fieldMapper.addMapping(self.tbProjTexture, defsdb.ProjectileModel.COL_TEXTURE)
-        self.fieldMapper.addMapping(self.tbProjAnimation, defsdb.ProjectileModel.COL_ANIM)
-        self.fieldMapper.addMapping(self.tbProjAnimationKey, defsdb.ProjectileModel.COL_ANIM_KEY)
         self.fieldMapper.addMapping(self.sbDamage, defsdb.ProjectileModel.COL_DAMAGE)
+
+        # Initial indices
+        self.fieldMapper.setCurrentIndex(0)
+        self.cbAnimation.setCurrentIndex(0)
+
+        self.cbAnimation.setModel(defsdb.animations)
+        self.cbAnimation.currentIndexChanged.connect(self.on_animation_changed)
+        self.cbAnimationClip.currentIndexChanged.connect(self.on_animation_clip_changed)
+
+    def on_animation_changed(self, index):
+        if index < 0 or self.cbAnimation.signalsBlocked():
+            return
+
+        # Set clips list
+        model = defsdb.animations.get_clip_list_model(index)
+        self.cbAnimationClip.setModel(model)
+
+        # Get projectile index
+        proj_idx = self.lvProjectiles.currentIndex()
+        if proj_idx.isValid():
+            defsdb.projectile_defs.set_animation(proj_idx.row(), self.cbAnimation.currentText())
+
+    def on_animation_clip_changed(self, index):
+        if index < 0 or self.cbAnimationClip.signalsBlocked():
+            return
+
+        proj_idx = self.lvProjectiles.currentIndex()
+        if proj_idx.isValid():
+            defsdb.projectile_defs.set_animation_clip(proj_idx.row(), self.cbAnimationClip.currentText())
 
     def add_projectile(self):
         val, res = QInputDialog.getText(self, "Add projectile...", "Name")
@@ -44,9 +71,26 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
 
     def selection_changed(self, new, prev):
         if new.isValid():
-            print(defsdb.projectile_defs._data_list[new.row()])
+            data = defsdb.projectile_defs._data_list[new.row()]
+
+            self.cbAnimation.blockSignals(True)
+            self.cbAnimationClip.blockSignals(True)
 
             self.fieldMapper.setCurrentIndex(new.row())
+            self.cbAnimation.setCurrentText(data.get('animation', ""))
+
+            # Change anim and clip
+            anim_index = self.cbAnimation.currentIndex()
+            if anim_index >= 0:
+                model = defsdb.animations.get_clip_list_model(anim_index)
+                self.cbAnimationClip.setModel(model)
+                self.cbAnimationClip.setCurrentText(data.get('animation_key', ""))
+            else:
+                self.cbAnimationClip.setModel(None)
+
+            self.cbAnimation.blockSignals(False)
+            self.cbAnimationClip.blockSignals(False)
+
             self.controlStack.setCurrentIndex(1)
         else:
             self.controlStack.setCurrentIndex(0)

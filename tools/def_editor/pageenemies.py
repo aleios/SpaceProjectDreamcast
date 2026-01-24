@@ -22,12 +22,17 @@ class pageEnemies(QWidget, Ui_pageEnemies):
 
         # Map fields to controls
         self.fieldMapper.addMapping(self.tbTexture, defsdb.EnemyModel.COL_TEXTURE)
-        self.fieldMapper.addMapping(self.tbAnimation, defsdb.EnemyModel.COL_ANIM)
-        self.fieldMapper.addMapping(self.tbIdleKey, defsdb.EnemyModel.COL_IDLE_KEY)
-        self.fieldMapper.addMapping(self.tbLeftKey, defsdb.EnemyModel.COL_LEFT_KEY)
-        self.fieldMapper.addMapping(self.tbRightKey, defsdb.EnemyModel.COL_RIGHT_KEY)
         self.fieldMapper.addMapping(self.sbHealth, defsdb.EnemyModel.COL_HEALTH)
         self.fieldMapper.addMapping(self.sbColliderRadius, defsdb.EnemyModel.COL_COLLISION_RADIUS)
+
+        # Model animation
+        self.cbAnimation.setModel(defsdb.animations)
+        self.cbAnimation.setCurrentIndex(0)
+        self.cbAnimation.currentIndexChanged.connect(self.on_animation_changed)
+
+        self.cbIdleClip.currentIndexChanged.connect(self.on_idle_clip_changed)
+        self.cbLeftClip.currentIndexChanged.connect(self.on_left_clip_changed)
+        self.cbRightClip.currentIndexChanged.connect(self.on_right_clip_changed)
 
         # Map events model
         self.events_model = QStandardItemModel()
@@ -42,6 +47,46 @@ class pageEnemies(QWidget, Ui_pageEnemies):
         # Add enemies
         self.btnAddEnemy.clicked.connect(self.add_enemy)
 
+    def on_animation_changed(self, index):
+        if index < 0 or self.cbAnimation.signalsBlocked():
+            return
+
+        # Set clips list
+        model = defsdb.animations.get_clip_list_model(index, include_empty=False)
+        self.cbIdleClip.setModel(model)
+
+        model_with_empty = defsdb.animations.get_clip_list_model(index, include_empty=True)
+        self.cbLeftClip.setModel(model_with_empty)
+        self.cbRightClip.setModel(model_with_empty)
+
+        # Get enemy index
+        enemy_idx = self.lvEnemies.currentIndex()
+        if enemy_idx.isValid():
+            defsdb.enemy_defs.set_animation(enemy_idx.row(), self.cbAnimation.currentText())
+
+    def on_idle_clip_changed(self, index):
+        if index < 0 or self.cbIdleClip.signalsBlocked():
+            return
+
+        enemy_idx = self.lvEnemies.currentIndex()
+        if enemy_idx.isValid():
+            defsdb.enemy_defs.set_idle_key(enemy_idx.row(), self.cbIdleClip.currentText())
+
+    def on_left_clip_changed(self, index):
+        if index < 0 or self.cbLeftClip.signalsBlocked():
+            return
+
+        enemy_idx = self.lvEnemies.currentIndex()
+        if enemy_idx.isValid():
+            defsdb.enemy_defs.set_left_key(enemy_idx.row(), self.cbLeftClip.currentText())
+
+    def on_right_clip_changed(self, index):
+        if index < 0 or self.cbRightClip.signalsBlocked():
+            return
+
+        enemy_idx = self.lvEnemies.currentIndex()
+        if enemy_idx.isValid():
+            defsdb.enemy_defs.set_right_key(enemy_idx.row(), self.cbRightClip.currentText())
 
     def add_enemy(self):
         print(defsdb.game_settings_model.data_obj)
@@ -57,7 +102,38 @@ class pageEnemies(QWidget, Ui_pageEnemies):
 
     def selection_changed(self, new, prev):
         if new.isValid():
+            data = defsdb.enemy_defs._data_list[new.row()]
+
+            self.cbAnimation.blockSignals(True)
+            self.cbIdleClip.blockSignals(True)
+            self.cbLeftClip.blockSignals(True)
+            self.cbRightClip.blockSignals(True)
+
             self.fieldMapper.setCurrentIndex(new.row())
+            self.cbAnimation.setCurrentText(data.get('animation', ""))
+
+            anim_index = self.cbAnimation.currentIndex()
+            if anim_index >= 0:
+                model = defsdb.animations.get_clip_list_model(anim_index)
+                self.cbIdleClip.setModel(model)
+
+                model_with_empty = defsdb.animations.get_clip_list_model(anim_index, include_empty=True)
+                self.cbLeftClip.setModel(model_with_empty)
+                self.cbRightClip.setModel(model_with_empty)
+
+                self.cbIdleClip.setCurrentText(data.get('idle_key', ""))
+                self.cbLeftClip.setCurrentText(data.get('left_key', ""))
+                self.cbRightClip.setCurrentText(data.get('right_key', ""))
+            else:
+                self.cbIdleClip.setModel(None)
+                self.cbLeftClip.setModel(None)
+                self.cbRightClip.setModel(None)
+
+            self.cbAnimation.blockSignals(False)
+            self.cbIdleClip.blockSignals(False)
+            self.cbLeftClip.blockSignals(False)
+            self.cbRightClip.blockSignals(False)
+
             self.controlStack.setCurrentIndex(1)
         else:
             self.controlStack.setCurrentIndex(0)

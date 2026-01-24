@@ -19,3 +19,15 @@ class EnemyModel(DefModel):
 
     def add_event_cmd(self, index, cmd):
         pass
+
+    def set_animation(self, row, anim):
+        self.setData(self.index(row, self.COL_ANIM), anim)
+
+    def set_idle_key(self, row, key):
+        self.setData(self.index(row, self.COL_IDLE_KEY), key)
+
+    def set_left_key(self, row, key):
+        self.setData(self.index(row, self.COL_LEFT_KEY), key)
+
+    def set_right_key(self, row, key):
+        self.setData(self.index(row, self.COL_RIGHT_KEY), key)

@@ -98,10 +98,11 @@ class ClipFramesModel(QAbstractTableModel):
 class ClipListModel(QAbstractTableModel):
     COL_NAME, COL_FPS, COL_LOOPMODE, COL_ORIGIN_X, COL_ORIGIN_Y = range(5)
 
-    def __init__(self, parent_model, parent_row, data_override=None):
+    def __init__(self, parent_model, parent_row, data_override=None, include_empty=False):
         super().__init__()
         self.parent_model = parent_model
         self.parent_row = parent_row
+        self.include_empty = include_empty
 
         if data_override is not None:
             self.clips = data_override
@@ -109,18 +110,33 @@ class ClipListModel(QAbstractTableModel):
             self.clips = parent_model._data_list[parent_row]['clips']
 
     def rowCount(self, parent=QModelIndex()):
-        return len(self.clips)
+        return len(self.clips) + (1 if self.include_empty else 0)
     
     def columnCount(self, parent=QModelIndex()):
         return 5
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
-        if not index.isValid() or not (0 <= index.row() < len(self.clips)):
+        if not index.isValid():
             return None
         
+        row = index.row()
+        if self.include_empty:
+            if row < 0 or row > len(self.clips):
+                return None
+            if row == 0:
+                if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+                    if index.column() == self.COL_NAME:
+                        return ""
+                return None
+            data_row = row - 1
+        else:
+            if row < 0 or row >= len(self.clips):
+                return None
+            data_row = row
+
         if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
             col = index.column()
-            clip = self.clips[index.row()]
+            clip = self.clips[data_row]
             
             if col == self.COL_NAME:
                 return clip.get('name', "")
@@ -137,9 +153,16 @@ class ClipListModel(QAbstractTableModel):
 
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
-            col = index.column()
             row = index.row()
-            clip = self.clips[row]
+            if self.include_empty:
+                if row == 0:
+                    return False
+                data_row = row - 1
+            else:
+                data_row = row
+
+            col = index.column()
+            clip = self.clips[data_row]
 
             if col == self.COL_NAME:
                 clip['name'] = str(value)
@@ -160,9 +183,15 @@ class ClipListModel(QAbstractTableModel):
         return False
 
     def flags(self, index):
+        if self.include_empty and index.row() == 0:
+            return super().flags(index)
         return super().flags(index) | Qt.ItemFlag.ItemIsEditable
 
     def get_clip_data(self, row):
+        if self.include_empty:
+            if row == 0:
+                return None
+            return self.clips[row - 1]
         return self.clips[row]
 
     def notify_changed(self):
@@ -285,8 +314,8 @@ class AnimationModel(QAbstractTableModel):
                     self._data_list.append(mapped_data)
         self.endResetModel()
 
-    def get_clip_list_model(self, row):
-        return ClipListModel(self, row)
+    def get_clip_list_model(self, row, include_empty=False):
+        return ClipListModel(self, row, include_empty=include_empty)
 
     def save(self, assets_path):
         base_path = os.path.join(assets_path, self.folder)
