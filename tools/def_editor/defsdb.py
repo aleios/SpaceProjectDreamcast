@@ -290,6 +290,7 @@ class AnimationModel(QAbstractTableModel):
 
     def save(self, assets_path):
         base_path = os.path.join(assets_path, self.folder)
+        os.makedirs(base_path, exist_ok=True)
         for item in self._data_list:
             if item['modified']:
                 tex = item.get('texture', None)
