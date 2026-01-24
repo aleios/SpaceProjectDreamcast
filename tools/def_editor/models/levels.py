@@ -45,13 +45,13 @@ class LevelEventsModel(QAbstractListModel):
 
         event_wrapper = self.events[index.row()]
         event_data = event_wrapper.get('event', {})
-        
+
         if role == Qt.ItemDataRole.DisplayRole:
             etype = event_data.get('type', 'unknown')
             if etype == 'spawn':
                 return f"spawn: {event_data.get('def', '???')}"
             return etype
-        
+
         return None
 
 class LevelsModel(QAbstractTableModel):
@@ -196,3 +196,7 @@ class LevelsModel(QAbstractTableModel):
                 item['modified'] = False
                 mod_idx = self.index(row, self.COL_MODIFIED)
                 self.dataChanged.emit(mod_idx, mod_idx, [Qt.ItemDataRole.DisplayRole])
+
+    def exists(self, key):
+        return bool([x for x in self.levels if x['name'] == key]) or os.path.isfile(
+            defsdb.assets_path + "/levels/" + key + ".json")

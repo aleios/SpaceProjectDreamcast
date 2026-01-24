@@ -4,6 +4,8 @@ import glob
 import json
 import copy
 
+from tools.def_editor import defsdb
+
 META_KEYS = [
     'name',
     'modified'
@@ -148,3 +150,6 @@ class DefModel(QAbstractTableModel):
             if item.get('name') == name:
                 return item
         return None
+
+    def exists(self, key):
+        return bool([x for x in self._data_list if x['name'] == key]) or os.path.isfile(f'{defsdb.assets_path}/defs/{self.folder}/{key}.json')

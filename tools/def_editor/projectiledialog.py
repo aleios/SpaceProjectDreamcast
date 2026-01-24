@@ -1,5 +1,5 @@
-from PyQt6.QtCore import QModelIndex, Qt, QStringListModel
-from PyQt6.QtWidgets import QDialog, QFileDialog
+from PyQt6.QtCore import QModelIndex, Qt, QStringListModel, QTimer
+from PyQt6.QtWidgets import QDialog, QFileDialog, QToolTip
 from ui.Projectiledialog import Ui_projectileDialog
 import os
 from tools.def_editor import defsdb
@@ -49,6 +49,7 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
 
     def name_changed(self, text):
         self.weapon_set['name'] = text
+        self._clear_error()
 
     def add_emitter(self):
         new_emitter = {
@@ -79,3 +80,27 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
             self.widget.set_emitter(emitter)
         else:
             self.stackedControls.setCurrentIndex(0)
+
+    def accept(self):
+        name = self.tbName.text().strip()
+        self.weapon_set['name'] = name
+        if name == '':
+            self._validation_error("Must pick a valid name")
+        elif [x for x in defsdb.game_settings.weapons if x['name'] == name]:
+            self._validation_error(f"{name} already exists")
+        else:
+            self._clear_error()
+            super().accept()
+
+    def _validation_error(self, msg):
+        self.tbName.setStyleSheet("border: 1px solid red;")
+        self.tbName.setFocus()
+        self.tbName.selectAll()
+
+        QTimer.singleShot(0, lambda: QToolTip.showText(
+            self.tbName.mapToGlobal(self.tbName.rect().bottomLeft()),
+            msg,
+            self.tbName
+        ))
+    def _clear_error(self):
+        self.tbName.setStyleSheet("")

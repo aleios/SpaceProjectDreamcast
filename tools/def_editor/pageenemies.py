@@ -90,10 +90,10 @@ class pageEnemies(QWidget, Ui_pageEnemies):
 
     def add_enemy(self):
         val, res = QInputDialog.getText(self, "Add enemy...", "Name")
+        val = val.strip()
 
         if res:
-            matches = [x for x in defsdb.enemy_defs._data_list if x['name'] == val]
-            if matches or os.path.isfile(defsdb.assets_path + "/defs/enemy/" + val + ".json"):
+            if defsdb.enemy_defs.exists(val):
                 QMessageBox.critical(self, "Error", "Error: Item already exists.")
             else:
                 initial_data = { "name": val, "health": 1, "collision_radius": 1.0 }

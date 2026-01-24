@@ -383,6 +383,9 @@ class AnimationModel(QAbstractTableModel):
         })
         self.endInsertRows()
 
+    def exists(self, key):
+        return bool([x for x in self._data_list if x['name'] == key]) or os.path.isfile(assets_path + "/animations/" + key + ".json")
+
 #
 # -- Game settings models --
 #

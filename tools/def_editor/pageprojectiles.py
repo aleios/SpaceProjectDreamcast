@@ -61,10 +61,10 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
 
     def add_projectile(self):
         val, res = QInputDialog.getText(self, "Add projectile...", "Name")
+        val = val.strip()
 
         if res:
-            matches = [x for x in defsdb.projectile_defs._data_list if x['name'] == val]
-            if matches or os.path.isfile(defsdb.assets_path + "/defs/projectile/" + val + ".json"):
+            if defsdb.projectile_defs.exists(val):
                 QMessageBox.critical(self, "Error", "Error: Item already exists.")
             else:
                 initial_data = { "name": val, "damage": 1 }

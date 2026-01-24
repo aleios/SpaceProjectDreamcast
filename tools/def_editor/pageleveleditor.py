@@ -36,9 +36,9 @@ class pageLevelEditor(QWidget, Ui_pageLevelEditor):
 
     def add_level(self):
         val, res = QInputDialog.getText(self, "Add Level...", "Name")
+        val = val.strip()
         if res:
-            matches = [x for x in defsdb.levels.levels if x['name'] == val]
-            if matches or os.path.isfile(defsdb.assets_path + "/levels/" + val + ".json"):
+            if defsdb.levels.exists(val):
                 QMessageBox.critical(self, "Error", "Error: Item already exists.")
             else:
                 defsdb.levels.add(val)

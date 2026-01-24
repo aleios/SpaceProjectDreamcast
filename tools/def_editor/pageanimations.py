@@ -1,4 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QAbstractItemView, QInputDialog
+import os
+
+from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QAbstractItemView, QInputDialog, QMessageBox
 from PyQt6.QtCore import Qt
 from ui.Animations import Ui_pageAnimations
 from clipdialog import ClipDialog
@@ -94,6 +96,10 @@ class pageAnimations(QWidget, Ui_pageAnimations):
 
     def add_animation(self):
         val, res = QInputDialog.getText(self, "Add animation...", "Name")
+        val = val.strip()
 
         if res:
-            defsdb.animations.add(val)
+            if defsdb.animations.exists(val):
+                QMessageBox.critical(self, "Error", "Error: Item already exists.")
+            else:
+                defsdb.animations.add(val)
