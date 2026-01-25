@@ -10,6 +10,7 @@
 #include "../gamesettings.h"
 #include "../cache/resourcecache.h"
 #include "../util/readutils.h"
+#include "../util/math.h"
 
 typedef struct SoundEffect {
     char* key;
@@ -90,7 +91,7 @@ void soundengine_resume_mus() {
 }
 
 void soundengine_step(float delta_time) {
-    const int vol = SHZ_MIN(g_gamesettings.options.music_volume, 255);
+    const int vol = imin32(g_gamesettings.options.music_volume, 255);
 
     if (g_soundEngine.fading_out > 0.0f) {
         if (!adx_is_playing()) {
@@ -186,7 +187,7 @@ bool soundengine_play_sfx_ex(uint32_t handle, int volume) {
         return false;
     }
 
-    return snd_sfx_play(handle, SHZ_MIN(volume, g_gamesettings.options.sfx_volume), 128) >= 0;
+    return snd_sfx_play(handle, imin32(volume, g_gamesettings.options.sfx_volume), 128) >= 0;
 }
 
 bool soundengine_play_sfx(uint32_t handle) {

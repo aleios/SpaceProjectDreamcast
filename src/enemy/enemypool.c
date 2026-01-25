@@ -1,7 +1,8 @@
 #include "enemypool.h"
+#include "../util/math.h"
 
 void enemypool_init(enemypool_t* pool, int initial_capacity) {
-    pool->capacity = SHZ_MAX(8, initial_capacity);
+    pool->capacity = imax32(8, initial_capacity);
     pool->total = 0;
     pool->enemies = malloc(sizeof(enemy_t*) * pool->capacity);
 }

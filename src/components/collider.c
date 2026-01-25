@@ -24,8 +24,8 @@ bool collider_test_circle(circlecollider_t* a, circlecollider_t* b) {
 }
 
 bool collider_test_circle_box(circlecollider_t* a, boxcollider_t* b) {
-    float close_x = SHZ_CLAMP(a->center.x, b->x, b->x + b->z);
-    float close_y = SHZ_CLAMP(a->center.y, b->y, b->y + b->w);
+    float close_x = shz_clampf(a->center.x, b->x, b->x + b->z);
+    float close_y = shz_clampf(a->center.y, b->y, b->y + b->w);
 
     float dist_x = a->center.x - close_x;
     float dist_y = a->center.y - close_y;

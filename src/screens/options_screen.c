@@ -4,6 +4,7 @@
 #include "screens.h"
 #include "../gamesettings.h"
 #include "../cache/caches.h"
+#include "../util/math.h"
 
 typedef enum OptionItemType {
     OPTION_ITEM_BUTTON,
@@ -131,7 +132,7 @@ void options_screen_step(float delta_time) {
             if (option->type == OPTION_ITEM_NUMERIC) {
                 int new_val = (state->dpad_left ? -1 : 1) * option->numeric.step;
                 option->numeric.value += new_val;
-                option->numeric.value = SHZ_CLAMP(option->numeric.value, option->numeric.min, option->numeric.max);
+                option->numeric.value = iclamp32(option->numeric.value, option->numeric.min, option->numeric.max);
                 if (option->numeric.changed)
                     option->numeric.changed(option->numeric.value);
             } else if (option->type == OPTION_ITEM_BOOLEAN) {
