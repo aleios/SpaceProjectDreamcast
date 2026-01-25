@@ -1,6 +1,6 @@
 # SPJ - Space Project (yeah...)
 
-Small demo space SHMUP for the Dreamcast. Uses KallistiOS and SH4ZAM.
+Small demo space SHMUP for the Dreamcast. Uses [KallistiOS](https://github.com/KallistiOS) and [SH4ZAM](https://github.com/gyrovorbis/sh4zam).
 
 The code here should not be considered as a reference for anything good. It's god awful and is the product of hacking around to get used to KOS, SH4ZAM and the PVR.
 
@@ -89,6 +89,6 @@ License: OFL 1.1 (OFL-NotoSansJP.txt)
 
 ## Special Thanks
 
-- Falco Girgis (Gyrovorbis) for sh4zam and the 1000 other examples of using the pvr
+- Falco Girgis ([Gyrovorbis](https://github.com/gyrovorbis)) for [sh4zam](https://github.com/gyrovorbis/sh4zam) and the 1000 other examples of using the pvr
 - sizious and nextgeniuspro for libadx(+modifications)
-- KallistiOS contributors
+- [KallistiOS](https://github.com/KallistiOS) contributors
