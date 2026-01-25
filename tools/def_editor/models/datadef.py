@@ -27,7 +27,7 @@ class DefModel(QAbstractTableModel):
     def columnCount(self, parent=None):
         return len(self._COLUMN_MAP)
     
-    def data(self, index, role):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid() or index.row() >= len(self._data_list):
             return None
 
