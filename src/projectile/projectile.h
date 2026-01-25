@@ -3,6 +3,8 @@
 #include "../components/sprite.h"
 #include "../components/collider.h"
 #include "../animator.h"
+#include "../entityid.h"
+#include "../defs/projectile_data.h"
 
 typedef struct Projectile {
     float lifetime;
@@ -13,8 +15,11 @@ typedef struct Projectile {
     circlecollider_t collider;
     animator_t animator;
 
+    float speed;
     shz_vec2_t velocity;
     float rotation;
-    
-    shz_vec2_t* target;
+
+    entityid_t target_uid;
+    projectiletrackingtype_t tracking_type;
+    float targeting_delay;
 } projectile_t;

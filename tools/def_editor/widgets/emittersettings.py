@@ -12,6 +12,7 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
         self.setupUi(self)
 
         self.cbProjectile.setModel(defsdb.projectile_defs)
+        self.cbTarget.currentIndexChanged.connect(self.target_updated)
 
         self.model = EmitterModel()
         self.mapper = QDataWidgetMapper()
@@ -27,8 +28,23 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
         self.mapper.addMapping(self.sbOffsetX, EmitterModel.COL_OFFSETX)
         self.mapper.addMapping(self.sbOffsetY, EmitterModel.COL_OFFSETY)
 
+        self.mapper.addMapping(self.cbTarget, EmitterModel.COL_TARGET, b"currentIndex")
+
+        self.mapper.addMapping(self.cbTracking, EmitterModel.COL_TARGET_TRACKING, b"currentIndex")
+        self.mapper.addMapping(self.sbTrackingDelay, EmitterModel.COL_TRACKING_DELAY)
+
         self.btnCopyEmitter.clicked.connect(self.copy_emitter)
         self.btnPasteEmitter.clicked.connect(self.paste_emitter)
+
+        self.mapper.setCurrentIndex(0)
+
+        self.target_updated(self.cbTarget.currentIndex())
+
+    def target_updated(self, index):
+        if index == 0:
+            self.targetStack.setCurrentIndex(0)
+        else:
+            self.targetStack.setCurrentIndex(1)
 
     def set_emitter(self, emitter_dict):
         self.model.set_data(emitter_dict)
@@ -39,7 +55,7 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
             return
         
         clipboard = QGuiApplication.clipboard()
-        clipboard.setText(json.dumps(self.model.data_dict))
+        clipboard.setText(json.dumps(self.model.export_data()))
 
     def paste_emitter(self):
         clipboard = QGuiApplication.clipboard()

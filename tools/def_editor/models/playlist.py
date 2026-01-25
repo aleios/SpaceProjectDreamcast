@@ -1,11 +1,9 @@
-from PyQt6.QtCore import QModelIndex, QAbstractTableModel, Qt
-from tools.def_editor import defsdb
-
+from PyQt6.QtCore import QModelIndex, QAbstractTableModel, Qt, QMimeData
 
 class PlaylistModel(QAbstractTableModel):
     mimeType = "application/x-playlist-item"
 
-    def __init__(self, data_obj: defsdb.GameSettingsData, parent=None):
+    def __init__(self, data_obj, parent=None):
         super().__init__(parent)
         self.data_obj = data_obj
 

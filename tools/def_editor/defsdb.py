@@ -401,6 +401,17 @@ class GameSettingsData:
     def to_dict(self):
         d = asdict(self)
         d.pop('modified', None)
+        
+        # Prune emitter keys that we don't need.
+        from tools.def_editor.models.emitter import EmitterModel
+        model = EmitterModel()
+        for weapon in d.get('weapons', []):
+            for emitter in weapon.get('emitters', []):
+                model.set_data(emitter)
+                pruned = model.export_data()
+                emitter.clear()
+                emitter.update(pruned)
+
         return d
     
     def from_dict(self, data: dict):

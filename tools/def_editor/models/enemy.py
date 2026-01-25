@@ -1,4 +1,4 @@
-from models.datadef import DefModel
+from .datadef import DefModel
 
 class EnemyModel(DefModel):
     COL_NAME, COL_MODIFIED, COL_TEXTURE, COL_ANIM, COL_IDLE_KEY, COL_LEFT_KEY, COL_RIGHT_KEY, COL_HEALTH, COL_COLLISION_RADIUS, COL_EVENTS = range(10)

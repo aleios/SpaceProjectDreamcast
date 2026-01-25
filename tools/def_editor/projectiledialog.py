@@ -56,14 +56,15 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
     def add_emitter(self):
         new_emitter = {
             "name": f"Emitter {len(self.weapon_set.get('emitters', [])) + 1}",
-            "projectile": "",
+            "projectile": defsdb.projectile_defs.data(
+                defsdb.projectile_defs.index(0, defsdb.ProjectileModel.COL_NAME), Qt.ItemDataRole.DisplayRole),
             "spawns_per_step": 1,
             "delay": 100,
             "start_angle": 0.0,
             "step_angle": 0.0,
             "speed": 1.0,
             "lifetime": 1000,
-            "offset": [0.0, 0.0]
+            "offset": [0.0, 0.0],
         }
         if 'emitters' not in self.weapon_set:
             self.weapon_set['emitters'] = []

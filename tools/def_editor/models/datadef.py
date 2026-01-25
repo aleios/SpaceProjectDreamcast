@@ -4,8 +4,6 @@ import glob
 import json
 import copy
 
-from tools.def_editor import defsdb
-
 META_KEYS = [
     'name',
     'modified'
@@ -109,6 +107,18 @@ class DefModel(QAbstractTableModel):
                 path = os.path.join(base_path, f"{item['name']}.json")
                 save_data = copy.deepcopy(item)
                 for k in META_KEYS: save_data.pop(k, None)
+
+                # Handle specific case for StartFiring event. Need to prune the emitter keys
+                # TODO: Need a better way of handling this... maybe an override
+                if self.folder == "enemy":
+                    from tools.def_editor.models.emitter import EmitterModel
+                    model = EmitterModel()
+                    for event in save_data.get('events', []):
+                        if event.get('type') == 'StartFiring':
+                            model.set_data(event)
+                            pruned = model.export_data()
+                            event.clear()
+                            event.update(pruned)
                 
                 with open(path, "w") as f:
                     json.dump(save_data, f, indent=2, separators=(',', ': '))
@@ -152,4 +162,5 @@ class DefModel(QAbstractTableModel):
         return None
 
     def exists(self, key):
+        from tools.def_editor import defsdb
         return bool([x for x in self._data_list if x['name'] == key]) or os.path.isfile(f'{defsdb.assets_path}/defs/{self.folder}/{key}.json')

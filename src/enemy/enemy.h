@@ -1,15 +1,14 @@
 #pragma once
 #include "../components/sprite.h"
-#include "../components/health.h"
 #include "../components/collider.h"
 #include "../animator.h"
-
 #include "enemy_def.h"
 #include "vm.h"
-#include "../defs/projectile_def.h"
+#include "../entityid.h"
 
 typedef struct Enemy {
     int pool_index;
+    entityid_t uid;
     bool is_dead;
     int health;
     bool is_immune;
