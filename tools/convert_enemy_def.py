@@ -21,7 +21,7 @@ def target_to_byte(target):
     if t == "point": return 0
     if t == "player_initial": return 1
     if t == "player_target": return 2
-    if t == "directional": return 3
+    if t == "direction": return 3
     if t == "sine": return 4
     return 0
 
@@ -45,7 +45,7 @@ def write_events(output_file, events):
             if target.lower() == "point":
                 helpers.write_float(output_file, event.get('x', 0.0))
                 helpers.write_float(output_file, event.get('y', 0.0))
-            elif target.lower() == "directional":
+            elif target.lower() == "direction":
                 helpers.write_float(output_file, math.radians(event.get('angle', 0.0)))
                 helpers.write_float(output_file, math.radians(event.get('angle_step', 0.0)))
                 helpers.write_float(output_file, event.get('duration', 0.0))
