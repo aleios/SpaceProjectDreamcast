@@ -205,6 +205,9 @@ class ClipListModel(QAbstractTableModel):
         self.endInsertRows()
         self.notify_changed()
 
+    def exists(self, key):
+        return bool([x for x in self.clips if x['name'] == key])
+
 class AnimationModel(QAbstractTableModel):
     COL_NAME, COL_MODIFIED, COL_TEXTURE, COL_ORIGIN, COL_ORIGIN_X, COL_ORIGIN_Y, COL_CLIPS = range(7)
 

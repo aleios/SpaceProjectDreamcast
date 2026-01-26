@@ -1,10 +1,11 @@
-from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene
+from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsRectItem
 from PyQt6.QtGui import QPixmap, QMouseEvent, QPen
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from tools.def_editor import defsdb
 import os
 
 class AnimFrameEditor(QGraphicsView):
+    selectionChanged = pyqtSignal(float, float, float, float)
     def __init__(self, parent=None):
         super().__init__(parent)
         self.tex_path = None
@@ -19,7 +20,7 @@ class AnimFrameEditor(QGraphicsView):
         self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
 
-        self.selection_rect = None
+        self.selection_rect: QGraphicsRectItem | None = None
         self.origin_plus = []
 
     def set_texture(self, tex):
@@ -59,6 +60,12 @@ class AnimFrameEditor(QGraphicsView):
                 event.modifiers()
             )
             super().mousePressEvent(fake_event)
+        if event.button() == Qt.MouseButton.LeftButton:
+            if not self.selection_rect:
+                return
+            self.selection_rect.setPos(self.mapToScene(event.position().toPoint()))
+            self.selectionChanged.emit(self.selection_rect.x(), self.selection_rect.y(),
+                                       self.selection_rect.rect().width(), self.selection_rect.rect().height())
         else:
             super().mousePressEvent(event)
 
@@ -80,7 +87,8 @@ class AnimFrameEditor(QGraphicsView):
         pen = QPen(Qt.GlobalColor.red, 2)
         pen.setCosmetic(True)
         
-        self.selection_rect = self._scene.addRect(x, y, w, h, pen)
+        self.selection_rect = self._scene.addRect(0, 0, w, h, pen)
+        self.selection_rect.setPos(x, y)
 
         if origin_x is not None and origin_y is not None:
             plus_pen = QPen(Qt.GlobalColor.blue, 2)

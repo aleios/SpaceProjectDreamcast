@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog, QDataWidgetMapper
+from PyQt6.QtWidgets import QDialog, QDataWidgetMapper, QMessageBox
 from PyQt6.QtCore import Qt
 from ui.Clipdialog import Ui_clipDialog
 from tools.def_editor import defsdb
@@ -9,6 +9,9 @@ class ClipDialog(QDialog, Ui_clipDialog):
         self.setupUi(self)
 
         self.global_origin = global_origin
+        self.clips_model = clips_model
+        self.clip_index = clip_index
+        self.orig_name = clips_model.data(clips_model.index(clip_index, defsdb.ClipListModel.COL_NAME))
 
         # Map clip data
         self.fieldMapper = QDataWidgetMapper(self)
@@ -49,12 +52,29 @@ class ClipDialog(QDialog, Ui_clipDialog):
         self.btnSetGlobalOrigin.clicked.connect(self.set_global_origin)
 
         self.gvTexture.set_texture(texture)
+        self.gvTexture.selectionChanged.connect(self.coords_changed)
         self.sbX.valueChanged.connect(self.update_editor_rect)
         self.sbY.valueChanged.connect(self.update_editor_rect)
         self.sbW.valueChanged.connect(self.update_editor_rect)
         self.sbH.valueChanged.connect(self.update_editor_rect)
         self.sbOriginX.valueChanged.connect(self.update_editor_rect)
         self.sbOriginY.valueChanged.connect(self.update_editor_rect)
+
+        # Initially disable frame controls until a frame is selected
+        self.set_frame_controls(False)
+
+    def set_frame_controls(self, enabled: bool):
+        disabled = not enabled
+        self.sbX.setDisabled(disabled)
+        self.sbY.setDisabled(disabled)
+        self.sbW.setDisabled(disabled)
+        self.sbH.setDisabled(disabled)
+
+    def coords_changed(self, x, y, w, h):
+        self.sbX.setValue(x)
+        self.sbY.setValue(y)
+        self.sbW.setValue(w)
+        self.sbH.setValue(h)
 
     def selection_changed(self, new, prev):
         if prev.isValid():
@@ -63,6 +83,9 @@ class ClipDialog(QDialog, Ui_clipDialog):
             row = new.row()
             self.frameFieldMapper.setCurrentIndex(row)
             self.update_editor_rect()
+            self.set_frame_controls(True)
+        else:
+            self.set_frame_controls(False)
 
     def update_editor_rect(self):
         x = self.sbX.value()
@@ -95,3 +118,15 @@ class ClipDialog(QDialog, Ui_clipDialog):
     def set_global_origin(self):
         self.sbOriginX.setValue(self.global_origin[0])
         self.sbOriginY.setValue(self.global_origin[1])
+
+    def accept(self):
+        # Check for duplicate clip name
+        name = self.tbName.text()
+        if name.strip() == "":
+            QMessageBox.warning(self, "Invalid Name", "Clip name cannot be empty")
+            return
+
+        if self.clips_model.exists(name) and self.orig_name != name:
+            QMessageBox.critical(self, "Duplicate Name", f"Clip with name '{name}' already exists")
+            return
+        super().accept()

@@ -83,8 +83,6 @@ class pageAnimations(QWidget, Ui_pageAnimations):
             clips_model_orig.endResetModel()
 
             clips_model_orig.notify_changed()
-            
-            #clips_model_orig.layoutChanged.emit()
 
     def add_clip(self):
         val, res = QInputDialog.getText(self, "Add clip...", "Name")
@@ -92,6 +90,9 @@ class pageAnimations(QWidget, Ui_pageAnimations):
         if res:
             clip_model = self.lvClips.model()
             if clip_model:
+                if clip_model.exists(val):
+                    QMessageBox.critical(self, "Error", "Error: Clip already exists.")
+                    return
                 clip_model.add(val)
 
     def add_animation(self):
