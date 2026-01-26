@@ -173,7 +173,8 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
     p->velocity = shz_vec2_init(sc.cos, sc.sin);
     p->velocity = shz_vec2_scale(p->velocity, emitter->speed);
 
-    if (def->sprite_rotates) {
+    p->sprite_rotates = def->sprite_rotates;
+    if (p->sprite_rotates) {
         p->transform.rot = angle;
     }
 
@@ -223,6 +224,10 @@ void projectilepool_step(projectilepool_t* pool, float delta_time) {
             if (get_entity_pos_by_uid(p->target_uid, &target_pos)) {
                 p->velocity = shz_vec2_normalize_safe(shz_vec2_sub(target_pos, p->transform.pos));
                 p->velocity = shz_vec2_scale(p->velocity, p->speed);
+
+                if (p->sprite_rotates) {
+                    p->transform.rot = shz_atan2f(p->velocity.y, p->velocity.x);
+                }
 
                 p->target_uid = ENTITY_NULL;
             } else {

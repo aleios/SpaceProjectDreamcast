@@ -17,7 +17,8 @@ typedef struct Projectile {
 
     float speed;
     shz_vec2_t velocity;
-    float rotation;
+
+    bool sprite_rotates;
 
     entityid_t target_uid;
     projectiletrackingtype_t tracking_type;
