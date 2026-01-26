@@ -1,0 +1,7 @@
+{
+  "damage": 1,
+  "animation": "projectiles",
+  "animation_key": "basic",
+  "texture": "ships",
+  "rotates": true
+}
