@@ -9,6 +9,5 @@ staging
 romdisk/*
 build
 .idea
-disc
 
 tools/def_editor/settings.json

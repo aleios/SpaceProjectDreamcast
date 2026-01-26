@@ -45,7 +45,14 @@ bool projectiledef_init(projectiledef_t* def, const char* key) {
         return false;
     }
     def->clip = animation_get_clip(def->anim, name_buffer);
+
+    if (!def->clip) {
+        return false;
+    }
+
     fs_read(def_file, &def->damage, sizeof(uint16_t));
+
+    fs_read(def_file, &def->collider_radius, sizeof(float));
 
     uint8_t rotates;
     fs_read(def_file, &rotates, sizeof(rotates));

@@ -28,6 +28,7 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
 
         self.fieldMapper.addMapping(self.tbProjTexture, defsdb.ProjectileModel.COL_TEXTURE)
         self.fieldMapper.addMapping(self.sbDamage, defsdb.ProjectileModel.COL_DAMAGE)
+        self.fieldMapper.addMapping(self.sbColliderRadius, defsdb.projectile_defs.COL_COLLIDER_RADIUS)
         self.fieldMapper.addMapping(self.cboxRotates, defsdb.ProjectileModel.COL_ROTATES)
 
         # Initial indices
@@ -67,7 +68,7 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
             if defsdb.projectile_defs.exists(val):
                 QMessageBox.critical(self, "Error", "Error: Item already exists.")
             else:
-                initial_data = { "name": val, "damage": 1 }
+                initial_data = { "name": val, "damage": 1, "collider_radius": 1.0}
                 if defsdb.animations.rowCount() > 0:
                     anim_name = defsdb.animations.data(defsdb.animations.index(0, defsdb.AnimationModel.COL_NAME))
                     initial_data["animation"] = anim_name

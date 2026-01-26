@@ -63,9 +63,8 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
     animator_init(&p->animator, &p->sprite, def->clip);
     projectilepool_rebind(p);
 
-    // TODO: Get from def
     p->collider.center = p->transform.pos;
-    p->collider.radius = 5.0f;
+    p->collider.radius = def->collider_radius;
 
     p->damage = def->damage;
 

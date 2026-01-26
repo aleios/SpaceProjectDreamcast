@@ -17,6 +17,7 @@ typedef struct ProjectileDef {
 
     // Data
     uint16_t damage;
+    float collider_radius;
     bool sprite_rotates;
 
     projectiletarget_t target;
