@@ -1,0 +1,45 @@
+{
+  "health": 3,
+  "collision_radius": 8.0,
+  "animation": "enemies",
+  "idle_key": "enemy1_idle",
+  "texture": "ships",
+  "left_key": "",
+  "right_key": "",
+  "events": [
+    {
+      "type": "StartFiring",
+      "delay": 500,
+      "lifetime": 2000,
+      "name": "Emitter",
+      "offset": [
+        0.0,
+        15.0
+      ],
+      "projectile": "basic",
+      "spawns_per_step": 1,
+      "speed": 0.2,
+      "start_angle": 90.0,
+      "step_angle": 0.0
+    },
+    {
+      "type": "MoveTo",
+      "angle": 90,
+      "angle_step": 0,
+      "duration": 500,
+      "speed": 0.15,
+      "target": "DIRECTION",
+      "x": 10.0,
+      "y": 100.0
+    },
+    {
+      "type": "MoveTo",
+      "amplitude": 5.0,
+      "angle": 0,
+      "duration": 0,
+      "period": 2.0,
+      "speed": 0.0,
+      "target": "SINE"
+    }
+  ]
+}

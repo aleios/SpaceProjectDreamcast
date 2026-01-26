@@ -1,0 +1,62 @@
+{
+  "max_health": 10,
+  "max_lives": 3,
+  "player_speed": 0.2,
+  "weapons": [
+    {
+      "name": "basic",
+      "emitters": [
+        {
+          "name": "Emitter 1",
+          "projectile": "basic",
+          "spawns_per_step": 1,
+          "delay": 500,
+          "start_angle": 270.0,
+          "step_angle": 0.0,
+          "speed": 0.3,
+          "lifetime": 2000,
+          "offset": [
+            10.0,
+            0.0
+          ]
+        },
+        {
+          "name": "Emitter 2",
+          "projectile": "basic",
+          "spawns_per_step": 1,
+          "delay": 500,
+          "start_angle": 270.0,
+          "step_angle": 0.0,
+          "speed": 0.3,
+          "lifetime": 2000,
+          "offset": [
+            -10.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "boomerang",
+      "emitters": [
+        {
+          "name": "Emitter 1",
+          "projectile": "boomerang",
+          "spawns_per_step": 1,
+          "delay": 100,
+          "start_angle": 270.0,
+          "step_angle": 0.0,
+          "speed": 0.5,
+          "lifetime": 3000,
+          "offset": [
+            0.0,
+            -20.0
+          ]
+        }
+      ]
+    }
+  ],
+  "playlist": [
+    "level1"
+  ]
+}
