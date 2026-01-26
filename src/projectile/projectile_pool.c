@@ -34,7 +34,25 @@ static bool get_entity_pos_by_uid(entityid_t uid, shz_vec2_t* out) {
 }
 
 static bool find_strongest_target(entityid_t* out) {
-    return false;
+    enemypool_t* pool = gamestate_enemy_pool();
+    int strongest_hp = 0;
+    uint32_t strongest_uid = 0;
+    for (int i = 0; i < pool->total; i++) {
+        enemy_t* e = pool->enemies[i];
+        if (!e || e->is_dead)
+            continue;
+
+        if (strongest_uid == 0 || e->health > strongest_hp) {
+            strongest_hp = e->health;
+            strongest_uid = e->uid;
+        }
+    }
+
+    if (strongest_uid == 0) {
+        return false;
+    }
+    *out = strongest_uid;
+    return true;
 }
 
 static bool find_nearest_target(shz_vec2_t pos, entityid_t* out) {
@@ -122,6 +140,7 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
 
     // TODO: We need 2 types of tracking. Single and Continuous.
     p->speed = emitter->speed;
+    p->target_uid = ENTITY_NULL;
     switch(emitter->target) {
     case PROJECTILETARGET_NEAREST: {
         if (pool->owner == PROJECTILE_POOL_OWNER_PLAYER) {
@@ -136,10 +155,16 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
         break;
     }
     case PROJECTILETARGET_STRONGEST:
-        // Unimplemented
+        if (pool->owner == PROJECTILE_POOL_OWNER_PLAYER) {
+            uint32_t uid;
+            if (find_strongest_target(&uid)) {
+                p->target_uid = uid;
+            }
+        } else {
+            p->target_uid = ENTITY_PLAYER;
+        }
         break;
     default:
-        p->target_uid = ENTITY_NULL;
         break;
     }
 
