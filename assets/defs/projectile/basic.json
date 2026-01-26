@@ -3,5 +3,6 @@
   "animation": "projectiles",
   "animation_key": "basic",
   "texture": "ships",
-  "rotates": true
+  "rotates": true,
+  "collider_radius": 5.0
 }
