@@ -1,0 +1,90 @@
+{
+  "initial_music": "hope",
+  "scroll_speed": 0.2,
+  "preloads": {
+    "enemies": [
+      "boss",
+      "enemy1"
+    ],
+    "projectiles": [
+      "basic",
+      "boomerang"
+    ]
+  },
+  "events": [
+    {
+      "pos": [
+        254.21,
+        365.28
+      ],
+      "event": {
+        "type": "spawn",
+        "def": "enemy1"
+      }
+    },
+    {
+      "pos": [
+        56,
+        368
+      ],
+      "event": {
+        "type": "spawn",
+        "def": "enemy1"
+      }
+    },
+    {
+      "pos": [
+        488,
+        672
+      ],
+      "event": {
+        "type": "spawn",
+        "def": "enemy1"
+      }
+    },
+    {
+      "pos": [
+        312,
+        792
+      ],
+      "event": {
+        "type": "wait_clear",
+        "timeout": 0.0
+      }
+    },
+    {
+      "pos": [
+        312.0,
+        800.0
+      ],
+      "event": {
+        "type": "music",
+        "key": "spiral_of_plasma",
+        "fade_in": 3000.0,
+        "fade_out": 1000.0
+      }
+    },
+    {
+      "pos": [
+        312.0,
+        808.0
+      ],
+      "event": {
+        "type": "starfield_speed",
+        "speed": 8.0,
+        "duration": 8000.0,
+        "block": true
+      }
+    },
+    {
+      "pos": [
+        312.0,
+        832.0
+      ],
+      "event": {
+        "type": "spawn",
+        "def": "boss"
+      }
+    }
+  ]
+}

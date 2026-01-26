@@ -1,0 +1,32 @@
+{
+  "health": 30,
+  "collision_radius": 8.0,
+  "animation": "enemies",
+  "idle_key": "enemy2_idle",
+  "texture": "ships",
+  "left_key": "",
+  "right_key": "",
+  "events": [
+    {
+      "type": "StartFiring",
+      "offset": [
+        0.0,
+        0.0
+      ],
+      "projectile": "boomerang",
+      "spawns_per_step": 8,
+      "start_angle": 0.0,
+      "step_angle": 45.0,
+      "speed": 0.2,
+      "lifetime": 3000,
+      "delay": 500
+    },
+    {
+      "type": "MoveTo",
+      "speed": 0.1,
+      "target": "POINT",
+      "x": 320.0,
+      "y": 250.0
+    }
+  ]
+}
