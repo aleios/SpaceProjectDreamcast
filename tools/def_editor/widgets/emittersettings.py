@@ -40,6 +40,12 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
 
         self.target_updated(self.cbTarget.currentIndex())
 
+        # Tooltips
+        self.cbTarget.setToolTip("Target types:\nNone - Do not track target\nNearest - Acquire nearest target\nStrongest - Acquire target with most max HP")
+
+        tracking_tt = "Tracking types:\nSnapshot - Select target at projectile spawn\nAcquire Once - Select target after tracking delay\nContinuous - Follow target until invalid or dead"
+        self.cbTracking.setToolTip(tracking_tt)
+
     def target_updated(self, index):
         if index == 0:
             self.targetStack.setCurrentIndex(0)

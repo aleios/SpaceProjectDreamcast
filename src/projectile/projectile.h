@@ -23,4 +23,6 @@ typedef struct Projectile {
     entityid_t target_uid;
     projectiletrackingtype_t tracking_type;
     float targeting_delay;
+    shz_vec2_t targeting_snapshot;
+
 } projectile_t;

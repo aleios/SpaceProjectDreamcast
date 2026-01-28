@@ -28,7 +28,6 @@ void projectilepool_init(projectilepool_t* pool, int capacity, projectile_pool_o
 void projectilepool_destroy(projectilepool_t* pool);
 
 void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t pos, float angle);
-//void projectilepool_spawn(projectilepool_t* pool, projectiledef_t* def, shz_vec2_t pos, float angle);
 void projectilepool_release(projectilepool_t* pool, int index);
 
 void projectilepool_clear(projectilepool_t* pool);

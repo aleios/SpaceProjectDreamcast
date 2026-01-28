@@ -136,12 +136,16 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
     p->collider.radius = def->collider_radius;
 
     p->damage = def->damage;
-
-    // TODO: We need 2 types of tracking. Single and Continuous.
     p->speed = emitter->speed;
+
+    // Tracking
     p->target_uid = ENTITY_NULL;
+    p->tracking_type = emitter->tracking_type;
+
     switch(emitter->target) {
     case PROJECTILETARGET_NEAREST: {
+
+        // Find target UID
         if (pool->owner == PROJECTILE_POOL_OWNER_PLAYER) {
             uint32_t uid;
             if (find_nearest_target(p->transform.pos, &uid)) {
@@ -150,6 +154,14 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
         } else {
             p->target_uid = ENTITY_PLAYER;
         }
+
+        // If snapshotted, find the target position now.
+        if (p->tracking_type == PROJECTILETRACKINGTYPE_SNAPSHOT) {
+            if (!get_entity_pos_by_uid(p->target_uid, &p->targeting_snapshot)) {
+                p->target_uid = ENTITY_NULL;
+            }
+        }
+
         p->targeting_delay = emitter->targeting_delay;
         break;
     }
@@ -217,21 +229,40 @@ void projectilepool_step(projectilepool_t* pool, float delta_time) {
         }
 
         p->targeting_delay -= delta_time;
-        if(p->targeting_delay <= 0.0f) {
+        if(p->targeting_delay <= 0.0f && p->target_uid != ENTITY_NULL) {
 
-            shz_vec2_t target_pos;
-            if (get_entity_pos_by_uid(p->target_uid, &target_pos)) {
-                p->velocity = shz_vec2_normalize_safe(shz_vec2_sub(target_pos, p->transform.pos));
-                p->velocity = shz_vec2_scale(p->velocity, p->speed);
+            switch (p->tracking_type) {
+                case PROJECTILETRACKINGTYPE_SNAPSHOT:
+                    p->velocity = shz_vec2_normalize_safe(shz_vec2_sub(p->targeting_snapshot, p->transform.pos));
+                    p->velocity = shz_vec2_scale(p->velocity, p->speed);
+                    p->target_uid = ENTITY_NULL;
 
-                if (p->sprite_rotates) {
-                    p->transform.rot = shz_atan2f(p->velocity.y, p->velocity.x);
-                }
+                    if (p->sprite_rotates) {
+                        p->transform.rot = shz_atan2f(p->velocity.y, p->velocity.x);
+                    }
+                    break;
+                case PROJECTILETRACKINGTYPE_CONTINUOUS:
+                case PROJECTILETRACKINGTYPE_ACQUIRE_ONCE:
+                    shz_vec2_t target_pos;
 
-                p->target_uid = ENTITY_NULL;
-            } else {
-                // Lost tracking of entity.
-                p->target_uid = ENTITY_NULL;
+                    if (get_entity_pos_by_uid(p->target_uid, &target_pos)) {
+                        p->velocity = shz_vec2_normalize_safe(shz_vec2_sub(target_pos, p->transform.pos));
+                        p->velocity = shz_vec2_scale(p->velocity, p->speed);
+
+                        if (p->sprite_rotates) {
+                            p->transform.rot = shz_atan2f(p->velocity.y, p->velocity.x);
+                        }
+
+                        if (p->tracking_type != PROJECTILETRACKINGTYPE_CONTINUOUS) {
+                            p->target_uid = ENTITY_NULL;
+                        }
+                    } else {
+                        // Lost tracking of entity.
+                        p->target_uid = ENTITY_NULL;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
