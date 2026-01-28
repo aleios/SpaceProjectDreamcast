@@ -13,8 +13,11 @@ ADX_DIR := externals/libadx
 ADX_O := $(ADX_DIR)/libadxl.o
 ADX_LIB := $(ADX_DIR)/libADXL.a
 
-CFLAGS += -I$(KOS_BASE)/utils -gz -std=gnu23 -O3 -fvisibility=hidden -flto -MMD -MP -I$(ADX_DIR)/include
-LDFLAGS += -flto -L$(ADX_DIR) -lADXL
+CFLAGS += -I$(KOS_BASE)/utils -gz -std=gnu23 -O3 \
+ 			-fomit-frame-pointer -flto -fbuiltin -ffast-math -ffp-contract=fast -mfsrra -mfsca \
+ 			-fmerge-all-constants -funroll-loops -fno-PIC -fipa-pta \
+ 			-fvisibility=hidden -flto -MMD -MP -I$(ADX_DIR)/include
+LDFLAGS += -ffast-math -flto -L$(ADX_DIR) -lADXL
 
 include $(KOS_BASE)/Makefile.rules
 
