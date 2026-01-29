@@ -5,6 +5,8 @@ typedef struct EnemyPool {
     enemy_t** enemies;
     int capacity;
     int total;
+
+    uint32_t next_uid;
 } enemypool_t;
 
 void enemypool_init(enemypool_t* pool, int initial_capacity);

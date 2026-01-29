@@ -1,6 +1,7 @@
 #include "projectile_pool.h"
 #include "../renderer/render_util.h"
 #include "../globals.h"
+#include "../defs/gamestate.h"
 
 static void projectilepool_rebind(projectile_t* p) {
     // Update internal pointers of components.
@@ -9,18 +10,90 @@ static void projectilepool_rebind(projectile_t* p) {
     animator_refresh(&p->animator);
 }
 
-void projectilepool_init(projectilepool_t* pool, int capacity) {
+static bool get_entity_pos_by_uid(entityid_t uid, shz_vec2_t* out) {
+    if (uid == ENTITY_NULL) {
+        return false;
+    }
+    if (uid == ENTITY_PLAYER) {
+        *out = gamestate_get_player()->transform.pos;
+        return true;
+    }
+
+    enemypool_t* pool = gamestate_enemy_pool();
+
+    for (int i = 0; i < pool->total; i++) {
+        enemy_t* e = pool->enemies[i];
+        if (!e || e->is_dead)
+            continue;
+        if (e->uid == uid) {
+            *out = e->transform.pos;
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool find_strongest_target(entityid_t* out) {
+    enemypool_t* pool = gamestate_enemy_pool();
+    int strongest_hp = 0;
+    uint32_t strongest_uid = 0;
+    for (int i = 0; i < pool->total; i++) {
+        enemy_t* e = pool->enemies[i];
+        if (!e || e->is_dead)
+            continue;
+
+        if (strongest_uid == 0 || e->health > strongest_hp) {
+            strongest_hp = e->health;
+            strongest_uid = e->uid;
+        }
+    }
+
+    if (strongest_uid == 0) {
+        return false;
+    }
+    *out = strongest_uid;
+    return true;
+}
+
+static bool find_nearest_target(shz_vec2_t pos, entityid_t* out) {
+    enemypool_t* pool = gamestate_enemy_pool();
+    float closest_dist = 0.0f;
+    uint32_t closest_uid = 0;
+    for (int i = 0; i < pool->total; i++) {
+        enemy_t* e = pool->enemies[i];
+        if (!e || e->is_dead)
+            continue;
+
+        const float dist = shz_vec2_distance_sqr(e->transform.pos, pos);
+
+        if (closest_uid == 0 || dist < closest_dist) {
+            closest_dist = dist;
+            closest_uid = e->uid;
+        }
+    }
+
+    if (closest_uid == 0) {
+        return false;
+    }
+    *out = closest_uid;
+    return true;
+}
+
+void projectilepool_init(projectilepool_t* pool, int capacity, projectile_pool_owner_t owner) {
 
     pool->projectiles = calloc(sizeof(projectile_t), capacity);
     pool->projectile_capacity = capacity;
     pool->active_projectiles = 0;
+    pool->owner = owner;
 
     for(int i = 0; i < capacity; ++i) {
         projectile_t* p = &pool->projectiles[i];
         p->lifetime = 0.0f;
+        p->damage = 0;
 
         p->velocity = shz_vec2_init(0.0f, 0.0f);
-        p->target = nullptr;
+        p->target_uid = 0;
+        p->targeting_delay = 0.0f;
     }
 }
 
@@ -50,16 +123,12 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
         return;
     }
 
-    // printf("Emitter:\nSpawns: %d\nDelay: %f\nStart Angle: %f\nStep Angle: %f\nSpeed: %f\nLifetime: %f\n",
-    //     emitter->spawns_per_step, emitter->delay, emitter->start_angle, emitter->step_angle, emitter->speed, emitter->lifetime);
-
     p->lifetime = emitter->lifetime;
 
     transform_init(&p->transform);
     p->transform.pos = pos;
 
     sprite_init(&p->sprite, &p->transform, def->tex);
-
     animator_init(&p->animator, &p->sprite, def->clip);
     projectilepool_rebind(p);
 
@@ -67,81 +136,61 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
     p->collider.radius = def->collider_radius;
 
     p->damage = def->damage;
+    p->speed = emitter->speed;
 
-    // velocity set
+    // Tracking
+    p->target_uid = ENTITY_NULL;
+    p->tracking_type = emitter->tracking_type;
 
-    switch(def->target) {
-    case PROJECTILETARGET_NEAREST:
-        // Unimplemented
+    switch(emitter->target) {
+    case PROJECTILETARGET_NEAREST: {
+
+        // Find target UID
+        if (pool->owner == PROJECTILE_POOL_OWNER_PLAYER) {
+            uint32_t uid;
+            if (find_nearest_target(p->transform.pos, &uid)) {
+                p->target_uid = uid;
+            }
+        } else {
+            p->target_uid = ENTITY_PLAYER;
+        }
+
+        // If snapshotted, find the target position now.
+        if (p->tracking_type == PROJECTILETRACKINGTYPE_SNAPSHOT) {
+            if (!get_entity_pos_by_uid(p->target_uid, &p->targeting_snapshot)) {
+                p->target_uid = ENTITY_NULL;
+            }
+        }
+
+        p->targeting_delay = emitter->targeting_delay;
         break;
+    }
     case PROJECTILETARGET_STRONGEST:
-        // Unimplemented
-        break;
-    default:
-        p->target = nullptr;
-
-        shz_sincos_t sc = shz_sincosf(angle);
-        p->velocity.x = sc.cos;
-        p->velocity.y = sc.sin;
-        p->velocity = shz_vec2_scale(p->velocity, emitter->speed);
-
-        if (def->sprite_rotates) {
-            p->transform.rot = angle;
+        if (pool->owner == PROJECTILE_POOL_OWNER_PLAYER) {
+            uint32_t uid;
+            if (find_strongest_target(&uid)) {
+                p->target_uid = uid;
+            }
+        } else {
+            p->target_uid = ENTITY_PLAYER;
         }
         break;
+    default:
+        break;
+    }
+
+    // Set initial velocity.
+    shz_sincos_t sc = shz_sincosf(angle);
+    p->velocity = shz_vec2_init(sc.cos, sc.sin);
+    p->velocity = shz_vec2_scale(p->velocity, emitter->speed);
+
+    p->sprite_rotates = def->sprite_rotates;
+    if (p->sprite_rotates) {
+        p->transform.rot = angle;
     }
 
     pool->active_projectiles++;
 }
-
-// void projectilepool_spawn(projectilepool_t* pool, projectiledef_t* def, shz_vec2_t pos, float angle) {
-//     if(pool->active_projectiles >= pool->projectile_capacity || !def) {
-//         return;
-//     }
-//
-//     projectile_t* p = projectilepool_get(pool);
-//
-//     if(!p) {
-//         return;
-//     }
-//
-//     p->lifetime = def->lifetime;
-//
-//     transform_init(&p->transform);
-//     p->transform.pos = pos;
-//
-//     sprite_init(&p->sprite, &p->transform, def->tex);
-//
-//     animator_init(&p->animator, &p->sprite, def->clip);
-//     projectilepool_rebind(p);
-//
-//     // TODO: Get from def
-//     p->collider.center = p->transform.pos;
-//     p->collider.radius = 5.0f;
-//
-//     p->damage = def->damage;
-//
-//     // velocity set
-//
-//     switch(def->target) {
-//     case PROJECTILETARGET_NEAREST:
-//         // Unimplemented
-//         break;
-//     case PROJECTILETARGET_STRONGEST:
-//         // Unimplemented
-//         break;
-//     default:
-//         p->target = nullptr;
-//
-//         shz_sincos_t sc = shz_sincosf(angle);
-//         p->velocity.x = sc.cos;
-//         p->velocity.y = sc.sin;
-//         p->velocity = shz_vec2_scale(p->velocity, def->speed);
-//         break;
-//     }
-//
-//     pool->active_projectiles++;
-// }
 
 void projectilepool_release(projectilepool_t* pool, int index) {
     if(!pool || index< 0 || index >= pool->active_projectiles)
@@ -177,6 +226,44 @@ void projectilepool_step(projectilepool_t* pool, float delta_time) {
             projectilepool_release(pool, i);
             i--;
             continue;
+        }
+
+        p->targeting_delay -= delta_time;
+        if(p->targeting_delay <= 0.0f && p->target_uid != ENTITY_NULL) {
+
+            switch (p->tracking_type) {
+                case PROJECTILETRACKINGTYPE_SNAPSHOT:
+                    p->velocity = shz_vec2_normalize_safe(shz_vec2_sub(p->targeting_snapshot, p->transform.pos));
+                    p->velocity = shz_vec2_scale(p->velocity, p->speed);
+                    p->target_uid = ENTITY_NULL;
+
+                    if (p->sprite_rotates) {
+                        p->transform.rot = shz_atan2f(p->velocity.y, p->velocity.x);
+                    }
+                    break;
+                case PROJECTILETRACKINGTYPE_CONTINUOUS:
+                case PROJECTILETRACKINGTYPE_ACQUIRE_ONCE:
+                    shz_vec2_t target_pos;
+
+                    if (get_entity_pos_by_uid(p->target_uid, &target_pos)) {
+                        p->velocity = shz_vec2_normalize_safe(shz_vec2_sub(target_pos, p->transform.pos));
+                        p->velocity = shz_vec2_scale(p->velocity, p->speed);
+
+                        if (p->sprite_rotates) {
+                            p->transform.rot = shz_atan2f(p->velocity.y, p->velocity.x);
+                        }
+
+                        if (p->tracking_type != PROJECTILETRACKINGTYPE_CONTINUOUS) {
+                            p->target_uid = ENTITY_NULL;
+                        }
+                    } else {
+                        // Lost tracking of entity.
+                        p->target_uid = ENTITY_NULL;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         p->transform.pos = shz_vec2_add(p->transform.pos, shz_vec2_scale(p->velocity, delta_time));

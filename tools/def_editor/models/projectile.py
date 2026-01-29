@@ -1,4 +1,4 @@
-from models.datadef import DefModel
+from .datadef import DefModel
 
 class ProjectileModel(DefModel):
     COL_NAME, COL_MODIFIED, COL_TEXTURE, COL_ANIM, COL_ANIM_KEY, COL_COLLIDER_RADIUS, COL_DAMAGE, COL_ROTATES = range(8)

@@ -28,3 +28,13 @@ def write_emitter(output_file, emitter):
 
     write_float(output_file, emitter.get("offset", [0.0, 0.0])[0])
     write_float(output_file, emitter.get("offset", [0.0, 0.0])[1])
+
+    # Target and tracking
+    target = emitter.get("target", 0)
+    write_ubyte(output_file, target)
+
+    # If we have a tracking target
+    if target > 0:
+        write_ubyte(output_file, emitter.get("target_tracking", 0))
+        write_float(output_file, float(emitter.get("tracking_delay", 0.0)))
+

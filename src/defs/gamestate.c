@@ -11,8 +11,8 @@ gamestate_t g_gamestate;
 void gamestate_init() {
 
     enemypool_init(gamestate_enemy_pool(), 20);
-    projectilepool_init(gamestate_player_projpool(), 100);
-    projectilepool_init(gamestate_enemy_projpool(), 350);
+    projectilepool_init(gamestate_player_projpool(), 100, PROJECTILE_POOL_OWNER_PLAYER);
+    projectilepool_init(gamestate_enemy_projpool(), 350, PROJECTILE_POOL_OWNER_ENEMY);
     collectablepool_init(gamestate_collectable_pool());
 }
 

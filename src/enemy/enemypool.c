@@ -5,6 +5,8 @@ void enemypool_init(enemypool_t* pool, int initial_capacity) {
     pool->capacity = imax32(8, initial_capacity);
     pool->total = 0;
     pool->enemies = malloc(sizeof(enemy_t*) * pool->capacity);
+
+    pool->next_uid = ENTITY_DYNAMIC_START;
 }
 
 void enemypool_destroy(enemypool_t* pool) {
@@ -34,6 +36,8 @@ enemy_t* enemypool_spawn(enemypool_t* pool, enemydef_t* def) {
 
     enemy_t* enemy = malloc(sizeof(enemy_t));
     enemy_init(enemy, def, pool->total);
+    enemy->uid = pool->next_uid;
+    pool->next_uid++;
     
     pool->enemies[pool->total] = enemy;
     

@@ -59,7 +59,7 @@ class EventDialog(QDialog, Ui_eventDialog):
     def save_start_firing(self, cmd):
         # ensure mapper actually updates the damn value
         self.pageStartFiring.mapper.submit()
-        cmd.update(self.pageStartFiring.model.data_dict)
+        cmd.update(self.pageStartFiring.model.export_data())
 
     def load_delay(self, cmd):
         self.sbDelay.setValue(int(cmd.get("duration", 0)))

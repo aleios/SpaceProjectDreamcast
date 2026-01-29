@@ -31,6 +31,20 @@ bool emitter_read(emitter_t* emitter, file_t file) {
 
     emitter->runtime.fire_timer = 0.0f;
 
+    uint8_t target;
+    fs_read(file, &target, sizeof(target));
+    emitter->target = target;
+
+    if (emitter->target > PROJECTILETARGET_NONE) {
+        uint8_t tracking;
+        fs_read(file, &tracking, sizeof(tracking));
+        emitter->tracking_type = tracking;
+
+        float targeting_delay;
+        fs_read(file, &targeting_delay, sizeof(targeting_delay));
+        emitter->targeting_delay = targeting_delay;
+    }
+
     // printf("Emitter:\nSpawns: %d\nDelay: %f\nStart Angle: %f\nStep Angle: %f\nSpeed: %f\nLifetime: %f\nOrigin: %f, %f\n",
     //     emitter->spawns_per_step, emitter->delay, emitter->start_angle, emitter->step_angle, emitter->speed, emitter->lifetime, x, y);
 

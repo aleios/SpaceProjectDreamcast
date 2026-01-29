@@ -1,10 +1,9 @@
 from PyQt6.QtCore import QModelIndex, QAbstractTableModel, Qt, QMimeData
-from tools.def_editor import defsdb
 
 class WeaponSetModel(QAbstractTableModel):
     mimeType = "application/x-weapon-set-item"
 
-    def __init__(self, data_obj: defsdb.GameSettingsData, parent=None):
+    def __init__(self, data_obj, parent=None):
         super().__init__(parent)
         self.data_obj = data_obj
 

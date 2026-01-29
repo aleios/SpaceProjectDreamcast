@@ -3,9 +3,6 @@ import json
 import os
 import glob
 
-import tools.def_editor.defsdb as defsdb
-
-
 class LevelEventsModel(QAbstractListModel):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -161,6 +158,7 @@ class LevelsModel(QAbstractTableModel):
                 if enemy_name:
                     preloads['enemies'].add(enemy_name)
                     # Get enemy event stack, extract out the projectile defs used.
+                    from tools.def_editor import defsdb
                     enemy_data = defsdb.enemy_defs.get_by_name(enemy_name)
                     if enemy_data:
                         enemy_events = enemy_data.get('events', [])
@@ -198,5 +196,6 @@ class LevelsModel(QAbstractTableModel):
                 self.dataChanged.emit(mod_idx, mod_idx, [Qt.ItemDataRole.DisplayRole])
 
     def exists(self, key):
+        from tools.def_editor import defsdb
         return bool([x for x in self.levels if x['name'] == key]) or os.path.isfile(
             defsdb.assets_path + "/levels/" + key + ".json")
