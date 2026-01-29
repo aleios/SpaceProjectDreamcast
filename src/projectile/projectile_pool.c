@@ -128,7 +128,7 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
     transform_init(&p->transform);
     p->transform.pos = pos;
 
-    sprite_init(&p->sprite, &p->transform, def->tex);
+    sprite_init(&p->sprite, &p->transform, def->anim->tex);
     animator_init(&p->animator, &p->sprite, def->clip);
     projectilepool_rebind(p);
 

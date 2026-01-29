@@ -26,15 +26,6 @@ bool projectiledef_init(projectiledef_t* def, const char* key) {
     if(!readutil_readstr(def_file, name_buffer, sizeof(name_buffer))) {
         return false;
     }
-    def->tex = texcache_get(name_buffer);
-
-    if(!def->tex) {
-        return false;
-    }
-
-    if(!readutil_readstr(def_file, name_buffer, sizeof(name_buffer))) {
-        return false;
-    }
     def->anim = animcache_get(name_buffer);
 
     if(!def->anim) {

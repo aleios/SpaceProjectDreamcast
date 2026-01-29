@@ -26,7 +26,6 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
         self.fieldMapper.setModel(defsdb.projectile_defs)
         self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
 
-        self.fieldMapper.addMapping(self.tbProjTexture, defsdb.ProjectileModel.COL_TEXTURE)
         self.fieldMapper.addMapping(self.sbDamage, defsdb.ProjectileModel.COL_DAMAGE)
         self.fieldMapper.addMapping(self.sbColliderRadius, defsdb.projectile_defs.COL_COLLIDER_RADIUS)
         self.fieldMapper.addMapping(self.cboxRotates, defsdb.ProjectileModel.COL_ROTATES)

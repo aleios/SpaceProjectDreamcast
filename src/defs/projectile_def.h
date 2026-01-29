@@ -3,8 +3,6 @@
 #include "../components/animation.h"
 
 typedef struct ProjectileDef {
-    //
-    texture_t* tex;
     animation_t* anim;
     animationclip_t* clip;
 

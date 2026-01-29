@@ -2,7 +2,6 @@
   "damage": 2,
   "animation": "projectiles",
   "animation_key": "boomerang",
-  "texture": "ships",
   "rotates": true,
   "collider_radius": 6.0
 }

@@ -1,11 +1,10 @@
 from .datadef import DefModel
 
 class ProjectileModel(DefModel):
-    COL_NAME, COL_MODIFIED, COL_TEXTURE, COL_ANIM, COL_ANIM_KEY, COL_COLLIDER_RADIUS, COL_DAMAGE, COL_ROTATES = range(8)
+    COL_NAME, COL_MODIFIED, COL_ANIM, COL_ANIM_KEY, COL_COLLIDER_RADIUS, COL_DAMAGE, COL_ROTATES = range(7)
     MAP = {
         COL_NAME: {'key': 'name', 'type': str},
         COL_MODIFIED: {'key': 'modified', 'type': bool},
-        COL_TEXTURE: {'key': 'texture', 'type': str},
         COL_ANIM: {'key': 'animation', 'type': str},
         COL_ANIM_KEY: {'key': 'animation_key', 'type': str},
         COL_DAMAGE: { 'key': 'damage', 'type': int },

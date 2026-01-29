@@ -100,11 +100,6 @@ bool enemydef_init(enemydef_t* def, const char* key) {
     if(!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
         return false;
     }
-    def->tex = texcache_get(str_buf);
-
-    if(!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
-        return false;
-    }
     def->anim = animcache_get(str_buf);
 
     // Animation clips

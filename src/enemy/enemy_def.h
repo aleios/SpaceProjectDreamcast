@@ -5,7 +5,6 @@
 #include "enemy_event.h"
 
 typedef struct EnemyDef {
-    texture_t* tex;
     animation_t* anim;
 
     animationclip_t* clip_idle;

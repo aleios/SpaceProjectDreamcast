@@ -1,5 +1,6 @@
 #include "animation.h"
 #include "../util/readutils.h"
+#include "../cache/caches.h"
 #include <kos.h>
 
 bool animation_init(animation_t* anim, const char* key) {
@@ -26,6 +27,17 @@ bool animation_init(animation_t* anim, const char* key) {
         goto error_close;
     }
 
+    // Read texture
+    char name_buffer[256];
+    if (!readutil_readstr(anim_file, name_buffer, sizeof(name_buffer))) {
+        goto error_close;
+    }
+    anim->tex = texcache_get(name_buffer);
+    if (!anim->tex) {
+        goto error_close;
+    }
+
+    // Read num clips
     if (fs_read(anim_file, &total_clips, sizeof(uint16_t)) != sizeof(uint16_t)) {
         goto error_close;
     }
@@ -36,7 +48,6 @@ bool animation_init(animation_t* anim, const char* key) {
         goto error_close;
     }
 
-    char name_buffer[256];
     for (int i = 0; i < total_clips; ++i) {
         animationclip_t* clip = &anim->clips[i];
 

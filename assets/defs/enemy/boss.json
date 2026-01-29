@@ -3,7 +3,6 @@
   "collision_radius": 8.0,
   "animation": "enemies",
   "idle_key": "enemy2_idle",
-  "texture": "ships",
   "left_key": "",
   "right_key": "",
   "events": [

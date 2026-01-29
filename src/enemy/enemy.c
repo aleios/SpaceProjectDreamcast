@@ -11,7 +11,7 @@ void enemy_init(enemy_t* enemy, enemydef_t* def, int pool_index) {
     enemy->is_dead = false;
 
     transform_init(&enemy->transform);
-    sprite_init(&enemy->sprite, &enemy->transform, def->tex);
+    sprite_init(&enemy->sprite, &enemy->transform, def->anim->tex);
 
     animator_init(&enemy->animator, &enemy->sprite, def->clip_idle);
 

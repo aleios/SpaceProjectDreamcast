@@ -9,32 +9,31 @@ import helpers
 
 global_origin = None
 
-def write_header(output_file, num_animations):
+def write_header(output_file, texture, num_animations):
     helpers.write_magicnum(output_file, 'ASAM')
-    output_file.write(struct.pack("<H", num_animations))
+    helpers.write_str(output_file, texture)
+    helpers.write_ushort(output_file, num_animations)
 
 def write_animation(output_file, animation):
     num_frames = len(animation['frames'])
 
     # Write name and length of it.
-    name_len = len(animation['name'])
-    output_file.write(struct.pack("<H", name_len+1))
-    output_file.write(bytes((animation['name'] + '\0').encode()))
+    helpers.write_str(output_file, animation['name'])
 
-    output_file.write(struct.pack("<f", animation['fps']))
-    output_file.write(struct.pack("B", animation['loop_mode']))
+    helpers.write_float(output_file, animation['fps'])
+    helpers.write_ubyte(output_file, animation['loop_mode'])
 
-    output_file.write(struct.pack("<f", animation['origin'][0]))
-    output_file.write(struct.pack("<f", animation['origin'][1]))
+    helpers.write_float(output_file, animation['origin'][0])
+    helpers.write_float(output_file, animation['origin'][1])
 
-    output_file.write(struct.pack("<H", num_frames))
+    helpers.write_ushort(output_file, num_frames)
     for frame in animation['frames']:
-        output_file.write(struct.pack("<f", frame[0]))
-        output_file.write(struct.pack("<f", frame[1]))
-        output_file.write(struct.pack("<f", frame[2]))
-        output_file.write(struct.pack("<f", frame[3]))
-        output_file.write(struct.pack("<f", frame[4])) # Width
-        output_file.write(struct.pack("<f", frame[5])) # Height
+        helpers.write_float(output_file, frame[0])
+        helpers.write_float(output_file, frame[1])
+        helpers.write_float(output_file, frame[2])
+        helpers.write_float(output_file, frame[3])
+        helpers.write_float(output_file, frame[4]) # Width
+        helpers.write_float(output_file, frame[5]) # Height
 
 
 def parse_animation(key, anim_data, atlas_width, atlas_height):
@@ -124,6 +123,11 @@ def parse_animation_set(input_file, output_fname):
         print("Error: No metadata block")
         exit(1)
 
+    texture = metadata.get("texture", None)
+    if not texture:
+        print("Error: Missing texture name")
+        exit(1)
+
     atlas_width = metadata.get("atlas_width", 0)
     atlas_height = metadata.get("atlas_height", 0)
 
@@ -145,7 +149,7 @@ def parse_animation_set(input_file, output_fname):
     num_animations = len(animations)
 
     with open(output_fname, "wb") as output_file:
-        write_header(output_file, num_animations)
+        write_header(output_file, texture, num_animations)
         for animation in animations:
             write_animation(output_file, animation)
 

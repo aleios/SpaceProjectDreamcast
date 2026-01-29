@@ -75,7 +75,6 @@ def write_events(output_file, events):
 def parse_proj_def(input_file, output_fname):
     data = json.load(input_file)
 
-    texture = data.get('texture', '')
     animation = data.get('animation', '')
     idle_key = data.get('idle_key', '')
     left_key = data.get('left_key', '')
@@ -87,7 +86,6 @@ def parse_proj_def(input_file, output_fname):
 
     with open(output_fname, "wb") as output_file:
         helpers.write_magicnum(output_file, 'EDEF')
-        helpers.write_str(output_file, texture)
         helpers.write_str(output_file, animation)
         helpers.write_str(output_file, idle_key)
         helpers.write_str(output_file, left_key)

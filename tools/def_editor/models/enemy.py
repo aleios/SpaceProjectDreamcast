@@ -1,11 +1,10 @@
 from .datadef import DefModel
 
 class EnemyModel(DefModel):
-    COL_NAME, COL_MODIFIED, COL_TEXTURE, COL_ANIM, COL_IDLE_KEY, COL_LEFT_KEY, COL_RIGHT_KEY, COL_HEALTH, COL_COLLISION_RADIUS, COL_EVENTS = range(10)
+    COL_NAME, COL_MODIFIED, COL_ANIM, COL_IDLE_KEY, COL_LEFT_KEY, COL_RIGHT_KEY, COL_HEALTH, COL_COLLISION_RADIUS, COL_EVENTS = range(9)
     MAP = {
         COL_NAME: {'key': 'name', 'type': str},
         COL_MODIFIED: {'key': 'modified', 'type': bool},
-        COL_TEXTURE: {'key': 'texture', 'type': str},
         COL_ANIM: {'key': 'animation', 'type': str},
         COL_IDLE_KEY: {'key': 'idle_key', 'type': str},
         COL_LEFT_KEY: {'key': 'left_key', 'type': str},

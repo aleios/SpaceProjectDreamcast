@@ -21,7 +21,6 @@ class pageEnemies(QWidget, Ui_pageEnemies):
         self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
 
         # Map fields to controls
-        self.fieldMapper.addMapping(self.tbTexture, defsdb.EnemyModel.COL_TEXTURE)
         self.fieldMapper.addMapping(self.sbHealth, defsdb.EnemyModel.COL_HEALTH)
         self.fieldMapper.addMapping(self.sbColliderRadius, defsdb.EnemyModel.COL_COLLISION_RADIUS)
 
