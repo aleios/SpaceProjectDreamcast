@@ -14,7 +14,7 @@
     "frames": [
       [
         1.0,
-        9.0,
+        1.0,
         34.0,
         9.0
       ]
@@ -22,15 +22,17 @@
     "origin": [
       17.0,
       4.5
-    ]
+    ],
+    "flip_h": false,
+    "flip_v": false
   },
   "boomerang": {
     "fps": 0.0,
     "loop_mode": 0,
     "frames": [
       [
-        246.0,
-        238.0,
+        148.0,
+        171.0,
         9.0,
         16.0
       ]
@@ -38,6 +40,8 @@
     "origin": [
       4.5,
       8.0
-    ]
+    ],
+    "flip_h": false,
+    "flip_v": false
   }
 }

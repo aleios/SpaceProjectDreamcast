@@ -51,6 +51,7 @@ def parse_animation(key, anim_data, atlas_width, atlas_height):
         
 
     flip_h: bool = anim_data.get("flip_h", False)
+    flip_v: bool = anim_data.get("flip_v", False)
     fps: float = anim_data.get("fps", 0.0)
     loop_mode: int = anim_data.get("loop_mode", 0)
 
@@ -63,6 +64,9 @@ def parse_animation(key, anim_data, atlas_width, atlas_height):
 
     if type(flip_h) != bool:
         print(f"flip_h contains invalid type for animation '{key}'")
+        exit(1)
+    if type(flip_v) != bool:
+        print(f"flip_v contains invalid type for animation '{key}'")
         exit(1)
 
     if type(fps) != float:
@@ -94,11 +98,16 @@ def parse_animation(key, anim_data, atlas_width, atlas_height):
         frame[2] /= atlas_width
         frame[3] /= atlas_height
 
-        # Flip UV if applicable.
+        # Flip UVs if applicable.
         if flip_h:
             tmp = frame[0]
             frame[0] = frame[2]
             frame[2] = tmp
+
+        if flip_v:
+            tmp = frame[1]
+            frame[1] = frame[3]
+            frame[3] = tmp
 
     # Convert fps to milliseconds
     if fps > 0.0:

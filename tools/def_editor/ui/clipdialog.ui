@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>851</width>
-    <height>619</height>
+    <width>1011</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
@@ -108,6 +108,24 @@
           <widget class="QPushButton" name="btnSetGlobalOrigin">
            <property name="text">
             <string>Set to Global Origin</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QCheckBox" name="cboxFlipH">
+           <property name="text">
+            <string>Flip H</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cboxFlipV">
+           <property name="text">
+            <string>Flip V</string>
            </property>
           </widget>
          </item>
