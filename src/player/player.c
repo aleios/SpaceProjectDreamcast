@@ -136,7 +136,7 @@ void player_init(player_t* player) {
 }
 
 void player_destroy(player_t* player) {
-    animation_destroy(player->anim);
+    animcache_release(player->anim);
     animator_destroy(&player->animator);
     sprite_renderer_remove(&player->sprite);
     sprite_destroy(&player->sprite);
