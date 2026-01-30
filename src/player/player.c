@@ -136,11 +136,16 @@ void player_init(player_t* player) {
 }
 
 void player_destroy(player_t* player) {
+    animation_destroy(player->anim);
     animator_destroy(&player->animator);
     sprite_renderer_remove(&player->sprite);
     sprite_destroy(&player->sprite);
 
     free(player->weapons);
+
+    player->clip_idle = nullptr;
+    player->clip_left = nullptr;
+    player->clip_right = nullptr;
 }
 
 void player_explode(player_t* player) {
