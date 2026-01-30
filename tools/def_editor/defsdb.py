@@ -95,7 +95,7 @@ class ClipFramesModel(QAbstractTableModel):
             self.endMoveRows()
 
 class ClipListModel(QAbstractTableModel):
-    COL_NAME, COL_FPS, COL_LOOPMODE, COL_ORIGIN_X, COL_ORIGIN_Y = range(5)
+    COL_NAME, COL_FPS, COL_LOOPMODE, COL_ORIGIN_X, COL_ORIGIN_Y, COL_FLIP_H, COL_FLIP_V = range(7)
 
     def __init__(self, parent_model, parent_row, data_override=None, include_empty=False):
         super().__init__()
@@ -112,7 +112,7 @@ class ClipListModel(QAbstractTableModel):
         return len(self.clips) + (1 if self.include_empty else 0)
     
     def columnCount(self, parent=QModelIndex()):
-        return 5
+        return 7
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
@@ -147,6 +147,10 @@ class ClipListModel(QAbstractTableModel):
                 return clip.get('origin', [0,0])[0]
             if col == self.COL_ORIGIN_Y:
                 return clip.get('origin', [0,0])[1]
+            if col == self.COL_FLIP_H:
+                return clip.get('flip_h', False)
+            if col == self.COL_FLIP_V:
+                return clip.get('flip_v', False)
                 
         return None
 
@@ -173,6 +177,10 @@ class ClipListModel(QAbstractTableModel):
                 clip['origin'][0] = float(value)
             elif col == self.COL_ORIGIN_Y:
                 clip['origin'][1] = float(value)
+            elif col == self.COL_FLIP_H:
+                clip['flip_h'] = bool(value)
+            elif col == self.COL_FLIP_V:
+                clip['flip_v'] = bool(value)
             else:
                 return False
 
@@ -200,7 +208,7 @@ class ClipListModel(QAbstractTableModel):
     def add(self, name):
         self.beginInsertRows(QModelIndex(), len(self.clips), len(self.clips))
         global_origin = self.parent_model.get_global_origin(self.parent_row)
-        self.clips.append({ "name": name, "fps": 0.0, "loop_mode": 0, "frames": [], "origin": global_origin })
+        self.clips.append({ "name": name, "fps": 0.0, "loop_mode": 0, "frames": [], "origin": global_origin, "flip_h": False, "flip_v": False })
         self.endInsertRows()
         self.notify_changed()
 

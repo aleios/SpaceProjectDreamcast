@@ -24,6 +24,8 @@ class ClipDialog(QDialog, Ui_clipDialog):
         self.fieldMapper.addMapping(self.cbLoopMode, defsdb.ClipListModel.COL_LOOPMODE, b"currentIndex")
         self.fieldMapper.addMapping(self.sbOriginX, defsdb.ClipListModel.COL_ORIGIN_X)
         self.fieldMapper.addMapping(self.sbOriginY, defsdb.ClipListModel.COL_ORIGIN_Y)
+        self.fieldMapper.addMapping(self.cboxFlipH, defsdb.ClipListModel.COL_FLIP_H)
+        self.fieldMapper.addMapping(self.cboxFlipV, defsdb.ClipListModel.COL_FLIP_V)
         self.fieldMapper.setCurrentIndex(clip_index)
 
         # Frames mapping
