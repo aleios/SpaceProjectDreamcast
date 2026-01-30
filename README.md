@@ -23,10 +23,8 @@ Will be replaced with configurable values eventually but required for now.
 
 Without these the game will abort.
 
-- animations/player
 - animations/ui
 - sprites/ui
-- sprites/ships
 - sprites/font_16x16
 - fonts/main_font
 
