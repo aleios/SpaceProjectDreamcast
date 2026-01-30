@@ -5,10 +5,10 @@ class WeaponSetModel(QAbstractTableModel):
 
     def __init__(self, data_obj, parent=None):
         super().__init__(parent)
-        self.data_obj = data_obj
+        self._weapons = data_obj
 
     def rowCount(self, parent=QModelIndex()):
-        return len(self.data_obj.weapons)
+        return len(self._weapons)
 
     def columnCount(self, parent=QModelIndex()):
         return 1
@@ -17,7 +17,7 @@ class WeaponSetModel(QAbstractTableModel):
         if not index.isValid() or role not in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
             return None
 
-        item = self.data_obj.weapons[index.row()]
+        item = self._weapons[index.row()]
         if role == Qt.ItemDataRole.DisplayRole:
             if isinstance(item, dict):
                 return item.get('name', 'Unnamed')
@@ -27,9 +27,9 @@ class WeaponSetModel(QAbstractTableModel):
 
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
-            if self.data_obj.weapons[index.row()] != value:
-                self.data_obj.weapons[index.row()] = value
-                self.data_obj.modified = True
+            if self._weapons[index.row()] != value:
+                self._weapons[index.row()] = value
+                self._weapons.modified = True
                 self.dataChanged.emit(index, index, [role, Qt.ItemDataRole.DisplayRole])
             return True
         return False
@@ -41,30 +41,30 @@ class WeaponSetModel(QAbstractTableModel):
         return super().flags(index) | Qt.ItemFlag.ItemIsDragEnabled | Qt.ItemFlag.ItemIsDropEnabled
 
     def add(self, weapon_set):
-        self.beginInsertRows(QModelIndex(), len(self.data_obj.weapons), len(self.data_obj.weapons))
-        self.data_obj.weapons.append(weapon_set)
-        self.data_obj.modified = True
+        self.beginInsertRows(QModelIndex(), len(self._weapons), len(self._weapons))
+        self._weapons.append(weapon_set)
+        # self.data_obj.modified = True
         self.endInsertRows()
 
     def remove(self, row):
-        if 0 <= row < len(self.data_obj.weapons):
+        if 0 <= row < len(self._weapons):
             self.beginRemoveRows(QModelIndex(), row, row)
-            self.data_obj.weapons.pop(row)
-            self.data_obj.modified = True
+            self._weapons.pop(row)
+            # self.data_obj.modified = True
             self.endRemoveRows()
 
     def shift_up(self, row):
         if row > 0:
             self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1)
-            self.data_obj.weapons[row], self.data_obj.weapons[row - 1] = self.data_obj.weapons[row - 1], self.data_obj.weapons[row]
-            self.data_obj.modified = True
+            self._weapons[row], self._weapons[row - 1] = self._weapons[row - 1], self._weapons[row]
+            # self.data_obj.modified = True
             self.endMoveRows()
 
     def shift_down(self, row):
-        if row < len(self.data_obj.weapons) - 1:
+        if row < len(self._weapons) - 1:
             self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
-            self.data_obj.weapons[row], self.data_obj.weapons[row + 1] = self.data_obj.weapons[row + 1], self.data_obj.weapons[row]
-            self.data_obj.modified = True
+            self._weapons[row], self._weapons[row + 1] = self._weapons[row + 1], self._weapons[row]
+            # self.data_obj.modified = True
             self.endMoveRows()
 
     def mimeTypes(self):
@@ -93,10 +93,10 @@ class WeaponSetModel(QAbstractTableModel):
 
         self.beginMoveRows(QModelIndex(), src_row, src_row, QModelIndex(), dest_row)
 
-        item = self.data_obj.weapons.pop(src_row)
+        item = self._weapons.pop(src_row)
         insert_at = dest_row if dest_row <= src_row else dest_row - 1
-        self.data_obj.weapons.insert(insert_at, item)
-        self.data_obj.modified = True
+        self._weapons.insert(insert_at, item)
+        self._weapons.modified = True
 
         self.endMoveRows()
         return True

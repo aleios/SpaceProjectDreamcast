@@ -58,13 +58,18 @@ romdisk/settings.dat: assets/settings.json
 	@mkdir -p $(dir $@)
 	python tools/convert_game_settings.py $< $@
 
+PLAYER := romdisk/player.dat
+romdisk/player.dat: assets/player.json
+	@mkdir -p $(dir $@)
+	python tools/convert_player.py $< $@
+
 FONT_SRCS := $(shell find assets/fonts -type f -name '*.json' | sort)
 FONTS := $(FONT_SRCS:assets/fonts/%.json=romdisk/fonts/%.dat)
 romdisk/fonts/%.dat: assets/fonts/%.json
 	@mkdir -p $(dir $@)
 	python tools/convert_font.py $< $@
 
-ASSETS := $(GAMESETTINGS) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(LEVELS) $(FONTS)
+ASSETS := $(GAMESETTINGS) $(PLAYER) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(LEVELS) $(FONTS)
 
 # Build targets
 .PHONY: all clean rebuild-cdi rm-elf rm-disc

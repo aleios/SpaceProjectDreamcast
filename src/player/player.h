@@ -13,6 +13,7 @@ typedef struct Player {
     bool firing;
 
     animator_t animator;
+    animation_t* anim;
     animationclip_t* clip_idle;
     animationclip_t* clip_left;
     animationclip_t* clip_right;

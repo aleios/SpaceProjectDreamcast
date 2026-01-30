@@ -38,3 +38,10 @@ def write_emitter(output_file, emitter):
         write_ubyte(output_file, emitter.get("target_tracking", 0))
         write_float(output_file, float(emitter.get("tracking_delay", 0.0)))
 
+def write_weapons(output_file, weapons):
+    write_ushort(output_file, len(weapons))
+    for weap in weapons:
+        emitters = weap.get("emitters", [])
+        write_ushort(output_file, len(emitters))
+        for emitter in emitters:
+            write_emitter(output_file, emitter)

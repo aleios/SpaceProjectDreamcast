@@ -10,11 +10,6 @@ from tools.def_editor import defsdb
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setupUi(self)
-        self.actionPaths.triggered.connect(self.open_paths_dialog)
-
-        self.btnSave.clicked.connect(self.save)
-
         if os.path.exists("settings.json"):
             with open("settings.json", "r") as settings_file:
                 jx = json.load(settings_file)
@@ -26,6 +21,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.tabWidget.hide()
             self.open_paths_dialog()
+
+        self.setupUi(self)
+        self.actionPaths.triggered.connect(self.open_paths_dialog)
+        self.btnSave.clicked.connect(self.save)
 
     def open_paths_dialog(self):
         dlg = PathsDialog(self)

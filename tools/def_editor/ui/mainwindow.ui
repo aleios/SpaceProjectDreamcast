@@ -18,11 +18,16 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="pageGameSettings" name="tab">
        <attribute name="title">
         <string>Game Settings</string>
+       </attribute>
+      </widget>
+      <widget class="pagePlayer" name="tab_6">
+       <attribute name="title">
+        <string>Player</string>
        </attribute>
       </widget>
       <widget class="pageProjectiles" name="tab_2">
@@ -109,6 +114,12 @@
    <class>pageLevelEditor</class>
    <extends>QWidget</extends>
    <header>pageleveleditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pagePlayer</class>
+   <extends>QWidget</extends>
+   <header>pageplayer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

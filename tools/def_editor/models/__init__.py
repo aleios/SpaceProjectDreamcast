@@ -4,3 +4,4 @@ from .enemy import EnemyModel
 from .levels import LevelsModel, LevelEventsModel
 from .playlist import PlaylistModel
 from .weaponset import WeaponSetModel
+from .player import PlayerModel

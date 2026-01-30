@@ -61,26 +61,29 @@ bool gamesettings_load() {
     fs_read(file, &max_health, sizeof(max_health));
     g_gamesettings.max_health = max_health;
 
-    fs_read(file, &g_gamesettings.player_speed, sizeof(g_gamesettings.player_speed));
+    g_gamesettings.player_speed = 0.2f;
+    g_gamesettings.total_weapons = 0;
 
-    uint16_t total_weapons;
-    fs_read(file, &total_weapons, sizeof(total_weapons));
-    g_gamesettings.total_weapons = total_weapons;
-
-    g_gamesettings.weapons = malloc(sizeof(weaponset_t) * total_weapons);
-    for (int weapid = 0; weapid < total_weapons; ++weapid) {
-        weaponset_t* weap = &g_gamesettings.weapons[weapid];
-
-        uint16_t total_emitters;
-        fs_read(file, &total_emitters, sizeof(total_emitters));
-        weap->total_emitters = total_emitters;
-
-        weap->emitters = malloc(sizeof(emitter_t) * total_emitters);
-        for (int emitterid = 0; emitterid < total_emitters; ++emitterid) {
-            emitter_t* emitter = &weap->emitters[emitterid];
-            emitter_read(emitter, file);
-        }
-    }
+    // fs_read(file, &g_gamesettings.player_speed, sizeof(g_gamesettings.player_speed));
+    //
+    // uint16_t total_weapons;
+    // fs_read(file, &total_weapons, sizeof(total_weapons));
+    // g_gamesettings.total_weapons = total_weapons;
+    //
+    // g_gamesettings.weapons = malloc(sizeof(weaponset_t) * total_weapons);
+    // for (int weapid = 0; weapid < total_weapons; ++weapid) {
+    //     weaponset_t* weap = &g_gamesettings.weapons[weapid];
+    //
+    //     uint16_t total_emitters;
+    //     fs_read(file, &total_emitters, sizeof(total_emitters));
+    //     weap->total_emitters = total_emitters;
+    //
+    //     weap->emitters = malloc(sizeof(emitter_t) * total_emitters);
+    //     for (int emitterid = 0; emitterid < total_emitters; ++emitterid) {
+    //         emitter_t* emitter = &weap->emitters[emitterid];
+    //         emitter_read(emitter, file);
+    //     }
+    // }
 
     // Playlist
     strpool_init(&g_gamesettings.strpool, 8192);

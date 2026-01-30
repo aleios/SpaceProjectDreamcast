@@ -22,6 +22,9 @@ class Ui_MainWindow(object):
         self.tab = pageGameSettings()
         self.tab.setObjectName("tab")
         self.tabWidget.addTab(self.tab, "")
+        self.tab_6 = pagePlayer()
+        self.tab_6.setObjectName("tab_6")
+        self.tabWidget.addTab(self.tab_6, "")
         self.tab_2 = pageProjectiles()
         self.tab_2.setObjectName("tab_2")
         self.tabWidget.addTab(self.tab_2, "")
@@ -54,13 +57,14 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "SPJ Def Editor"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Game Settings"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), _translate("MainWindow", "Player"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Projectiles"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Enemies"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainWindow", "Animations"))
@@ -72,4 +76,5 @@ from pageanimations import pageAnimations
 from pageenemies import pageEnemies
 from pagegamesettings import pageGameSettings
 from pageleveleditor import pageLevelEditor
+from pageplayer import pagePlayer
 from pageprojectiles import pageProjectiles

@@ -3,9 +3,8 @@ import os
 import glob
 import json
 from dataclasses import dataclass, asdict, field
-from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, WeaponSetModel
+from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, WeaponSetModel, PlayerModel
 from PIL import Image
-
 #
 # -- Animation Model
 #
@@ -465,10 +464,12 @@ class GameSettingsModel(QAbstractTableModel):
 projectile_defs = ProjectileModel()
 enemy_defs = EnemyModel()
 
+player_def = PlayerModel()
+
 # Game settings models
 game_settings = GameSettingsData()
 game_settings_model = GameSettingsModel(game_settings)
-weapons_model = WeaponSetModel(game_settings)
+#weapons_model = WeaponSetModel(game_settings)
 playlist_model = PlaylistModel(game_settings)
 
 # Animation models
@@ -491,14 +492,16 @@ def reload_defs():
         with open(assets_path + "/settings.json", "r") as f:
             data = json.load(f)
             game_settings_model.beginResetModel()
-            weapons_model.beginResetModel()
+            #weapons_model.beginResetModel()
             playlist_model.beginResetModel()
             game_settings.from_dict(data)
             game_settings_model.endResetModel()
-            weapons_model.endResetModel()
+            #weapons_model.endResetModel()
             playlist_model.endResetModel()
     except IOError:
         print("Loading default game settings")
+
+    player_def.load(assets_path)
 
     print("Defs reloaded")
 
@@ -507,6 +510,8 @@ def save_pending_defs():
     enemy_defs.save(assets_path)
     animations.save(assets_path)
     levels.save(assets_path)
+
+    player_def.save(assets_path)
 
     if game_settings.modified:
         path = assets_path + "/settings.json"

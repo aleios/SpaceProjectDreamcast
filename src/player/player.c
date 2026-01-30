@@ -11,6 +11,7 @@
 #include "../sound/sound.h"
 
 #include "../screens/load_screen.h"
+#include "../util/readutils.h"
 
 typedef struct InputAccumulator {
     shz_vec2_t dir;
@@ -39,24 +40,69 @@ void inputaccumulator_apply_delta(inputaccumulator_t* acc, float speed, float de
     acc->dir = shz_vec2_scale(acc->dir, speed * delta_time);
 }
 
+static bool player_load(player_t* player) {
+    file_t f = fs_open("/rd/player.dat", O_RDONLY);
+
+    // TODO: do a goto or we leak.
+    if (f < 0) {
+        return false;
+    }
+
+    // Read animation
+    char path_buf[256];
+    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+        return false;
+    }
+    player->anim = animcache_get(path_buf);
+    if (!player->anim) {
+        return false;
+    }
+
+    // Read idle clip
+    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+        return false;
+    }
+    player->clip_idle = animation_get_clip(player->anim, path_buf);
+    if (!player->clip_idle) {
+        return false;
+    }
+
+    // Read left and right clips (optional fields)
+    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+        return false;
+    }
+    player->clip_left = animation_get_clip(player->anim, path_buf);
+
+    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+        return false;
+    }
+    player->clip_right = animation_get_clip(player->anim, path_buf);
+
+    // Physics
+    fs_read(f, &player->speed, sizeof(float));
+
+    // Weapons
+    fs_close(f);
+    return true;
+}
+
 void player_init(player_t* player) {
 
+    // Load player data
+    if (!player_load(player)) {
+        arch_abort();
+    }
+
+    // Setup
     transform_init(&player->transform);
 
-    sprite_init(&player->sprite, &player->transform, texcache_get("ships"));
-
-    animation_t* player_anim = animcache_get("player");
-    if(player_anim) {
-        player->clip_idle = animation_get_clip(player_anim, "idle");
-        player->clip_left = animation_get_clip(player_anim, "left");
-        player->clip_right = animation_get_clip(player_anim, "right");
-    }
+    sprite_init(&player->sprite, &player->transform, player->anim->tex);
 
     animator_init(&player->animator, &player->sprite, player->clip_idle);
 
     sprite_renderer_add(&player->sprite);
 
-    player->speed = 0.2f;
+    //player->speed = 0.2f;
     player->transform.origin = shz_vec2_init(24.0f, 29.0f);
     player->collider.radius = 1.0f;
 
@@ -140,7 +186,7 @@ void player_step(player_t* player, float delta_time) {
         float jy = (float)state->joyy * factor;
 
         inputaccumulator_add(&acc, jx, jy, state->a);
-        inputaccumulator_add(&acc, 
+        inputaccumulator_add(&acc,
             (float)(state->dpad_right - state->dpad_left),
             (float)(state->dpad_down - state->dpad_up),
             false
@@ -151,14 +197,14 @@ void player_step(player_t* player, float delta_time) {
     if(kbd_dev) {
         kbd_state_t* state = maple_dev_status(kbd_dev);
 
-        inputaccumulator_add(&acc, 
+        inputaccumulator_add(&acc,
             (float)(state->key_states[KBD_KEY_D].is_down - state->key_states[KBD_KEY_A].is_down),
             (float)(state->key_states[KBD_KEY_S].is_down - state->key_states[KBD_KEY_W].is_down),
             state->key_states[KBD_KEY_SPACE].is_down
         );
     }
 
-    const float move_threshold = 0.2f;
+    const float move_threshold = 0.15f;
     if(acc.dir.x >= move_threshold) {
         animator_set_clip(&player->animator, player->clip_right);
     } else if(acc.dir.x <= -move_threshold) {
@@ -167,7 +213,7 @@ void player_step(player_t* player, float delta_time) {
         animator_set_clip(&player->animator, player->clip_idle);
     }
 
-    inputaccumulator_apply_delta(&acc, gamesettings_player_speed(), delta_time);
+    inputaccumulator_apply_delta(&acc, player->speed, delta_time);
     float new_x = player->transform.pos.x + acc.dir.x;
     float new_y = player->transform.pos.y + acc.dir.y;
 
