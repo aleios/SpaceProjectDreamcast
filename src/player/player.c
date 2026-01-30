@@ -40,6 +40,13 @@ void inputaccumulator_apply_delta(inputaccumulator_t* acc, float speed, float de
     acc->dir = shz_vec2_scale(acc->dir, speed * delta_time);
 }
 
+static weaponset_t* player_get_weaponset(player_t* player, int index) {
+    if (SHZ_UNLIKELY(index < 0 || index >= player->total_weapons)) {
+        return nullptr;
+    }
+    return &player->weapons[index];
+}
+
 static bool player_load(player_t* player) {
     file_t f = fs_open("/rd/player.dat", O_RDONLY);
 
@@ -82,6 +89,25 @@ static bool player_load(player_t* player) {
     fs_read(f, &player->speed, sizeof(float));
 
     // Weapons
+    uint16_t total_weapons;
+    fs_read(f, &total_weapons, sizeof(total_weapons));
+    player->total_weapons = total_weapons;
+
+    player->weapons = malloc(sizeof(weaponset_t) * total_weapons);
+    for (int weapid = 0; weapid < total_weapons; ++weapid) {
+        weaponset_t* weap = &player->weapons[weapid];
+
+        uint16_t total_emitters;
+        fs_read(f, &total_emitters, sizeof(total_emitters));
+        weap->total_emitters = total_emitters;
+
+        weap->emitters = malloc(sizeof(emitter_t) * total_emitters);
+        for (int emitterid = 0; emitterid < total_emitters; ++emitterid) {
+            emitter_t* emitter = &weap->emitters[emitterid];
+            emitter_read(emitter, f);
+        }
+    }
+
     fs_close(f);
     return true;
 }
@@ -113,6 +139,8 @@ void player_destroy(player_t* player) {
     animator_destroy(&player->animator);
     sprite_renderer_remove(&player->sprite);
     sprite_destroy(&player->sprite);
+
+    free(player->weapons);
 }
 
 void player_explode(player_t* player) {
@@ -204,7 +232,7 @@ void player_step(player_t* player, float delta_time) {
         );
     }
 
-    const float move_threshold = 0.15f;
+    constexpr float move_threshold = 0.20f;
     if(acc.dir.x >= move_threshold) {
         animator_set_clip(&player->animator, player->clip_right);
     } else if(acc.dir.x <= -move_threshold) {
@@ -227,10 +255,10 @@ void player_step(player_t* player, float delta_time) {
 
     player->firing = acc.firing;
 
-    weaponset_t* set = gamesettings_get_weaponset(g_gamestate.weaponset);
+    weaponset_t* set = player_get_weaponset(player, g_gamestate.current_weapon);
     int num_emitters = set ? set->total_emitters : 0;
     for (int i = 0; i < num_emitters; ++i) {
-        emitter_t* emitter = gamesettings_get_emitter(set, i);
+        emitter_t* emitter = weaponset_get_emitter(set, i);
         if (SHZ_UNLIKELY(!emitter)) {
             continue;
         }

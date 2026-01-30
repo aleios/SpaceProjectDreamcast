@@ -87,8 +87,8 @@ void collectablepool_step(collectablepool_t* pool, float delta_time) {
                 }
                 break;
             case COLLECTABLE_POWER:
-                if (g_gamestate.weaponset < gamesettings_total_weapons()-1) {
-                    g_gamestate.weaponset += 1;
+                if (g_gamestate.current_weapon < player_get_total_weapons(gamestate_get_player())-1) {
+                    g_gamestate.current_weapon += 1;
                 }
                 break;
             case COLLECTABLE_LIFE:

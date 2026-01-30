@@ -2,6 +2,7 @@
 #include "../components/sprite.h"
 #include "../animator.h"
 #include "../components/collider.h"
+#include "../projectile/weaponset.h"
 
 typedef struct Player {
     sprite_t sprite;
@@ -18,6 +19,9 @@ typedef struct Player {
     animationclip_t* clip_left;
     animationclip_t* clip_right;
 
+    int total_weapons;
+    weaponset_t* weapons;
+
     uint32_t boom;
 } player_t;
 
@@ -31,4 +35,8 @@ void player_move(player_t* player, shz_vec2_t offset);
 
 SHZ_FORCE_INLINE shz_vec2_t player_get_position(player_t* player) {
     return player->transform.pos;
+}
+
+SHZ_FORCE_INLINE int player_get_total_weapons(player_t* player) {
+    return player->total_weapons;
 }

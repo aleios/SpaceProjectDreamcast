@@ -39,7 +39,7 @@ void gamestate_reset() {
     g_gamestate.lives = gamesettings_max_lives();
     g_gamestate.health = gamesettings_max_health();
     g_gamestate.playlist_index = 0;
-    g_gamestate.weaponset = 0;
+    g_gamestate.current_weapon = 0;
 }
 
 bool gamestate_set_level(const char* level_name, bool keep_stats) {

@@ -23,7 +23,7 @@ typedef struct GameState {
     int lives;
     int health;
 
-    int weaponset;
+    int current_weapon;
 
     int playlist_index;
     bool is_playlist;
