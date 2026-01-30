@@ -48,16 +48,16 @@ static weaponset_t* player_get_weaponset(player_t* player, int index) {
 }
 
 static bool player_load(player_t* player) {
-    file_t f = fs_open("/rd/player.dat", O_RDONLY);
+    const file_t player_file = fs_open("/rd/player.dat", O_RDONLY);
 
     // TODO: do a goto or we leak.
-    if (f < 0) {
+    if (player_file < 0) {
         return false;
     }
 
     // Read animation
     char path_buf[256];
-    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+    if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
         return false;
     }
     player->anim = animcache_get(path_buf);
@@ -66,7 +66,7 @@ static bool player_load(player_t* player) {
     }
 
     // Read idle clip
-    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+    if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
         return false;
     }
     player->clip_idle = animation_get_clip(player->anim, path_buf);
@@ -75,22 +75,22 @@ static bool player_load(player_t* player) {
     }
 
     // Read left and right clips (optional fields)
-    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+    if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
         return false;
     }
     player->clip_left = animation_get_clip(player->anim, path_buf);
 
-    if (!readutil_readstr(f, path_buf, sizeof(path_buf))) {
+    if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
         return false;
     }
     player->clip_right = animation_get_clip(player->anim, path_buf);
 
     // Physics
-    fs_read(f, &player->speed, sizeof(float));
+    fs_read(player_file, &player->speed, sizeof(float));
 
     // Weapons
     uint16_t total_weapons;
-    fs_read(f, &total_weapons, sizeof(total_weapons));
+    fs_read(player_file, &total_weapons, sizeof(total_weapons));
     player->total_weapons = total_weapons;
 
     player->weapons = malloc(sizeof(weaponset_t) * total_weapons);
@@ -98,17 +98,17 @@ static bool player_load(player_t* player) {
         weaponset_t* weap = &player->weapons[weapid];
 
         uint16_t total_emitters;
-        fs_read(f, &total_emitters, sizeof(total_emitters));
+        fs_read(player_file, &total_emitters, sizeof(total_emitters));
         weap->total_emitters = total_emitters;
 
         weap->emitters = malloc(sizeof(emitter_t) * total_emitters);
         for (int emitterid = 0; emitterid < total_emitters; ++emitterid) {
             emitter_t* emitter = &weap->emitters[emitterid];
-            emitter_read(emitter, f);
+            emitter_read(emitter, player_file);
         }
     }
 
-    fs_close(f);
+    fs_close(player_file);
     return true;
 }
 
