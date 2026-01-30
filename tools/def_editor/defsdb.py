@@ -471,21 +471,17 @@ class GameSettingsModel(QAbstractTableModel):
 # Def models
 projectile_defs = ProjectileModel()
 enemy_defs = EnemyModel()
-
 player_def = PlayerModel()
 
 # Game settings models
 game_settings = GameSettingsData()
 game_settings_model = GameSettingsModel(game_settings)
-#weapons_model = WeaponSetModel(game_settings)
 playlist_model = PlaylistModel(game_settings)
 
 # Animation models
 animations = AnimationModel()
 
 levels = LevelsModel()
-
-pending_removals = []
 
 assets_path = ""
 
