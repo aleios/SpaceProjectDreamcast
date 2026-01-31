@@ -1,7 +1,6 @@
-import os
-
 from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QAbstractItemView, QInputDialog, QMessageBox
 from PyQt6.QtCore import Qt
+from models.animation import ClipListModel, ClipFramesModel
 from ui.Animations import Ui_pageAnimations
 from clipdialog import ClipDialog
 from tools.def_editor import defsdb
@@ -56,7 +55,7 @@ class pageAnimations(QWidget, Ui_pageAnimations):
         # Clone original model
         clips_data = copy.deepcopy(clips_model_orig.clips)
 
-        clips_model_copy = defsdb.ClipListModel(
+        clips_model_copy = ClipListModel(
             clips_model_orig.parent_model, 
             clips_model_orig.parent_row, 
             data_override=clips_data
@@ -67,7 +66,7 @@ class pageAnimations(QWidget, Ui_pageAnimations):
         global_origin = defsdb.animations.get_global_origin(anim_row)
 
         temp_clip_data = clips_data[clip_index]
-        frames_model = defsdb.ClipFramesModel(temp_clip_data, clips_model_copy)
+        frames_model = ClipFramesModel(temp_clip_data, clips_model_copy)
         dlg = ClipDialog(clips_model_copy, clip_index, frames_model, global_origin, self.tbTexture.text())
         res = dlg.exec()
 

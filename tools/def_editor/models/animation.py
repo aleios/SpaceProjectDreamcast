@@ -1,0 +1,394 @@
+import json
+import os
+import glob
+from PIL import Image
+from PyQt6.QtCore import QModelIndex, Qt, QAbstractTableModel
+
+class ClipFramesModel(QAbstractTableModel):
+    # COL_DISPLAY is for list views showing [x, y, w, h]
+    COL_DISPLAY, COL_X, COL_Y, COL_W, COL_H = range(5)
+
+    def __init__(self, clip_dict, parent_clip_model):
+        super().__init__()
+        self.clip_dict = clip_dict
+        self.frames = clip_dict.get('frames', [])
+        self.parent_clip_model = parent_clip_model
+
+    def rowCount(self, parent=QModelIndex()):
+        return len(self.frames)
+
+    def columnCount(self, parent=QModelIndex()):
+        return 5
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid() or not (0 <= index.row() < len(self.frames)):
+            return None
+
+        row_data = self.frames[index.row()]
+        col = index.column()
+
+        if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+            # Format for list views if requesting display.
+            if col == self.COL_DISPLAY:
+                return f"[{row_data[0]}, {row_data[1]}, {row_data[2]}, {row_data[3]}]"
+
+            # Otherwise grab the internal values
+            if col == self.COL_X: return row_data[0]
+            if col == self.COL_Y: return row_data[1]
+            if col == self.COL_W: return row_data[2]
+            if col == self.COL_H: return row_data[3]
+
+        return None
+
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
+        if index.isValid() and role == Qt.ItemDataRole.EditRole:
+            row = index.row()
+            col = index.column()
+
+            try:
+                val = float(value)
+                if col == self.COL_X: self.frames[row][0] = val
+                elif col == self.COL_Y: self.frames[row][1] = val
+                elif col == self.COL_W: self.frames[row][2] = val
+                elif col == self.COL_H: self.frames[row][3] = val
+                else: return False
+
+                # Update list view str
+                display_idx = self.index(row, self.COL_DISPLAY)
+                self.dataChanged.emit(display_idx, display_idx, [Qt.ItemDataRole.DisplayRole])
+
+                # update mapper col
+                self.dataChanged.emit(index, index, [role])
+
+                # Notify parent of vhanges.
+                self.parent_clip_model.notify_changed()
+                return True
+            except (ValueError, IndexError):
+                return False
+        return False
+
+    def add(self):
+        self.beginInsertRows(QModelIndex(), len(self.frames), len(self.frames))
+        self.frames.append([0.0,0.0,0.0,0.0])
+        self.endInsertRows()
+
+    def remove(self, row):
+        if 0 <= row < len(self.frames):
+            self.beginRemoveRows(QModelIndex(), row, row)
+            self.frames.pop(row)
+            self.endRemoveRows()
+
+    def shift_up(self, row):
+        if row > 0:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1)
+            self.frames[row], self.frames[row - 1] = self.frames[row - 1], self.frames[row]
+            self.endMoveRows()
+
+    def shift_down(self, row):
+        if row < len(self.frames) - 1:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
+            self.frames[row], self.frames[row + 1] = self.frames[row + 1], self.frames[row]
+            self.endMoveRows()
+
+class ClipListModel(QAbstractTableModel):
+    COL_NAME, COL_FPS, COL_LOOPMODE, COL_ORIGIN_X, COL_ORIGIN_Y, COL_FLIP_H, COL_FLIP_V = range(7)
+
+    def __init__(self, parent_model, parent_row, data_override=None, include_empty=False):
+        super().__init__()
+        self.parent_model = parent_model
+        self.parent_row = parent_row
+        self.include_empty = include_empty
+
+        if data_override is not None:
+            self.clips = data_override
+        else:
+            self.clips = parent_model._data_list[parent_row]['clips']
+
+    def rowCount(self, parent=QModelIndex()):
+        return len(self.clips) + (1 if self.include_empty else 0)
+
+    def columnCount(self, parent=QModelIndex()):
+        return 7
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid():
+            return None
+
+        row = index.row()
+        if self.include_empty:
+            if row < 0 or row > len(self.clips):
+                return None
+            if row == 0:
+                if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+                    if index.column() == self.COL_NAME:
+                        return ""
+                return None
+            data_row = row - 1
+        else:
+            if row < 0 or row >= len(self.clips):
+                return None
+            data_row = row
+
+        if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+            col = index.column()
+            clip = self.clips[data_row]
+
+            if col == self.COL_NAME:
+                return clip.get('name', "")
+            if col == self.COL_FPS:
+                return clip.get('fps', 0.0)
+            if col == self.COL_LOOPMODE:
+                return clip.get('loop_mode', 0)
+            if col == self.COL_ORIGIN_X:
+                return clip.get('origin', [0,0])[0]
+            if col == self.COL_ORIGIN_Y:
+                return clip.get('origin', [0,0])[1]
+            if col == self.COL_FLIP_H:
+                return clip.get('flip_h', False)
+            if col == self.COL_FLIP_V:
+                return clip.get('flip_v', False)
+
+        return None
+
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
+        if index.isValid() and role == Qt.ItemDataRole.EditRole:
+            row = index.row()
+            if self.include_empty:
+                if row == 0:
+                    return False
+                data_row = row - 1
+            else:
+                data_row = row
+
+            col = index.column()
+            clip = self.clips[data_row]
+
+            if col == self.COL_NAME:
+                clip['name'] = str(value)
+            elif col == self.COL_FPS:
+                clip['fps'] = float(value)
+            elif col == self.COL_LOOPMODE:
+                clip['loop_mode'] = int(value)
+            elif col == self.COL_ORIGIN_X:
+                clip['origin'][0] = float(value)
+            elif col == self.COL_ORIGIN_Y:
+                clip['origin'][1] = float(value)
+            elif col == self.COL_FLIP_H:
+                clip['flip_h'] = bool(value)
+            elif col == self.COL_FLIP_V:
+                clip['flip_v'] = bool(value)
+            else:
+                return False
+
+            self.dataChanged.emit(index, index, [role, Qt.ItemDataRole.DisplayRole])
+            self.notify_changed()
+            return True
+        return False
+
+    def flags(self, index):
+        if self.include_empty and index.row() == 0:
+            return super().flags(index)
+        return super().flags(index) | Qt.ItemFlag.ItemIsEditable
+
+    def get_clip_data(self, row):
+        if self.include_empty:
+            if row == 0:
+                return None
+            return self.clips[row - 1]
+        return self.clips[row]
+
+    def notify_changed(self):
+        idx = self.parent_model.index(self.parent_row, AnimationModel.COL_MODIFIED)
+        self.parent_model.setData(idx, True)
+
+    def add(self, name):
+        self.beginInsertRows(QModelIndex(), len(self.clips), len(self.clips))
+        global_origin = self.parent_model.get_global_origin(self.parent_row)
+        self.clips.append({ "name": name, "fps": 0.0, "loop_mode": 0, "frames": [], "origin": global_origin, "flip_h": False, "flip_v": False })
+        self.endInsertRows()
+        self.notify_changed()
+
+    def exists(self, key):
+        return bool([x for x in self.clips if x['name'] == key])
+
+class AnimationModel(QAbstractTableModel):
+    COL_NAME, COL_MODIFIED, COL_TEXTURE, COL_ORIGIN, COL_ORIGIN_X, COL_ORIGIN_Y, COL_CLIPS = range(7)
+
+    def __init__(self):
+        super().__init__()
+        self._data_list = []
+        self._pending_deletions = []
+        self.folder = "animations"
+
+    def rowCount(self, parent=QModelIndex()):
+        return len(self._data_list)
+
+    def columnCount(self, parent=QModelIndex()):
+        return 7
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid() or not (0 <= index.row() < len(self._data_list)):
+            return None
+
+        item = self._data_list[index.row()]
+        col = index.column()
+
+        if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+            if col == self.COL_NAME: return item['name']
+            if col == self.COL_MODIFIED: return item['modified']
+            if col == self.COL_TEXTURE: return item['texture']
+            if col == self.COL_ORIGIN_X:
+                return item['origin'][0] if len(item['origin']) > 0 else 0
+            if col == self.COL_ORIGIN_Y:
+                return item['origin'][1] if len(item['origin']) > 1 else 0
+            if col == self.COL_CLIPS: return item['clips'] # Returns the list of dicts
+        return None
+
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
+        if not index.isValid() or role != Qt.ItemDataRole.EditRole:
+            return False
+
+        row = index.row()
+        col = index.column()
+        item = self._data_list[row]
+        changed = False
+
+        if col == self.COL_ORIGIN_X:
+            item['origin'][0] = float(value)
+            changed = True
+        elif col == self.COL_ORIGIN_Y:
+            item['origin'][1] = float(value)
+            changed = True
+        elif col == self.COL_TEXTURE:
+            item['texture'] = value
+            changed = True
+        elif col == self.COL_NAME:
+            item['name'] = value
+            changed = True
+        elif col == self.COL_MODIFIED:
+            item['modified'] = bool(value)
+            self.dataChanged.emit(index, index, [role])
+            return True
+
+        if changed:
+            self._mark_dirty(row, index)
+            return True
+
+        return False
+
+    def get_global_origin(self, row: int):
+        x = self.data(self.index(row, self.COL_ORIGIN_X), Qt.ItemDataRole.EditRole)
+        y = self.data(self.index(row, self.COL_ORIGIN_Y), Qt.ItemDataRole.EditRole)
+        return [x, y]
+
+    @classmethod
+    def _normalize_clip_data(cls, name, v):
+        if not isinstance(v, dict):
+            v = {}
+        clip = { "name": name, **v }
+        clip.setdefault("fps", 0.0)
+        clip.setdefault("loop_mode", 0)
+        clip.setdefault("frames", [])
+        clip.setdefault("origin", [0.0,0.0])
+        return clip
+
+    def load(self, assets_path):
+        self.beginResetModel()
+        self._data_list = []
+        path = os.path.join(assets_path, self.folder, "*.json")
+        for file_path in glob.glob(path):
+            if os.path.isfile(file_path):
+                name = os.path.splitext(os.path.basename(file_path))[0]
+                with open(file_path, "r") as f:
+                    data = json.load(f)
+                    mapped_data = {
+                        "name": name,
+                        "modified": False,
+                        "texture": "",
+                        "origin": [0, 0],
+                        "clips": []
+                    }
+                    if '_meta' in data:
+                        meta = data["_meta"]
+                        mapped_data['texture'] = meta.get("texture", "")
+                        mapped_data['origin'] = meta.get("origin", [0, 0])
+
+                    for k, v in data.items():
+                        if k == '_meta': continue
+                        mapped_data["clips"].append(self._normalize_clip_data(k, v))
+
+                    self._data_list.append(mapped_data)
+        self.endResetModel()
+
+    def get_clip_list_model(self, row, include_empty=False):
+        return ClipListModel(self, row, include_empty=include_empty)
+
+    def save(self, assets_path):
+        base_path = os.path.join(assets_path, self.folder)
+        os.makedirs(base_path, exist_ok=True)
+        for item in self._data_list:
+            if item['modified']:
+                tex = item.get('texture', None)
+
+                # TODO: Error message... or maybe just 0 out the atlas w/h
+                atlas_width = 0
+                atlas_height = 0
+                if tex:
+                    # Get atlas_width and atlas_height from texture dimensions
+                    try:
+                        tex_path = os.path.join(assets_path, f"sprites/{tex}.png")
+                        with Image.open(tex_path) as im:
+                            atlas_width = im.width
+                            atlas_height = im.height
+                    except:
+                        pass
+                else:
+                    pass
+                    # Spawn warning message box
+
+                # Reconstruct JSON
+                out = {
+                    "_meta": {
+                        "texture": item['texture'],
+                        "origin": item['origin'],
+                        "atlas_width": atlas_width,
+                        "atlas_height": atlas_height
+                    }
+                }
+                # Add clips back as keys
+                for clip in item['clips']:
+                    clip_copy = dict(clip)
+                    name = clip_copy.pop('name')
+                    out[name] = clip_copy
+
+                file_path = os.path.join(base_path, f"{item['name']}.json")
+                with open(file_path, "w") as f:
+                    json.dump(out, f, indent=2, separators=(',', ': '))
+                item['modified'] = False
+        self.layoutChanged.emit()
+
+    def _mark_dirty(self, row, index):
+        if not self._data_list[row]['modified']:
+            self._data_list[row]['modified'] = True
+            mod_idx = self.index(row, self.COL_MODIFIED)
+            self.dataChanged.emit(mod_idx, mod_idx, [Qt.ItemDataRole.DisplayRole])
+
+        self.dataChanged.emit(index, index, [Qt.ItemDataRole.EditRole, Qt.ItemDataRole.DisplayRole])
+
+    def isDirty(self):
+        return any(item.get('modified') for item in self._data_list) or len(self._pending_deletions) > 0
+
+    def add(self, name):
+        self.beginInsertRows(QModelIndex(), len(self._data_list), len(self._data_list))
+        self._data_list.append({
+            "name": name,
+            "modified": True,
+            "texture": "",
+            "origin": [0.0,0.0],
+            "clips": []
+        })
+        self.endInsertRows()
+
+    def exists(self, key):
+        from tools.def_editor import defsdb
+        return bool([x for x in self._data_list if x['name'] == key]) or os.path.isfile(defsdb.assets_path + "/animations/" + key + ".json")
