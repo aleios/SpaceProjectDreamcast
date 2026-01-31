@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QDataWidgetMapper, QMessageBox
 from PyQt6.QtCore import Qt
+from models.animation import ClipListModel, ClipFramesModel
 from ui.Clipdialog import Ui_clipDialog
-from tools.def_editor import defsdb
 
 class ClipDialog(QDialog, Ui_clipDialog):
     def __init__(self, clips_model, clip_index, frames_model, global_origin, texture, *args, **kwargs):
@@ -11,7 +11,7 @@ class ClipDialog(QDialog, Ui_clipDialog):
         self.global_origin = global_origin
         self.clips_model = clips_model
         self.clip_index = clip_index
-        self.orig_name = clips_model.data(clips_model.index(clip_index, defsdb.ClipListModel.COL_NAME))
+        self.orig_name = clips_model.data(clips_model.index(clip_index, ClipListModel.COL_NAME))
 
         # Map clip data
         self.fieldMapper = QDataWidgetMapper(self)
@@ -19,13 +19,13 @@ class ClipDialog(QDialog, Ui_clipDialog):
         self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
         self.fieldMapper.setSubmitPolicy(QDataWidgetMapper.SubmitPolicy.ManualSubmit)
 
-        self.fieldMapper.addMapping(self.tbName, defsdb.ClipListModel.COL_NAME)
-        self.fieldMapper.addMapping(self.sbFPS, defsdb.ClipListModel.COL_FPS)
-        self.fieldMapper.addMapping(self.cbLoopMode, defsdb.ClipListModel.COL_LOOPMODE, b"currentIndex")
-        self.fieldMapper.addMapping(self.sbOriginX, defsdb.ClipListModel.COL_ORIGIN_X)
-        self.fieldMapper.addMapping(self.sbOriginY, defsdb.ClipListModel.COL_ORIGIN_Y)
-        self.fieldMapper.addMapping(self.cboxFlipH, defsdb.ClipListModel.COL_FLIP_H)
-        self.fieldMapper.addMapping(self.cboxFlipV, defsdb.ClipListModel.COL_FLIP_V)
+        self.fieldMapper.addMapping(self.tbName, ClipListModel.COL_NAME)
+        self.fieldMapper.addMapping(self.sbFPS, ClipListModel.COL_FPS)
+        self.fieldMapper.addMapping(self.cbLoopMode, ClipListModel.COL_LOOPMODE, b"currentIndex")
+        self.fieldMapper.addMapping(self.sbOriginX, ClipListModel.COL_ORIGIN_X)
+        self.fieldMapper.addMapping(self.sbOriginY, ClipListModel.COL_ORIGIN_Y)
+        self.fieldMapper.addMapping(self.cboxFlipH, ClipListModel.COL_FLIP_H)
+        self.fieldMapper.addMapping(self.cboxFlipV, ClipListModel.COL_FLIP_V)
         self.fieldMapper.setCurrentIndex(clip_index)
 
         # Frames mapping
@@ -38,10 +38,10 @@ class ClipDialog(QDialog, Ui_clipDialog):
         self.frameFieldMapper.setOrientation(Qt.Orientation.Horizontal)
         self.frameFieldMapper.setSubmitPolicy(QDataWidgetMapper.SubmitPolicy.ManualSubmit)
 
-        self.frameFieldMapper.addMapping(self.sbX, defsdb.ClipFramesModel.COL_X)
-        self.frameFieldMapper.addMapping(self.sbY, defsdb.ClipFramesModel.COL_Y)
-        self.frameFieldMapper.addMapping(self.sbW, defsdb.ClipFramesModel.COL_W)
-        self.frameFieldMapper.addMapping(self.sbH, defsdb.ClipFramesModel.COL_H)
+        self.frameFieldMapper.addMapping(self.sbX, ClipFramesModel.COL_X)
+        self.frameFieldMapper.addMapping(self.sbY, ClipFramesModel.COL_Y)
+        self.frameFieldMapper.addMapping(self.sbW, ClipFramesModel.COL_W)
+        self.frameFieldMapper.addMapping(self.sbH, ClipFramesModel.COL_H)
         
         self.frameFieldMapper.setCurrentIndex(0)
 

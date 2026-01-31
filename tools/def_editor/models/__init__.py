@@ -5,3 +5,4 @@ from .levels import LevelsModel, LevelEventsModel
 from .playlist import PlaylistModel
 from .weaponset import WeaponSetModel
 from .player import PlayerModel
+from .animation import AnimationModel
