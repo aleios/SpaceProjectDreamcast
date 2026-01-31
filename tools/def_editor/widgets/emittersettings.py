@@ -53,25 +53,26 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
             self.targetStack.setCurrentIndex(1)
 
     def set_emitter(self, emitter_dict):
-        self.model.set_data(emitter_dict)
+        self.model.set_emitters([emitter_dict])
         self.mapper.toFirst()
 
     def copy_emitter(self):
-        if not self.model.data_dict:
+        if not self.model.emitters:
             return
         
         clipboard = QGuiApplication.clipboard()
-        clipboard.setText(json.dumps(self.model.export_data()))
+        clipboard.setText(json.dumps(self.model.export_data(0)))
 
     def paste_emitter(self):
         clipboard = QGuiApplication.clipboard()
         try:
             data = json.loads(clipboard.text())
             # Don't overwrite the name
-            name = self.model.data_dict.get('name', 'Emitter')
-            self.model.data_dict.update(data)
-            self.model.data_dict['name'] = name
-            self.model.set_data(self.model.data_dict) # Refresh model
+            emitter = self.model.emitters[0]
+            name = emitter.get('name', 'Emitter')
+            emitter.update(data)
+            emitter['name'] = name
+            self.model.set_emitters([emitter]) # Refresh model
             self.mapper.toFirst()
         except:
             pass

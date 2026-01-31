@@ -115,8 +115,8 @@ class DefModel(QAbstractTableModel):
                     model = EmitterModel()
                     for event in save_data.get('events', []):
                         if event.get('type') == 'StartFiring':
-                            model.set_data(event)
-                            pruned = model.export_data()
+                            model.set_emitters([event])
+                            pruned = model.export_data(0)
                             event.clear()
                             event.update(pruned)
                 

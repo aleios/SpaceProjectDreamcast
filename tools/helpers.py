@@ -44,5 +44,10 @@ def write_weapons(output_file, weapons):
         emitters = weap.get("emitters", [])
         write_ubyte(output_file, weap.get("mode", 0))
         write_ushort(output_file, len(emitters))
+
+        if len(emitters) > 10:
+            print("Warning: More than 10 emitters. Truncated.")
+            emitters = emitters[:10]
+
         for emitter in emitters:
             write_emitter(output_file, emitter)

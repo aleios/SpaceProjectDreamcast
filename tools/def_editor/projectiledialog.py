@@ -1,29 +1,12 @@
-from PyQt6.QtCore import QModelIndex, Qt, QStringListModel, QTimer
-from PyQt6.QtWidgets import QDialog, QFileDialog, QToolTip
+from PyQt6.QtCore import QModelIndex, Qt, QTimer
+from PyQt6.QtWidgets import QDialog, QToolTip
 from ui.Projectiledialog import Ui_projectileDialog
-import os
 from tools.def_editor import defsdb
+from tools.def_editor.models.emitter import EmitterModel
 import copy
 
-class EmitterListModel(QStringListModel):
-    def __init__(self, emitters, parent=None):
-        super().__init__(parent)
-        self.emitters = emitters
-        self.setStringList([e.get('name', 'Unnamed') for e in self.emitters])
-
-    def add_emitter(self, emitter):
-        row = len(self.emitters)
-        self.insertRow(row)
-        self.emitters.append(emitter)
-        self.setData(self.index(row), emitter['name'])
-        return self.index(row)
-
-    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
-        if role == Qt.ItemDataRole.EditRole:
-            self.emitters[index.row()]['name'] = value
-        return super().setData(index, value, role)
-
 class ProjectileDialog(QDialog, Ui_projectileDialog):
+    MAX_EMITTERS = 10
     def __init__(self, parent=None, weapon_set=None):
         super().__init__()
         self.setupUi(self)
@@ -41,14 +24,24 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
         self.cbEmitterMode.setCurrentIndex(self.weapon_set.get('mode', 0))
         self.cbEmitterMode.currentIndexChanged.connect(self.mode_changed)
 
-        self.emitter_model = EmitterListModel(self.weapon_set.get('emitters', []))
+        if 'emitters' not in self.weapon_set:
+            self.weapon_set['emitters'] = []
+
+        self.emitter_model = EmitterModel()
+        self.emitter_model.set_emitters(self.weapon_set['emitters'])
         self.lvEmitters.setModel(self.emitter_model)
         self.lvEmitters.selectionModel().currentChanged.connect(self.emitter_selection_changed)
 
         self.btnNewEmitter.pressed.connect(self.add_emitter)
+        self.emitter_model.rowsInserted.connect(self.row_count_changed)
+        self.emitter_model.rowsRemoved.connect(self.row_count_changed)
+
+        self.btnDeleteEmitter.pressed.connect(self.delete_emitter)
+        self.btnMoveEmitterUp.pressed.connect(self.move_emitter_up)
+        self.btnMoveEmitterDown.pressed.connect(self.move_emitter_down)
 
         if len(self.weapon_set.get('emitters', [])) > 0:
-            self.lvEmitters.setCurrentIndex(self.emitter_model.index(0))
+            self.lvEmitters.setCurrentIndex(self.emitter_model.index(0, 0))
         else:
             self.stackedControls.setCurrentIndex(0)
 
@@ -59,9 +52,25 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
     def mode_changed(self, idx):
         self.weapon_set['mode'] = idx
 
+    def row_count_changed(self, parent, start, end):
+        self.btnNewEmitter.setEnabled(self.emitter_model.rowCount() < self.MAX_EMITTERS)
+        self._renumber_emitters()
+
+    def _renumber_emitters(self):
+        for i, emitter in enumerate(self.weapon_set['emitters']):
+            new_name = f"Emitter {i + 1}"
+            if emitter.get('name') != new_name:
+                emitter['name'] = new_name
+                # Notify name changed
+                idx = self.emitter_model.index(i, EmitterModel.COL_NAME)
+                self.emitter_model.dataChanged.emit(idx, idx, [Qt.ItemDataRole.DisplayRole])
+
     def add_emitter(self):
+        if self.emitter_model.rowCount() >= self.MAX_EMITTERS:
+            return
+
         new_emitter = {
-            "name": f"Emitter {len(self.weapon_set.get('emitters', [])) + 1}",
+            "name": f"Emitter {self.emitter_model.rowCount() + 1}",
             "projectile": defsdb.projectile_defs.data(
                 defsdb.projectile_defs.index(0, defsdb.ProjectileModel.COL_NAME), Qt.ItemDataRole.DisplayRole),
             "spawns_per_step": 1,
@@ -72,18 +81,45 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
             "lifetime": 1000,
             "offset": [0.0, 0.0],
         }
-        if 'emitters' not in self.weapon_set:
-            self.weapon_set['emitters'] = []
 
         idx = self.emitter_model.add_emitter(new_emitter)
         self.lvEmitters.setCurrentIndex(idx)
+
+    def delete_emitter(self):
+        idx = self.lvEmitters.currentIndex()
+        if idx.isValid():
+            row = idx.row()
+            self.emitter_model.remove(row)
+            
+            # Select the next available emitter or clear selection
+            new_row = min(row, self.emitter_model.rowCount() - 1)
+            if new_row >= 0:
+                self.lvEmitters.setCurrentIndex(self.emitter_model.index(new_row, 0))
+            else:
+                self.lvEmitters.setCurrentIndex(QModelIndex())
+
+    def move_emitter_up(self):
+        idx = self.lvEmitters.currentIndex()
+        if idx.isValid():
+            row = idx.row()
+            if self.emitter_model.shift_up(row):
+                self.lvEmitters.setCurrentIndex(self.emitter_model.index(row - 1, 0))
+                self._renumber_emitters()
+
+    def move_emitter_down(self):
+        idx = self.lvEmitters.currentIndex()
+        if idx.isValid():
+            row = idx.row()
+            if self.emitter_model.shift_down(row):
+                self.lvEmitters.setCurrentIndex(self.emitter_model.index(row + 1, 0))
+                self._renumber_emitters()
 
     def emitter_selection_changed(self, current, previous):
         self.emitter_changed(current.row())
 
     def emitter_changed(self, index):
         # If valid emitter (index >= 0), switch to page 1, otherwise page 0.
-        if index >= 0:
+        if 0 <= index < len(self.weapon_set.get('emitters', [])):
             self.stackedControls.setCurrentIndex(1)
             emitter = self.weapon_set['emitters'][index]
             self.widget.set_emitter(emitter)

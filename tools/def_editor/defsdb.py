@@ -23,9 +23,9 @@ class GameSettingsData:
         from tools.def_editor.models.emitter import EmitterModel
         model = EmitterModel()
         for weapon in d.get('weapons', []):
-            for emitter in weapon.get('emitters', []):
-                model.set_data(emitter)
-                pruned = model.export_data()
+            for i, emitter in enumerate(weapon.get('emitters', [])):
+                model.set_emitters(weapon['emitters'])
+                pruned = model.export_data(i)
                 emitter.clear()
                 emitter.update(pruned)
 
@@ -103,11 +103,9 @@ def reload_defs():
         with open(assets_path + "/settings.json", "r") as f:
             data = json.load(f)
             game_settings_model.beginResetModel()
-            #weapons_model.beginResetModel()
             playlist_model.beginResetModel()
             game_settings.from_dict(data)
             game_settings_model.endResetModel()
-            #weapons_model.endResetModel()
             playlist_model.endResetModel()
     except IOError:
         print("Loading default game settings")

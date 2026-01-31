@@ -1,10 +1,11 @@
 from PyQt6.QtCore import QAbstractTableModel, QModelIndex, Qt
 
 class EmitterModel(QAbstractTableModel):
-    COL_PROJECTILE, COL_SPAWNS, COL_DELAY, COL_START_ANGLE, COL_STEP_ANGLE, COL_SPEED, COL_LIFETIME, COL_OFFSETX, COL_OFFSETY = range(9)
-    COL_TARGET, COL_TARGET_TRACKING, COL_TRACKING_DELAY = range(9, 12)
+    COL_NAME, COL_PROJECTILE, COL_SPAWNS, COL_DELAY, COL_START_ANGLE, COL_STEP_ANGLE, COL_SPEED, COL_LIFETIME, COL_OFFSETX, COL_OFFSETY = range(10)
+    COL_TARGET, COL_TARGET_TRACKING, COL_TRACKING_DELAY = range(10, 13)
 
     MAP = {
+        COL_NAME: {'key': 'name', 'type': str, 'default': 'Unnamed', 'export_cond': lambda d: False },
         COL_PROJECTILE: {'key': 'projectile', 'type': str, 'default': ''},
         COL_SPAWNS: {'key': 'spawns_per_step', 'type': int, 'default': 1},
         COL_DELAY: {'key': 'delay', 'type': int, 'default': 500 },
@@ -34,60 +35,112 @@ class EmitterModel(QAbstractTableModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.data_dict = {}
+        self.emitters = []
 
     def rowCount(self, parent=QModelIndex()):
-        return 1
+        return len(self.emitters)
 
     def columnCount(self, parent=QModelIndex()):
-        return 12
+        return 13
 
-    def set_data(self, data):
+    def set_emitters(self, emitters):
         self.beginResetModel()
-        self.data_dict = data
+        self.emitters = emitters
         
-        # Ensure all keys from MAP exist in data_dict with defaults if missing
+        for emitter in self.emitters:
+            # Ensure all keys from MAP exist in data_dict with defaults if missing
+            for col, info in self.MAP.items():
+                key = info['key']
+                if key not in emitter:
+                    emitter[key] = info.get('default')
+
+            if 'offset' not in emitter or not isinstance(emitter['offset'], list) or len(emitter['offset']) < 2:
+                emitter['offset'] = [0.0, 0.0]
+        self.endResetModel()
+
+    def add_emitter(self, emitter):
+        row = len(self.emitters)
+        self.beginInsertRows(QModelIndex(), row, row)
+        self.emitters.append(emitter)
+        
+        # Ensure default values
         for col, info in self.MAP.items():
             key = info['key']
-            if key not in self.data_dict:
-                self.data_dict[key] = info.get('default')
+            if key not in emitter:
+                emitter[key] = info.get('default')
+        if 'offset' not in emitter:
+            emitter['offset'] = [0.0, 0.0]
+            
+        self.endInsertRows()
+        return self.index(row, 0)
 
-        if 'offset' not in self.data_dict or not isinstance(self.data_dict['offset'], list) or len(self.data_dict['offset']) < 2:
-            self.data_dict['offset'] = [0.0, 0.0]
-        self.endResetModel()
+    def remove(self, row):
+        if 0 <= row < len(self.emitters):
+            self.beginRemoveRows(QModelIndex(), row, row)
+            self.emitters.pop(row)
+            self.endRemoveRows()
+
+    def shift_up(self, row):
+        if row > 0:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1)
+            self.emitters[row], self.emitters[row - 1] = self.emitters[row - 1], self.emitters[row]
+            self.endMoveRows()
+            return True
+        return False
+
+    def shift_down(self, row):
+        if row < len(self.emitters) - 1:
+            # Note: to move to after row+1, we must specify row+2 as destination
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
+            self.emitters[row], self.emitters[row + 1] = self.emitters[row + 1], self.emitters[row]
+            self.endMoveRows()
+            return True
+        return False
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid() or role not in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
             return None
 
+        row = index.row()
         col = index.column()
+        if not (0 <= row < len(self.emitters)):
+            return None
+            
+        emitter = self.emitters[row]
+
         if col == self.COL_OFFSETX:
-            return self.data_dict.get('offset', [0.0, 0.0])[0]
+            return emitter.get('offset', [0.0, 0.0])[0]
         if col == self.COL_OFFSETY:
-            return self.data_dict.get('offset', [0.0, 0.0])[1]
+            return emitter.get('offset', [0.0, 0.0])[1]
 
         key = self.MAP[col]['key']
         default = self.MAP[col].get('default')
-        return self.data_dict.get(key, default)
+        return emitter.get(key, default)
 
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         if not index.isValid() or role != Qt.ItemDataRole.EditRole:
             return False
 
+        row = index.row()
         col = index.column()
+        if not (0 <= row < len(self.emitters)):
+            return False
+
+        emitter = self.emitters[row]
+
         if col == self.COL_OFFSETX or col == self.COL_OFFSETY:
-            if 'offset' not in self.data_dict or not isinstance(self.data_dict['offset'], list) or len(self.data_dict['offset']) < 2:
-                self.data_dict['offset'] = [0.0, 0.0]
+            if 'offset' not in emitter or not isinstance(emitter['offset'], list) or len(emitter['offset']) < 2:
+                emitter['offset'] = [0.0, 0.0]
             
             if col == self.COL_OFFSETX:
-                self.data_dict['offset'][0] = float(value)
+                emitter['offset'][0] = float(value)
             else:
-                self.data_dict['offset'][1] = float(value)
+                emitter['offset'][1] = float(value)
         else:
             key = self.MAP[col]['key']
             val_type = self.MAP[col]['type']
             try:
-                self.data_dict[key] = val_type(value)
+                emitter[key] = val_type(value)
             except (ValueError, TypeError):
                 return False
 
@@ -97,6 +150,8 @@ class EmitterModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemFlag.NoItemFlags
+        if index.column() == self.COL_NAME:
+            return Qt.ItemFlag.ItemIsEnabled
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
 
     def _should_export(self, col, d):
@@ -104,8 +159,11 @@ class EmitterModel(QAbstractTableModel):
         pred = data.get('export_cond', None)
         return True if pred is None else bool(pred(d))
 
-    def export_data(self) -> dict:
-        src = self.data_dict or {}
+    def export_data(self, row) -> dict:
+        if not (0 <= row < len(self.emitters)):
+            return {}
+            
+        src = self.emitters[row]
         out = dict(src)
         
         # Ensure all mapped keys are present
