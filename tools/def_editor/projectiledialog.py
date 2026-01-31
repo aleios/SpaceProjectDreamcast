@@ -8,7 +8,7 @@ import copy
 class ProjectileDialog(QDialog, Ui_projectileDialog):
     MAX_EMITTERS = 10
     def __init__(self, parent=None, weapon_set=None):
-        super().__init__()
+        super().__init__(parent)
         self.setupUi(self)
 
         if weapon_set:
