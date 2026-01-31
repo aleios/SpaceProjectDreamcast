@@ -42,6 +42,7 @@ def write_weapons(output_file, weapons):
     write_ushort(output_file, len(weapons))
     for weap in weapons:
         emitters = weap.get("emitters", [])
+        write_ubyte(output_file, weap.get("mode", 0))
         write_ushort(output_file, len(emitters))
         for emitter in emitters:
             write_emitter(output_file, emitter)

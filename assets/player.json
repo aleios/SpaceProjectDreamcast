@@ -20,7 +20,12 @@
           "offset": [
             10.0,
             0.0
-          ]
+          ],
+          "offset_x": 0.0,
+          "offset_y": 0.0,
+          "target": 0,
+          "target_tracking": 0,
+          "tracking_delay": 0
         },
         {
           "name": "Emitter 2",
@@ -36,7 +41,8 @@
             0.0
           ]
         }
-      ]
+      ],
+      "mode": 1
     },
     {
       "name": "boomerang",

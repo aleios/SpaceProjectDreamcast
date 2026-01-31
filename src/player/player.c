@@ -97,14 +97,8 @@ static bool player_load(player_t* player) {
     for (int weapid = 0; weapid < total_weapons; ++weapid) {
         weaponset_t* weap = &player->weapons[weapid];
 
-        uint16_t total_emitters;
-        fs_read(player_file, &total_emitters, sizeof(total_emitters));
-        weap->total_emitters = total_emitters;
-
-        weap->emitters = malloc(sizeof(emitter_t) * total_emitters);
-        for (int emitterid = 0; emitterid < total_emitters; ++emitterid) {
-            emitter_t* emitter = &weap->emitters[emitterid];
-            emitter_read(emitter, player_file);
+        if (!weaponset_load(weap, player_file)) {
+            return false;
         }
     }
 
@@ -258,23 +252,10 @@ void player_step(player_t* player, float delta_time) {
         player->transform.pos.y = new_y;
     }
 
-    player->firing = acc.firing;
-
-    weaponset_t* set = player_get_weaponset(player, g_gamestate.current_weapon);
-    int num_emitters = set ? set->total_emitters : 0;
-    for (int i = 0; i < num_emitters; ++i) {
-        emitter_t* emitter = weaponset_get_emitter(set, i);
-        if (SHZ_UNLIKELY(!emitter)) {
-            continue;
-        }
-
-        emitter->runtime.fire_timer -= delta_time;
-        if (player->firing && emitter->runtime.fire_timer <= 0.0f) {
-            shz_vec2_t pos = player->transform.pos;
-            pos = shz_vec2_add(pos, emitter->offset);
-            projectilepool_spawn(gamestate_player_projpool(), emitter, pos, emitter->start_angle);
-            emitter->runtime.fire_timer = emitter->delay;
-        }
+    weaponset_t* weapon = player_get_weaponset(player, g_gamestate.current_weapon);
+    if (weapon) {
+        weaponset_set_firing(weapon, acc.firing);
+        weaponset_step(weapon, gamestate_player_projpool(), player_get_position(player), delta_time);
     }
 
     animator_step(&player->animator, delta_time);

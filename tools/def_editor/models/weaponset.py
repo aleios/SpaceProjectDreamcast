@@ -29,7 +29,7 @@ class WeaponSetModel(QAbstractTableModel):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
             if self._weapons[index.row()] != value:
                 self._weapons[index.row()] = value
-                self._weapons.modified = True
+                #self._weapons.modified = True
                 self.dataChanged.emit(index, index, [role, Qt.ItemDataRole.DisplayRole])
             return True
         return False
@@ -96,7 +96,7 @@ class WeaponSetModel(QAbstractTableModel):
         item = self._weapons.pop(src_row)
         insert_at = dest_row if dest_row <= src_row else dest_row - 1
         self._weapons.insert(insert_at, item)
-        self._weapons.modified = True
+        #self._weapons.modified = True
 
         self.endMoveRows()
         return True

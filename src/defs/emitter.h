@@ -27,7 +27,13 @@ typedef struct Emitter {
 
     struct {
         float fire_timer;  //< Accumulator
+        float angle;       //< Current angle the emitter is firing at.
     } runtime;
 } emitter_t;
 
 bool emitter_read(emitter_t* emitter, file_t file);
+
+SHZ_FORCE_INLINE void emitter_reset(emitter_t* emitter) {
+    emitter->runtime.fire_timer = 0.0f;
+    emitter->runtime.angle = emitter->start_angle;
+}

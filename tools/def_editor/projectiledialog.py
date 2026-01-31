@@ -33,10 +33,13 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
             self.orig_name = weapon_set['name']
         else:
             self.orig_name = ''
-            self.weapon_set = { "name": "", "emitters": [] }
+            self.weapon_set = { "name": "", "mode": 0, "emitters": [] }
 
         self.tbName.setText(self.weapon_set.get('name', ''))
         self.tbName.textChanged.connect(self.name_changed)
+
+        self.cbEmitterMode.setCurrentIndex(self.weapon_set.get('mode', 0))
+        self.cbEmitterMode.currentIndexChanged.connect(self.mode_changed)
 
         self.emitter_model = EmitterListModel(self.weapon_set.get('emitters', []))
         self.lvEmitters.setModel(self.emitter_model)
@@ -52,6 +55,9 @@ class ProjectileDialog(QDialog, Ui_projectileDialog):
     def name_changed(self, text):
         self.weapon_set['name'] = text
         self._clear_error()
+
+    def mode_changed(self, idx):
+        self.weapon_set['mode'] = idx
 
     def add_emitter(self):
         new_emitter = {

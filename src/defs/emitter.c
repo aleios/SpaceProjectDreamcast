@@ -29,8 +29,6 @@ bool emitter_read(emitter_t* emitter, file_t file) {
 
     emitter->offset = shz_vec2_init(x, y);
 
-    emitter->runtime.fire_timer = 0.0f;
-
     uint8_t target;
     fs_read(file, &target, sizeof(target));
     emitter->target = target;
@@ -44,6 +42,9 @@ bool emitter_read(emitter_t* emitter, file_t file) {
         fs_read(file, &targeting_delay, sizeof(targeting_delay));
         emitter->targeting_delay = targeting_delay;
     }
+
+    emitter->runtime.fire_timer = emitter->delay;
+    emitter->runtime.angle = emitter->start_angle;
 
     // printf("Emitter:\nSpawns: %d\nDelay: %f\nStart Angle: %f\nStep Angle: %f\nSpeed: %f\nLifetime: %f\nOrigin: %f, %f\n",
     //     emitter->spawns_per_step, emitter->delay, emitter->start_angle, emitter->step_angle, emitter->speed, emitter->lifetime, x, y);
