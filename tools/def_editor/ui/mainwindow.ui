@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tabsPages">
       <property name="currentIndex">
        <number>1</number>
       </property>
@@ -33,6 +33,11 @@
       <widget class="pageProjectiles" name="tab_2">
        <attribute name="title">
         <string>Projectiles</string>
+       </attribute>
+      </widget>
+      <widget class="pageWeaponsets" name="tab_7">
+       <attribute name="title">
+        <string>Weapon Sets</string>
        </attribute>
       </widget>
       <widget class="pageEnemies" name="tab_3">
@@ -120,6 +125,12 @@
    <class>pagePlayer</class>
    <extends>QWidget</extends>
    <header>pageplayer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pageWeaponsets</class>
+   <extends>QWidget</extends>
+   <header>pageweaponsets.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -24,10 +24,8 @@ typedef struct Task {
             move_sine_state_t sine_state;
             bool destroy_on_complete;
         } move;
-        struct { 
-            fireparams_t params; 
-            float accumulator;
-            float angle;
+        struct {
+            weaponset_t weapon;
         } fire;
         struct { 
             float time; 

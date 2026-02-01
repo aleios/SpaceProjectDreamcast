@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QInputDialog, QMessageBox, QDataWidgetMapper
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtCore import Qt
+
+from tools.def_editor.models import ClipListModel
 from ui.Enemies import Ui_pageEnemies
 from eventdialog import EventDialog
 from tools.def_editor import defsdb
@@ -102,7 +104,7 @@ class pageEnemies(QWidget, Ui_pageEnemies):
                     
                     clip_model = defsdb.animations.get_clip_list_model(0)
                     if clip_model.rowCount() > 0:
-                        idle_key = clip_model.data(clip_model.index(0, defsdb.ClipListModel.COL_NAME))
+                        idle_key = clip_model.data(clip_model.index(0, ClipListModel.COL_NAME))
                         initial_data["idle_key"] = idle_key
 
                 defsdb.enemy_defs.add(initial_data)

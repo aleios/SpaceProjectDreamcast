@@ -21,3 +21,6 @@ void projdefcache_release(projectiledef_t* data);
 
 enemydef_t* enemydefcache_get(const char* key);
 void enemydefcache_release(enemydef_t* data);
+
+weaponsetdef_t* weaponsetcache_get(const char* key);
+void weaponsetcache_release(weaponsetdef_t* data);

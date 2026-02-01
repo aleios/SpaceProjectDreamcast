@@ -1,4 +1,6 @@
 from PyQt6.QtWidgets import QDialog, QWidget
+
+from tools.def_editor import defsdb
 from ui.Eventdialog import Ui_eventDialog
 import copy
 
@@ -54,12 +56,19 @@ class EventDialog(QDialog, Ui_eventDialog):
             cmd["duration"] = self.sbSineDuration.value()
 
     def load_start_firing(self, cmd):
-        self.pageStartFiring.set_emitter(copy.deepcopy(cmd))
+        self.cbStartFiringWeapon.setModel(defsdb.weaponset_defs)
+        idx = self.cbStartFiringWeapon.findText(cmd.get("weapon", ""))
+        if idx >= 0:
+            self.cbStartFiringWeapon.setCurrentIndex(idx)
+
+        #self.pageStartFiring.set_emitter(copy.deepcopy(cmd))
+        pass
 
     def save_start_firing(self, cmd):
+        cmd["weapon"] = self.cbStartFiringWeapon.currentText()
         # ensure mapper actually updates the damn value
-        self.pageStartFiring.mapper.submit()
-        cmd.update(self.pageStartFiring.model.export_data())
+        #self.pageStartFiring.mapper.submit()
+        #cmd.update(self.pageStartFiring.model.export_data())
 
     def load_delay(self, cmd):
         self.sbDelay.setValue(int(cmd.get("duration", 0)))

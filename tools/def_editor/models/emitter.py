@@ -5,7 +5,7 @@ class EmitterModel(QAbstractTableModel):
     COL_TARGET, COL_TARGET_TRACKING, COL_TRACKING_DELAY = range(10, 13)
 
     MAP = {
-        COL_NAME: {'key': 'name', 'type': str, 'default': 'Unnamed', 'export_cond': lambda d: False },
+        COL_NAME: {'key': 'name', 'type': str, 'default': 'Unnamed' },
         COL_PROJECTILE: {'key': 'projectile', 'type': str, 'default': ''},
         COL_SPAWNS: {'key': 'spawns_per_step', 'type': int, 'default': 1},
         COL_DELAY: {'key': 'delay', 'type': int, 'default': 500 },
@@ -151,7 +151,7 @@ class EmitterModel(QAbstractTableModel):
         if not index.isValid():
             return Qt.ItemFlag.NoItemFlags
         if index.column() == self.COL_NAME:
-            return Qt.ItemFlag.ItemIsEnabled
+            return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
 
     def _should_export(self, col, d):

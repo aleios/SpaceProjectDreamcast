@@ -2,6 +2,7 @@ from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
 import json
 from dataclasses import dataclass, asdict, field
 from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, PlayerModel, AnimationModel
+from tools.def_editor.models.weaponset import WeaponSetModel
 
 #
 # -- Game settings models --
@@ -11,31 +12,18 @@ class GameSettingsData:
     max_health: int = 10
     max_lives: int = 3
     player_speed: float = 0.2
-    weapons: list = field(default_factory=list)
     playlist: list = field(default_factory=list)
     modified: bool = True
 
     def to_dict(self):
         d = asdict(self)
         d.pop('modified', None)
-        
-        # Prune emitter keys that we don't need.
-        from tools.def_editor.models.emitter import EmitterModel
-        model = EmitterModel()
-        for weapon in d.get('weapons', []):
-            for i, emitter in enumerate(weapon.get('emitters', [])):
-                model.set_emitters(weapon['emitters'])
-                pruned = model.export_data(i)
-                emitter.clear()
-                emitter.update(pruned)
-
         return d
     
     def from_dict(self, data: dict):
         self.max_health = data.get("max_health", self.max_health)
         self.max_lives = data.get("max_lives", self.max_lives)
         self.player_speed = data.get("player_speed", self.player_speed)
-        self.weapons = list(data.get("weapons", []))
         self.playlist = list(data.get("playlist", []))
         self.modified = False
 
@@ -79,6 +67,7 @@ class GameSettingsModel(QAbstractTableModel):
 projectile_defs = ProjectileModel()
 enemy_defs = EnemyModel()
 player_def = PlayerModel()
+weaponset_defs = WeaponSetModel()
 
 # Game settings models
 game_settings = GameSettingsData()
@@ -94,6 +83,7 @@ assets_path = ""
 
 def reload_defs():
     projectile_defs.load(assets_path)
+    weaponset_defs.load(assets_path)
     enemy_defs.load(assets_path)
 
     animations.load(assets_path)
@@ -116,6 +106,7 @@ def reload_defs():
 
 def save_pending_defs():
     projectile_defs.save(assets_path)
+    weaponset_defs.save(assets_path)
     enemy_defs.save(assets_path)
     animations.save(assets_path)
     levels.save(assets_path)
@@ -129,4 +120,4 @@ def save_pending_defs():
         game_settings.modified = False
 
 def is_dirty():
-    return projectile_defs.isDirty() or enemy_defs.isDirty() or animations.isDirty() or game_settings.modified
+    return projectile_defs.isDirty() or weaponset_defs.isDirty() or enemy_defs.isDirty() or animations.isDirty() or game_settings.modified or player_def.is_dirty()

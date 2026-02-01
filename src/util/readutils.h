@@ -51,32 +51,7 @@ inline static bool readutil_readstr(file_t file, char out[static 1], size_t out_
     return true;
 }
 
-// inline static char* readutil_readstr(file_t file) {
+#define READUTIL_READ_VALIDATE_EX(file, var, size) \
+    (fs_read(file, &var, sizeof(var)) == sizeof(var))
 
-//     uint16_t str_len;
-//     ssize_t read_bytes = fs_read(file, &str_len, sizeof(str_len));
-
-//     if(read_bytes <= -1 || read_bytes != sizeof(str_len)) {
-//         return nullptr;
-//     }
-
-//     if(str_len == 0) {
-//         return nullptr;
-//     }
-
-//     char* buffer = malloc((str_len * sizeof(char)) + 1);
-
-//     if(!buffer) {
-//         return nullptr;
-//     }
-
-//     read_bytes = fs_read(file, buffer, str_len);
-
-//     if(read_bytes <= -1 || read_bytes < str_len) {
-//         free(buffer);
-//         return nullptr;
-//     }
-
-//     buffer[str_len] = '\0';
-//     return buffer;
-// }
+#define READUTIL_READ_VALIDATE(file, var) READUTIL_READ_VALIDATE_EX(file, var, sizeof(var))

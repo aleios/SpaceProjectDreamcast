@@ -183,8 +183,16 @@ class Ui_eventDialog(object):
         self.sbRepeatTarget.setObjectName("sbRepeatTarget")
         self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.ItemRole.FieldRole, self.sbRepeatTarget)
         self.stackedControls.addWidget(self.pageRepeat)
-        self.pageStartFiring = EmitterSettings()
+        self.pageStartFiring = QtWidgets.QWidget()
         self.pageStartFiring.setObjectName("pageStartFiring")
+        self.formLayout_7 = QtWidgets.QFormLayout(self.pageStartFiring)
+        self.formLayout_7.setObjectName("formLayout_7")
+        self.label_17 = QtWidgets.QLabel(parent=self.pageStartFiring)
+        self.label_17.setObjectName("label_17")
+        self.formLayout_7.setWidget(0, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label_17)
+        self.cbStartFiringWeapon = QtWidgets.QComboBox(parent=self.pageStartFiring)
+        self.cbStartFiringWeapon.setObjectName("cbStartFiringWeapon")
+        self.formLayout_7.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.cbStartFiringWeapon)
         self.stackedControls.addWidget(self.pageStartFiring)
         self.pageDelay = QtWidgets.QWidget()
         self.pageDelay.setObjectName("pageDelay")
@@ -206,7 +214,7 @@ class Ui_eventDialog(object):
         self.verticalLayout.addWidget(self.buttonBox)
 
         self.retranslateUi(eventDialog)
-        self.stackedControls.setCurrentIndex(1)
+        self.stackedControls.setCurrentIndex(3)
         self.stackedMoveTarget.setCurrentIndex(1)
         self.buttonBox.accepted.connect(eventDialog.accept) # type: ignore
         self.buttonBox.rejected.connect(eventDialog.reject) # type: ignore
@@ -243,5 +251,5 @@ class Ui_eventDialog(object):
         self.label_16.setText(_translate("eventDialog", "Speed"))
         self.label_14.setText(_translate("eventDialog", "Repeats"))
         self.label_15.setText(_translate("eventDialog", "Target Event"))
+        self.label_17.setText(_translate("eventDialog", "Weapon"))
         self.label_6.setText(_translate("eventDialog", "Delay (ms)"))
-from widgets.emittersettings import EmitterSettings

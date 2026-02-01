@@ -1,11 +1,48 @@
 from PyQt6.QtCore import QModelIndex, QAbstractTableModel, Qt, QMimeData
+from .datadef import DefModel
 
-class WeaponSetModel(QAbstractTableModel):
+class WeaponSetModel(DefModel):
+    COL_NAME, COL_MODIFIED, COL_MODE, COL_EMITTERS = range(4)
+    MAP = {
+        COL_NAME: {'key': 'name', 'type': str },
+        COL_MODIFIED: {'key': 'modified', 'type': bool },
+        COL_MODE: { 'key': 'mode', 'type': int, 'default': 0 },
+        COL_EMITTERS: { 'key': 'emitters', 'type': list }
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__("weapons", self.MAP, *args, **kwargs)
+
+    def get_emitters(self, row):
+        return self._data_list[row]['emitters']
+
+    def get_emitter(self, row, emitter_idx):
+        if not 0 <= row < self.rowCount():
+            return None
+        emitters = self._data_list[row].get('emitters', None)
+        if emitters is None:
+            return None
+        if not 0 <= emitter_idx < len(emitters):
+            return None
+
+        return emitters[emitter_idx]
+
+    def get_num_emitters(self, row):
+        return len(self._data_list[row]['emitters'])
+
+    def process_item(self, item):
+        from .emitter import EmitterModel
+        model = EmitterModel()
+        model.set_emitters(item.get('emitters', []))
+        for i,emitter in enumerate(item['emitters']):
+            item['emitters'][i] = model.export_data(i)
+
+class WeaponSetListModel(QAbstractTableModel):
     mimeType = "application/x-weapon-set-item"
 
-    def __init__(self, data_obj, parent=None):
+    def __init__(self, data_list, parent=None):
         super().__init__(parent)
-        self._weapons = data_obj
+        self._weapons = data_list
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._weapons)
@@ -29,7 +66,8 @@ class WeaponSetModel(QAbstractTableModel):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
             if self._weapons[index.row()] != value:
                 self._weapons[index.row()] = value
-                #self._weapons.modified = True
+                from tools.def_editor import defsdb
+                defsdb.player_def.dataChanged.emit(QModelIndex(), QModelIndex())
                 self.dataChanged.emit(index, index, [role, Qt.ItemDataRole.DisplayRole])
             return True
         return False
@@ -40,31 +78,35 @@ class WeaponSetModel(QAbstractTableModel):
     def flags(self, index):
         return super().flags(index) | Qt.ItemFlag.ItemIsDragEnabled | Qt.ItemFlag.ItemIsDropEnabled
 
-    def add(self, weapon_set):
+    def add(self, weapon_set_name):
         self.beginInsertRows(QModelIndex(), len(self._weapons), len(self._weapons))
-        self._weapons.append(weapon_set)
-        # self.data_obj.modified = True
+        self._weapons.append(weapon_set_name)
+        from tools.def_editor import defsdb
+        defsdb.player_def.dataChanged.emit(QModelIndex(), QModelIndex())
         self.endInsertRows()
 
     def remove(self, row):
         if 0 <= row < len(self._weapons):
             self.beginRemoveRows(QModelIndex(), row, row)
             self._weapons.pop(row)
-            # self.data_obj.modified = True
+            from tools.def_editor import defsdb
+            defsdb.player_def.dataChanged.emit(QModelIndex(), QModelIndex())
             self.endRemoveRows()
 
     def shift_up(self, row):
         if row > 0:
             self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1)
             self._weapons[row], self._weapons[row - 1] = self._weapons[row - 1], self._weapons[row]
-            # self.data_obj.modified = True
+            from tools.def_editor import defsdb
+            defsdb.player_def.dataChanged.emit(QModelIndex(), QModelIndex())
             self.endMoveRows()
 
     def shift_down(self, row):
         if row < len(self._weapons) - 1:
             self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
             self._weapons[row], self._weapons[row + 1] = self._weapons[row + 1], self._weapons[row]
-            # self.data_obj.modified = True
+            from tools.def_editor import defsdb
+            defsdb.player_def.dataChanged.emit(QModelIndex(), QModelIndex())
             self.endMoveRows()
 
     def mimeTypes(self):
@@ -96,7 +138,6 @@ class WeaponSetModel(QAbstractTableModel):
         item = self._weapons.pop(src_row)
         insert_at = dest_row if dest_row <= src_row else dest_row - 1
         self._weapons.insert(insert_at, item)
-        #self._weapons.modified = True
 
         self.endMoveRows()
         return True

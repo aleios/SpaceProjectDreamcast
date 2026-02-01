@@ -47,6 +47,12 @@ romdisk/defs/projectile/%.dat: assets/defs/projectile/%.json
 	@mkdir -p $(dir $@)
 	python tools/convert_projectile_def.py $< $@
 
+WEAPONSETDEF_SRCS := $(shell find assets/defs/weapons -type f -name '*.json' | sort)
+WEAPONSETDEFS := $(WEAPONSETDEF_SRCS:assets/defs/weapons/%.json=romdisk/defs/weapons/%.dat)
+romdisk/defs/weapons/%.dat: assets/defs/weapons/%.json
+	@mkdir -p $(dir $@)
+	python tools/convert_weaponset_def.py $< $@
+
 LEVEL_SRCS := $(shell find assets/levels -type f -name '*.json' | sort)
 LEVELS := $(LEVEL_SRCS:assets/levels/%.json=romdisk/levels/%.dat)
 romdisk/levels/%.dat: assets/levels/%.json
@@ -69,7 +75,7 @@ romdisk/fonts/%.dat: assets/fonts/%.json
 	@mkdir -p $(dir $@)
 	python tools/convert_font.py $< $@
 
-ASSETS := $(GAMESETTINGS) $(PLAYER) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(LEVELS) $(FONTS)
+ASSETS := $(GAMESETTINGS) $(PLAYER) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(WEAPONSETDEFS) $(LEVELS) $(FONTS)
 
 # Build targets
 .PHONY: all clean rebuild-cdi rm-elf rm-disc
@@ -106,7 +112,7 @@ $(TARGET): $(OBJS) $(ADX_LIB)
 	kos-cc -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 $(DISC_NAME): $(ADX_LIB) $(TARGET)
-	$(DC_TOOLS_BASE)/mkdcdisc -a aleios -e $(TARGET) -D disc -o $(DISC_NAME)
+	$(DC_TOOLS_BASE)/mkdcdisc -a aleios -e $(TARGET) --no-padding -D disc -o $(DISC_NAME)
 
 romdisk.img: $(ASSETS)
 

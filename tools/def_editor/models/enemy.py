@@ -16,9 +16,6 @@ class EnemyModel(DefModel):
     def __init__(self, *args, **kwargs):
         super().__init__("enemy", self.MAP, *args, **kwargs)
 
-    def add_event_cmd(self, index, cmd):
-        pass
-
     def set_animation(self, row, anim):
         self.setData(self.index(row, self.COL_ANIM), anim)
 

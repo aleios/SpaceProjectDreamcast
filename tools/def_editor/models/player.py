@@ -3,7 +3,7 @@ import os
 
 from PyQt6.QtCore import QAbstractTableModel, Qt
 
-from tools.def_editor.models import WeaponSetModel
+from tools.def_editor.models.weaponset import WeaponSetListModel
 
 
 class PlayerModel(QAbstractTableModel):
@@ -47,6 +47,8 @@ class PlayerModel(QAbstractTableModel):
             if col == self.COL_LEFT_CLIP: self._data['left_clip'] = value
             if col == self.COL_RIGHT_CLIP: self._data['right_clip'] = value
             if col == self.COL_SPEED: self._data['speed'] = float(value)
+            
+            self._data['modified'] = True
             self.dataChanged.emit(index, index, [role, Qt.ItemDataRole.DisplayRole])
 
             return True
@@ -58,17 +60,24 @@ class PlayerModel(QAbstractTableModel):
             with open(os.path.join(assets_path, 'player.json'), 'r') as f:
                 self.beginResetModel()
                 self._data = json.load(f)
+                self._data['modified'] = False
                 self.endResetModel()
         except Exception as e:
-            with open(os.path.join(assets_path, 'player.json'), 'w') as f:
-                json.dump(self._data, f, indent=2, separators=(',', ': '))
+            self._data['modified'] = True
+            self.save(assets_path)
 
     def save(self, assets_path):
+        save_data = self._data.copy()
+        save_data.pop('modified', None)
         with open(os.path.join(assets_path, 'player.json'), 'w') as f:
-            json.dump(self._data, f, indent=2, separators=(',', ': '))
+            json.dump(save_data, f, indent=2, separators=(',', ': '))
+        self._data['modified'] = False
+
+    def is_dirty(self):
+        return self._data.get('modified', False)
 
     def make_weapons_model(self):
-        return WeaponSetModel(self._data['weapons'])
+        return WeaponSetListModel(self._data['weapons'])
 
     def set_animation(self, anim):
         self.setData(self.index(0, self.COL_ANIMATION), anim)

@@ -1,8 +1,7 @@
 from PyQt6.QtCore import QModelIndex, Qt
-from PyQt6.QtWidgets import QWidget, QDataWidgetMapper
+from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QInputDialog
 
 from tools.def_editor import defsdb
-from tools.def_editor.projectiledialog import ProjectileDialog
 from ui.Player import Ui_pagePlayer
 
 class pagePlayer(QWidget, Ui_pagePlayer):
@@ -29,7 +28,7 @@ class pagePlayer(QWidget, Ui_pagePlayer):
         self.weapons_model = defsdb.player_def.make_weapons_model()
 
         self.lvWeaponSets.setModel(self.weapons_model)
-        self.lvWeaponSets.doubleClicked.connect(self.edit_weapon_set)
+        self.lvWeaponSets.doubleClicked.connect(self.on_weapon_double_clicked)
 
         self.btnAddWeaponSet.clicked.connect(self.add_weapon_set)
         self.btnDeleteWeaponSet.clicked.connect(self.delete_weapon_set)
@@ -70,17 +69,40 @@ class pagePlayer(QWidget, Ui_pagePlayer):
             return
         defsdb.player_def.set_right_clip(self.cbRightClip.currentText())
 
-    def edit_weapon_set(self, index):
-        weapon_set = self.weapons_model.data(index, role=Qt.ItemDataRole.EditRole)
-        dlg = ProjectileDialog(self, weapon_set=weapon_set)
-        if dlg.exec():
-            self.weapons_model.setData(index, dlg.weapon_set)
+    def on_weapon_double_clicked(self, index):
+        if not index.isValid():
+            return
+
+        weapon_name = self.weapons_model.data(index, Qt.ItemDataRole.DisplayRole)
+        if not weapon_name:
+            return
+
+        # Find the main window and then try to switch to weapon sets tab
+        parent = self.parent()
+        while parent and not hasattr(parent, 'tabsPages'):
+            parent = parent.parent()
+
+        if parent:
+            parent.tabsPages.setCurrentIndex(3) # TODO: Not exactly the most stable index in the world.
+            from pageweaponsets import pageWeaponsets
+            for i in range(parent.tabsPages.count()):
+                widget = parent.tabsPages.widget(i)
+                if isinstance(widget, pageWeaponsets):
+                    widget.select_weaponset(weapon_name)
+                    break
 
     def add_weapon_set(self):
-        dlg = ProjectileDialog(self, weapon_set=None)
-        res = dlg.exec()
-        if res:
-            self.weapons_model.add(dlg.weapon_set)
+        items = []
+        for i in range(defsdb.weaponset_defs.rowCount()):
+            name_idx = defsdb.weaponset_defs.index(i, defsdb.WeaponSetModel.COL_NAME)
+            items.append(defsdb.weaponset_defs.data(name_idx, Qt.ItemDataRole.DisplayRole))
+
+        if not items:
+            return
+
+        item, ok = QInputDialog.getItem(self, "Add Weapon Set", "Weapon Set:", items, 0, False)
+        if ok and item:
+            self.weapons_model.add(item)
 
     def delete_weapon_set(self):
         idx = self.lvWeaponSets.currentIndex()

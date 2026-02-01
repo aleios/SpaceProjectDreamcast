@@ -48,20 +48,17 @@ void enemydef_read_move_ev(file_t def_file, event_t* ev) {
 }
 
 void enemydef_read_fire_ev(file_t def_file, event_t* ev) {
-    emitter_read(&ev->fire.emitter, def_file);
-    // char name_buf[256];
-    // readutil_readstr(def_file, name_buf, sizeof(name_buf));
-    //
-    // //ev->fire.def = projdefcache_get(name_buf);
-    // ev->fire.emitter.def = projdefcache_get(name_buf);
-    //
-    // fs_read(def_file, &ev->fire.emitter.delay, sizeof(float));
-    // fs_read(def_file, &ev->fire.emitter.start_angle, sizeof(float));
-    // fs_read(def_file, &ev->fire.emitter.step_angle, sizeof(float));
-    //
-    // uint8_t spawns_per_step;
-    // fs_read(def_file, &spawns_per_step, sizeof(spawns_per_step));
-    // ev->fire.emitter.spawns_per_step = spawns_per_step;
+    // Read name
+    char path_buf[256];
+    readutil_readstr(def_file, path_buf, sizeof(path_buf));
+
+    weaponsetdef_t* weapon = weaponsetcache_get(path_buf);
+    if (!weapon) {
+        arch_abort();
+    }
+
+    weaponset_init(&ev->fire.weapon, weapon);
+    weaponset_set_firing(&ev->fire.weapon, true);
 }
 
 void enemydef_read_delay_ev(file_t def_file, event_t* ev) {

@@ -57,12 +57,7 @@ def write_events(output_file, events):
                 helpers.write_float(output_file, event.get('amplitude', 0.0))
                 helpers.write_float(output_file, event.get('duration', 0.0))
         elif ev_type == "startfiring":
-            helpers.write_emitter(output_file, event)
-            # helpers.write_str(output_file, event.get('projectile', ''))
-            # helpers.write_float(output_file, event.get('delay', 0.0))
-            # helpers.write_float(output_file, math.radians(event.get('start_angle', 0.0)))
-            # helpers.write_float(output_file, math.radians(event.get('step_angle', 0.0)))
-            # helpers.write_ubyte(output_file, event.get('spawns_per_step', 1))
+            helpers.write_str(output_file, event.get('weapon', ''))
         elif ev_type == "delay":
             helpers.write_float(output_file, event.get('duration', 0.0))
         elif ev_type == "exitscreen":

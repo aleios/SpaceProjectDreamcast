@@ -97,9 +97,10 @@ static bool player_load(player_t* player) {
     for (int weapid = 0; weapid < total_weapons; ++weapid) {
         weaponset_t* weap = &player->weapons[weapid];
 
-        if (!weaponset_load(weap, player_file)) {
-            return false;
-        }
+        readutil_readstr(player_file, path_buf, sizeof(path_buf));
+
+        weaponsetdef_t* def = weaponsetcache_get(path_buf);
+        weaponset_init(weap, def);
     }
 
     fs_close(player_file);

@@ -74,6 +74,18 @@ class DefModel(QAbstractTableModel):
             flags = flags | Qt.ItemFlag.ItemIsEditable
         return flags
 
+    def _ensure_keys(self, data):
+        # Add missing keys
+        missing_key = False
+        for col_info in self._COLUMN_MAP.values():
+            key = col_info['key']
+            col_type = col_info['type']
+            if key not in data:
+                data[key] = col_type()
+                missing_key = True
+        if missing_key:
+            data['modified'] = True
+
     def load(self, assets_path):
         self.beginResetModel()
         self._data_list = []
@@ -88,6 +100,7 @@ class DefModel(QAbstractTableModel):
                     data = json.load(f)
                     data["name"] = name
                     data["modified"] = False
+                    self._ensure_keys(data)
                     self._data_list.append(data)
 
         self.endResetModel()
@@ -108,17 +121,7 @@ class DefModel(QAbstractTableModel):
                 save_data = copy.deepcopy(item)
                 for k in META_KEYS: save_data.pop(k, None)
 
-                # Handle specific case for StartFiring event. Need to prune the emitter keys
-                # TODO: Need a better way of handling this... maybe an override
-                if self.folder == "enemy":
-                    from tools.def_editor.models.emitter import EmitterModel
-                    model = EmitterModel()
-                    for event in save_data.get('events', []):
-                        if event.get('type') == 'StartFiring':
-                            model.set_emitters([event])
-                            pruned = model.export_data(0)
-                            event.clear()
-                            event.update(pruned)
+                self.process_item(save_data)
                 
                 with open(path, "w") as f:
                     json.dump(save_data, f, indent=2, separators=(',', ': '))
@@ -128,16 +131,15 @@ class DefModel(QAbstractTableModel):
                     m_idx = self.index(row, self.COL_MODIFIED)
                     self.dataChanged.emit(m_idx, m_idx, [Qt.ItemDataRole.DisplayRole])
 
+    def process_item(self, item):
+        pass
+
     def add(self, data):
         parent_index = QModelIndex() 
         row_count = len(self._data_list)
 
         # Add missing keys
-        for col_info in self._COLUMN_MAP.values():
-            key = col_info['key']
-            col_type = col_info['type']
-            if key not in data:
-                data[key] = col_type()
+        self._ensure_keys(data)
         data['modified'] = True
         
         self.beginInsertRows(parent_index, row_count, row_count)

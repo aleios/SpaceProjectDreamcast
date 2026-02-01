@@ -1,7 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QDataWidgetMapper
 from PyQt6.QtCore import Qt, QModelIndex
 from tools.def_editor.ui.Gamesettings import Ui_pageGameSettings
-from tools.def_editor.projectiledialog import ProjectileDialog
 
 from tools.def_editor import defsdb
 
@@ -9,12 +8,6 @@ class pageGameSettings(QWidget, Ui_pageGameSettings):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-
-        #self.lstPlayerProj.
-        # self.weapons_model = defsdb.player_def.make_weapons_model()
-        #
-        # self.weapons_model.rowsAboutToBeRemoved.connect(self.model_rows_removed)
-        # self.weapons_model.modelReset.connect(self.model_reset)
 
         self.fieldMapper = QDataWidgetMapper(self)
         self.fieldMapper.setModel(defsdb.game_settings_model)
@@ -73,6 +66,3 @@ class pageGameSettings(QWidget, Ui_pageGameSettings):
             defsdb.playlist_model.shift_down(row)
             if row < defsdb.playlist_model.rowCount() - 1:
                 self.lvLevelPlaylist.setCurrentIndex(defsdb.playlist_model.index(row + 1, 0))
-
-    def model_rows_removed(self, parent, first, last):
-        print('removed: ', parent, first, last)

@@ -1,6 +1,7 @@
 #pragma once
 #include "../defs/projectile_def.h"
 #include "../defs/emitter.h"
+#include "../projectile/weaponset.h"
 
 #define MAX_EVENTS 25
 
@@ -32,7 +33,7 @@ typedef struct MoveParams {
 } moveparams_t;
 
 typedef struct FireParams {
-    emitter_t emitter;
+    weaponset_t weapon;
 } fireparams_t;
 
 typedef struct ExitScreenParams {

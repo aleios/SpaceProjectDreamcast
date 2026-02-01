@@ -13,7 +13,10 @@ def parse_player(input_file, output_fname):
         helpers.write_str(output_file, settings.get('left_clip', ''))
         helpers.write_str(output_file, settings.get('right_clip', ''))
         helpers.write_float(output_file, settings.get("speed", 0.2))
-        helpers.write_weapons(output_file, weapons)
+
+        helpers.write_ushort(output_file, len(weapons))
+        for weap in weapons:
+            helpers.write_str(output_file, weap)
 
 def main():
     input_fname = sys.argv[-2]

@@ -78,7 +78,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedControls">
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="pageMoveTo">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -348,7 +348,20 @@
        </item>
       </layout>
      </widget>
-     <widget class="EmitterSettings" name="pageStartFiring"/>
+     <widget class="QWidget" name="pageStartFiring">
+      <layout class="QFormLayout" name="formLayout_7">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>Weapon</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cbStartFiringWeapon"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="pageDelay">
       <layout class="QFormLayout" name="formLayout_3">
        <item row="0" column="0">
@@ -381,14 +394,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>EmitterSettings</class>
-   <extends>QWidget</extends>
-   <header>widgets/emittersettings.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

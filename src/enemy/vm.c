@@ -112,26 +112,8 @@ static bool task_move_to_sine(virtualmachine_t* vm, struct Task* task, float del
 
 
 static bool task_fire_projectile(virtualmachine_t* vm, struct Task* task, float delta_time) {
-    task->fire.accumulator += delta_time;
 
-    emitter_t* emitter = &task->fire.params.emitter;
-    // emitter->lifetime = 2000.0f;
-    // emitter->speed = 0.1f;
-    if(task->fire.accumulator >= emitter->delay) {
-
-        for(int i = 0; i < emitter->spawns_per_step; ++i) {
-            projectilepool_spawn(gamestate_enemy_projpool(), emitter, vm->owner->transform.pos, task->fire.angle);
-            task->fire.angle += emitter->step_angle;
-        }
-
-        // Wrap angle
-        constexpr float inv_tau = 0.159154943f;
-        constexpr float tau     = 6.283185307f;
-        task->fire.angle = task->fire.angle - tau * floorf(task->fire.angle * inv_tau);
-
-        task->fire.accumulator -= emitter->delay;
-    }
-
+    weaponset_step(&task->fire.weapon, gamestate_enemy_projpool(), vm->owner->transform.pos, delta_time);
     return false;
 }
 
@@ -197,9 +179,10 @@ static void vm_fire_event(virtualmachine_t* vm, event_t ev, int event_idx) {
         }
         case EVENT_START_FIRING: {
             new_task.step = task_fire_projectile;
-            new_task.fire.params = ev.fire;
-            new_task.fire.accumulator = 0.0f;
-            new_task.fire.angle = ev.fire.emitter.start_angle;
+            new_task.fire.weapon = ev.fire.weapon;
+            // new_task.fire.params = ev.fire;
+            // new_task.fire.accumulator = 0.0f;
+            // new_task.fire.angle = ev.fire.emitter.start_angle;
             new_task.is_blocking = false;
             break;
         }
