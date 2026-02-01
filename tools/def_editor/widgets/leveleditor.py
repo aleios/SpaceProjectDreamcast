@@ -106,6 +106,13 @@ class LevelEditor(QGraphicsView):
         self.grid_enabled = True
         self.grid_snap = True
 
+        self.spawn_line = 240
+        self.tick_minor = 100
+        self.tick_major = 500
+        self.tick_margin_x = 0
+        self.tick_len_minor = 6
+        self.tick_len_major = 12
+
     def _on_tick(self):
         nanos = self._elapsed_timer.nsecsElapsed()
         self._elapsed_timer.restart()
@@ -122,7 +129,7 @@ class LevelEditor(QGraphicsView):
                     scroll_speed = 0.0
 
             self.current_pos += scroll_speed * delta_time
-            self.updateDisplay()
+            self.update_display()
 
     def set_level(self, model, row):
         self.model = model
@@ -165,10 +172,10 @@ class LevelEditor(QGraphicsView):
             item.set_active(item.event is target_event)
 
     def viewport_to_world_y(self, screen_y):
-        return (480 - screen_y) + self.current_pos
+        return (self.spawn_line - screen_y) + self.current_pos
 
     def world_to_screen_y(self, world_time):
-        return 480 - (world_time - self.current_pos)
+        return self.spawn_line - (world_time - self.current_pos)
 
     def populate_items(self):
         self._scene.clear()
@@ -200,7 +207,7 @@ class LevelEditor(QGraphicsView):
                 item.setPos(item.event['pos'][0], new_y)
                 item._ignore_changes = False
 
-    def updateDisplay(self):
+    def update_display(self):
         self.update_items()
         self.viewport().update()
 
@@ -212,7 +219,7 @@ class LevelEditor(QGraphicsView):
         # Scroll "up" increases time
         delta = event.angleDelta().y()
         self.current_pos = max(0.0, self.current_pos + delta)
-        self.updateDisplay()
+        self.update_display()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.MiddleButton:
@@ -225,7 +232,7 @@ class LevelEditor(QGraphicsView):
             delta_y = -(event.pos().y() - self._last_mouse_pos.y())
             self.current_pos = max(0.0, self.current_pos - delta_y)
             self._last_mouse_pos = event.pos()
-            self.updateDisplay()
+            self.update_display()
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
@@ -289,20 +296,19 @@ class LevelEditor(QGraphicsView):
             speed_mod = 10.0
         if event.key() == Qt.Key.Key_W:
             self.current_pos += speed_mod
-            self.updateDisplay()
+            self.update_display()
         elif event.key() == Qt.Key.Key_S:
             if self.current_pos >= speed_mod:
                 self.current_pos -= speed_mod
-                self.updateDisplay()
+                self.update_display()
         elif event.key() == Qt.Key.Key_Space:
-            self.current_pos = 0.0
-            self.updateDisplay()
+            if not self.scroll_preview:
+                self.current_pos = 0.0
+            self.update_display()
             self.scroll_preview = not self.scroll_preview
 
 
-    def drawBackground(self, painter, rect):
-        super().drawBackground(painter, rect)
-
+    def draw_grid(self, painter):
         if self.grid_enabled:
             grid_pen = QPen(QColor(40, 40, 40))
             grid_pen.setCosmetic(True)
@@ -318,10 +324,7 @@ class LevelEditor(QGraphicsView):
                 screen_y = 480 - y_offset
                 painter.drawLine(0, screen_y, 640, screen_y)
 
-
-        #
-        # Draw screen boundaries
-        #
+    def draw_screen_boundaries(self, painter):
         screen_height = 480.0
         screen_pen = QPen(QColor(0, 255, 0, 50))
         screen_pen.setWidth(2)
@@ -344,7 +347,7 @@ class LevelEditor(QGraphicsView):
             label = f"Screen Boundary ({int(boundary_px)}px)"
             painter.drawText(640 - 200, int(y) - 5, label)
 
-        # Draw Screen Edges
+    def draw_screen_edges(self, painter):
         edge_pen = QPen(Qt.GlobalColor.red)
         edge_pen.setCosmetic(True)
         edge_pen.setStyle(Qt.PenStyle.DashLine)
@@ -352,13 +355,94 @@ class LevelEditor(QGraphicsView):
         painter.drawLine(0, 0, 0, 480)
         painter.drawLine(640, 0, 640, 480)
 
+    def draw_timeline(self, painter):
+        tick_pen = QPen(QColor(160, 160, 160, 160))
+        tick_pen.setCosmetic(True)
+        painter.setPen(tick_pen)
+        font = painter.font()
+        font.setPointSize(max(1, font.pointSize() - 4))
+        painter.setFont(font)
+
+        # Determine visible world range
+        world_top = self.viewport_to_world_y(0)
+        world_bottom = self.viewport_to_world_y(480)
+
+        world_min = min(world_top, world_bottom)
+        world_max = max(world_top, world_bottom)
+
+        start_tick = int(world_min // self.tick_minor) * self.tick_minor
+        end_tick = int(world_max // self.tick_minor) * self.tick_minor
+
+        for t in range(start_tick, end_tick + self.tick_minor, self.tick_minor):
+            y = self.world_to_screen_y(t)
+            is_major = (t % self.tick_major) == 0
+            tick_len = self.tick_len_major if is_major else self.tick_len_minor
+            painter.drawLine(self.tick_margin_x, int(y),
+                             self.tick_margin_x + tick_len, int(y))
+
+            if is_major:
+                painter.drawText(self.tick_margin_x + tick_len + 4, int(y)+2, f"{t}")
+
+        # Current timeline position
+        scroll_speed = 0.0
+        if self.model and self.level_row >= 0:
+            idx = defsdb.levels.index(self.level_row, LevelsModel.COL_SPEED)
+            if idx.isValid():
+                scroll_speed = defsdb.levels.data(idx, Qt.ItemDataRole.EditRole) or 0.0
+
+        if scroll_speed > 0.0:
+            label_text = f"{int(self.current_pos)} px ({int(self.current_pos / scroll_speed)}ms)"
+        else:
+            label_text = f"{int(self.current_pos)} px(? ms)"
+
+        label_x = self.tick_margin_x + self.tick_len_major + 4
+
+        metrics = painter.fontMetrics()
+        text_w = metrics.horizontalAdvance(label_text)
+        text_h = metrics.height()
+
+        padding_x = 6
+        padding_y = 3
+        label_w = text_w + padding_x * 2
+        label_h = text_h + padding_y * 2
+        label_y = int(self.spawn_line - label_h / 2)
+
+        # Put world Y and ms in box
+        current_y = int(self.world_to_screen_y(self.current_pos))
+        painter.setPen(QPen(QColor(255, 255, 0, 180)))
+        painter.drawLine(self.tick_margin_x, current_y,
+                         self.tick_margin_x + self.tick_len_major, current_y)
+
+        painter.setBrush(QBrush(QColor(0, 0, 0, 180)))
+        painter.setPen(QPen(QColor(255, 255, 0, 180)))
+        painter.drawRect(label_x, label_y, label_w, label_h)
+        painter.drawText(label_x + padding_x, label_y + padding_y + metrics.ascent(), label_text)
+
+        # Spawn line
+        spawn_pen = QPen(QColor(190, 190, 190, 120))
+        spawn_pen.setWidth(1)
+        spawn_pen.setCosmetic(True)
+        painter.setPen(spawn_pen)
+
+        spawn_y = self.world_to_screen_y(self.current_pos)
+        painter.drawLine(0, int(spawn_y), 640, int(spawn_y))
+
+
+    def drawBackground(self, painter, rect):
+        super().drawBackground(painter, rect)
+
+        self.draw_grid(painter)
+        self.draw_screen_boundaries(painter)
+        self.draw_screen_edges(painter)
+        self.draw_timeline(painter)
+
     def scroll_to_time(self, time):
         self.current_pos = time
-        self.updateDisplay()
+        self.update_display()
 
     def update_settings(self, settings):
         self.grid_enabled = settings.get('grid_enabled', True)
         self.grid_snap = settings.get('grid_snap', False)
         self.grid_width = settings.get('grid_width', 8)
         self.grid_height = settings.get('grid_height', 8)
-        self.updateDisplay()
+        self.update_display()
