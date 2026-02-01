@@ -2,6 +2,7 @@
 
 #include <adx/adx.h>
 
+#include "../globals.h"
 #include "../cache/caches.h"
 #include "../defs/gamestate.h"
 #include "../util/readutils.h"
@@ -203,7 +204,8 @@ static void level_process_event(level_t* level, levelevent_timepair_t* pair) {
     switch(ev->type) {
     case LEVEL_EVENT_SPAWN: {
         enemy_t* enemy = enemypool_spawn(gamestate_enemy_pool(), ev->spawn.def);
-        enemy_set_position(enemy, shz_vec2_init(pair->pos.x, 0.0f));
+        const float y = (SCREEN_HEIGHT - pair->pos.y);
+        enemy_set_position(enemy, shz_vec2_init(pair->pos.x, y));
         break;
     }
     case LEVEL_EVENT_MUSIC: {
