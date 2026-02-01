@@ -144,3 +144,4 @@ class pageLevelEditor(QWidget, Ui_pageLevelEditor):
                 if level_data.get('scroll_speed') != new_speed:
                     speed_idx = defsdb.levels.index(row, LevelsModel.COL_SPEED)
                     defsdb.levels.setData(speed_idx, new_speed, Qt.ItemDataRole.EditRole)
+                    self.gvLevelEditor.update_display()
