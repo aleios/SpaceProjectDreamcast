@@ -180,9 +180,6 @@ static void vm_fire_event(virtualmachine_t* vm, event_t ev, int event_idx) {
         case EVENT_START_FIRING: {
             new_task.step = task_fire_projectile;
             new_task.fire.weapon = ev.fire.weapon;
-            // new_task.fire.params = ev.fire;
-            // new_task.fire.accumulator = 0.0f;
-            // new_task.fire.angle = ev.fire.emitter.start_angle;
             new_task.is_blocking = false;
             break;
         }
@@ -202,8 +199,6 @@ static void vm_fire_event(virtualmachine_t* vm, event_t ev, int event_idx) {
             break;
         }
         case EVENT_DESTROY: {
-            //health_add(&vm->owner->health, HEALTH_INSTANT_DEAD);
-            //vm->owner->health = 0;
             enemypool_despawn(gamestate_enemy_pool(), vm->owner);
             return;
         }
@@ -250,8 +245,6 @@ static void vm_fire_event(virtualmachine_t* vm, event_t ev, int event_idx) {
 
             if (should_repeat) {
                 // TODO: Option to stop all tasks on repeat?
-                //vm->total_tasks = 0;
-                //vm->is_blocked = false;
                 vm->current_event = frame->target_event_idx;
             }
 
