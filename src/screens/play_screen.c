@@ -14,7 +14,6 @@
 
 #include "../ui/ui.h"
 
-spritefont_t* font;
 ui_t ui;
 
 typedef enum PlayScreenState {
@@ -34,8 +33,6 @@ static void play_screen_fade_out(float duration) {
 }
 
 void play_screen_init() {
-    //spritefont_init(&font, "main_font", 16, 16);
-    font = fontcache_get("main_font");
     ui_init(&ui);
 
     play_state = PLAY_STATE_PLAYING;
@@ -43,7 +40,6 @@ void play_screen_init() {
 
 void play_screen_cleanup() {
     //spritefont_destroy(&font);
-    fontcache_release(font);
     ui_destroy(&ui);
 }
 
@@ -221,7 +217,7 @@ void play_screen_render_tr() {
         shz_vec2_t pos = shz_vec2_init(SCREEN_HALF_WIDTH - (16.0f * 3), SCREEN_HALF_HEIGHT);
 
         render_rect(shz_vec4_init(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT), PVR_LIST_TR_POLY, 0x66000000);
-        spritefont_render(font, "Paused", pos, 0xFFFFFFFF);
+        spritefont_render(gamesettings_main_font(), "Paused", pos, 0xFFFFFFFF);
     }
 
     ui_render(&ui);

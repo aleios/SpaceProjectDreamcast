@@ -2,6 +2,7 @@
 #include <kos.h>
 
 #include "util/readutils.h"
+#include "cache/caches.h"
 
 gamesettings_t g_gamesettings;
 
@@ -60,6 +61,10 @@ bool gamesettings_load() {
     uint16_t max_health;
     fs_read(file, &max_health, sizeof(max_health));
     g_gamesettings.max_health = max_health;
+
+    char path_buf[256];
+    readutil_readstr(file, path_buf, sizeof(path_buf));
+    g_gamesettings.main_font = fontcache_get(path_buf);
 
     // Playlist
     strpool_init(&g_gamesettings.strpool, 8192);

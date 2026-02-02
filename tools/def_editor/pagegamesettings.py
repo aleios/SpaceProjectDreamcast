@@ -9,6 +9,8 @@ class pageGameSettings(QWidget, Ui_pageGameSettings):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
 
+        self.cbMainFont.setModel(defsdb.fonts)
+
         self.fieldMapper = QDataWidgetMapper(self)
         self.fieldMapper.setModel(defsdb.game_settings_model)
         self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
@@ -17,6 +19,7 @@ class pageGameSettings(QWidget, Ui_pageGameSettings):
         # Explicitly map to the 'value' property of the spinboxes.
         self.fieldMapper.addMapping(self.sbMaxLives, 0, b"value")
         self.fieldMapper.addMapping(self.sbMaxHealth, 1, b"value")
+        self.fieldMapper.addMapping(self.cbMainFont, 2, b"currentText")
         self.fieldMapper.setCurrentIndex(0)
 
         self.sbMaxLives.valueChanged.connect(self.fieldMapper.submit)

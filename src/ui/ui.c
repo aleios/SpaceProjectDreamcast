@@ -2,6 +2,7 @@
 #include "../renderer/render_util.h"
 #include "../defs/gamestate.h"
 #include "../cache/caches.h"
+#include "../gamesettings.h"
 
 void ui_init(ui_t* ui) {
 
@@ -15,11 +16,9 @@ void ui_init(ui_t* ui) {
     ui->healthbar_frame = health_clip->frames[0];
     ui->healthpip_frame = healthpip_clip->frames[0];
     ui->life_frame = life_clip->frames[0];
-    ui->font = fontcache_get("main_font");
 }
 
 void ui_destroy(ui_t* ui) {
-    fontcache_release(ui->font);
     // animcache_release(ui->ui_anim);
     // texcache_release(ui->ui_tex);
 }
@@ -55,5 +54,5 @@ void ui_render(ui_t* ui) {
     float y = (healthbar_size.y * 2.0f + 5.0f) + ui->life_frame.size.y;
     char score_buf[50];
     snprintf(score_buf, sizeof(score_buf), "Score: %d", g_gamestate.score);
-    spritefont_render(ui->font, score_buf, shz_vec2_init(0.0f, y), 0xFFFFFFFF);
+    spritefont_render(gamesettings_main_font(), score_buf, shz_vec2_init(0.0f, y), 0xFFFFFFFF);
 }

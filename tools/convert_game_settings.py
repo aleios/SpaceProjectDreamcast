@@ -13,6 +13,7 @@ def parse_settings(input_file, output_fname):
     with open(output_fname, "wb") as output_file:
         helpers.write_ushort(output_file, settings.get("max_lives", 3))
         helpers.write_ushort(output_file, settings.get("max_health", 10))
+        helpers.write_str(output_file, settings.get("main_font", ""))
         write_playlist(output_file, settings.get("playlist", []))
 
 def main():

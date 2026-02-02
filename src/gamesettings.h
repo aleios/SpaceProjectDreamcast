@@ -1,5 +1,6 @@
 #pragma once
 #include "defs/emitter.h"
+#include "renderer/sprite_font.h"
 #include "util/strpool.h"
 
 typedef struct GameOptions {
@@ -10,6 +11,7 @@ typedef struct GameOptions {
 typedef struct GameSettings {
     int max_lives;
     int max_health;
+    spritefont_t* main_font;
 
     strpool_t strpool;
     uint16_t total_levels;
@@ -41,4 +43,8 @@ SHZ_FORCE_INLINE const char* gamesettings_get_level(int index) {
 
 SHZ_FORCE_INLINE int gamesettings_total_levels() {
     return g_gamesettings.total_levels;
+}
+
+SHZ_FORCE_INLINE spritefont_t* gamesettings_main_font() {
+    return g_gamesettings.main_font;
 }

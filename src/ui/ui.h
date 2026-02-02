@@ -7,7 +7,6 @@
 typedef struct UI {
     texture_t* tex;
     animation_t* anim;
-    spritefont_t* font;
 
     animationframe_t healthbar_frame;
     animationframe_t healthpip_frame;

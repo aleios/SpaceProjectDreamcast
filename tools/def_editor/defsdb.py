@@ -1,8 +1,7 @@
 from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
 import json
 from dataclasses import dataclass, asdict, field
-from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, PlayerModel, AnimationModel
-from tools.def_editor.models.weaponset import WeaponSetModel
+from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, PlayerModel, AnimationModel, WeaponSetModel, FontsModel
 
 #
 # -- Game settings models --
@@ -11,7 +10,7 @@ from tools.def_editor.models.weaponset import WeaponSetModel
 class GameSettingsData:
     max_health: int = 10
     max_lives: int = 3
-    player_speed: float = 0.2
+    main_font: str = ""
     playlist: list = field(default_factory=list)
     modified: bool = True
 
@@ -23,7 +22,7 @@ class GameSettingsData:
     def from_dict(self, data: dict):
         self.max_health = data.get("max_health", self.max_health)
         self.max_lives = data.get("max_lives", self.max_lives)
-        self.player_speed = data.get("player_speed", self.player_speed)
+        self.main_font = data.get("main_font", self.main_font)
         self.playlist = list(data.get("playlist", []))
         self.modified = False
 
@@ -31,7 +30,7 @@ class GameSettingsModel(QAbstractTableModel):
     def __init__(self, data_obj: GameSettingsData, parent=None):
         super().__init__(parent)
         self.data_obj = data_obj
-        self.fields = ["max_lives", "max_health", "player_speed"]
+        self.fields = ["max_lives", "max_health", "main_font"]
 
     def rowCount(self, parent=QModelIndex()):
         return 1
@@ -74,6 +73,9 @@ game_settings = GameSettingsData()
 game_settings_model = GameSettingsModel(game_settings)
 playlist_model = PlaylistModel(game_settings)
 
+# Resource models
+fonts = FontsModel()
+
 # Animation models
 animations = AnimationModel()
 
@@ -88,6 +90,8 @@ def reload_defs():
 
     animations.load(assets_path)
     levels.load(assets_path)
+
+    fonts.load(assets_path)
 
     try:
         with open(assets_path + "/settings.json", "r") as f:

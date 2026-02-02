@@ -4,18 +4,16 @@
 #include "../renderer/sprite_font.h"
 #include "../cache/caches.h"
 #include "../globals.h"
+#include "../gamesettings.h"
 #include <stdio.h>
 
-static spritefont_t* load_font;
 static float load_timer;
 static loadscreen_data_t load_data;
 
 void load_screen_init() {
-    load_font = fontcache_get("main_font");
 }
 
 void load_screen_cleanup() {
-    fontcache_release(load_font);
 }
 
 void load_screen_enter(void* data) {
@@ -53,12 +51,14 @@ void load_screen_render_op() {
 void load_screen_render_tr() {
     char buffer[128];
     snprintf(buffer, sizeof(buffer), "%s", load_data.level);
-    
-    shz_vec2_t size = spritefont_str_size(load_font, buffer);
+
+    spritefont_t* font = gamesettings_main_font();
+
+    shz_vec2_t size = spritefont_str_size(font, buffer);
     shz_vec2_t pos = {
         .x = SCREEN_HALF_WIDTH - (size.x / 2.0f),
         .y = SCREEN_HALF_HEIGHT - (size.y / 2.0f)
     };
     
-    spritefont_render(load_font, buffer, pos, 0xFFFFFFFF);
+    spritefont_render(font, buffer, pos, 0xFFFFFFFF);
 }

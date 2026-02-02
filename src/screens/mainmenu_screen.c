@@ -71,7 +71,6 @@ menuoption_t menu_options[] = {
 };
 size_t total_menu_options;
 
-spritefont_t* menu_font;
 cont_state_t prev_state;
 
 static bool mainmenu_any_enabled_option(void) {
@@ -123,10 +122,10 @@ void mainmenu_select_option() {
 
 void mainmenu_screen_init() {
 
-    menu_font = fontcache_get("main_font");
-
     shz_vec2_t total_size = shz_vec2_init(0, 0);
     total_menu_options = sizeof(menu_options) / sizeof(menu_options[0]);
+
+    spritefont_t* menu_font = gamesettings_main_font();
 
     // Calculate total size
     for(int i = 0; i < total_menu_options; ++i) {
@@ -153,7 +152,6 @@ void mainmenu_screen_init() {
 }
 
 void mainmenu_screen_cleanup() {
-    fontcache_release(menu_font);
 }
 
 void mainmenu_screen_enter(void* data) {
@@ -217,6 +215,6 @@ void mainmenu_screen_render_op() {
 void mainmenu_screen_render_tr() {
     for(int i = 0; i < total_menu_options; ++i) {
         uint32_t col = (menu_options[i].enabled) ? ((current_menu_option == i) ? 0xFFFF0000 : 0xFFFFFFFF) : 0xFF333333;
-        spritefont_render(menu_font, menu_options[i].label, menu_options[i].pos, col);
+        spritefont_render(gamesettings_main_font(), menu_options[i].label, menu_options[i].pos, col);
     }
 }
