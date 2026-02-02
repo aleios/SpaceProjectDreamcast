@@ -107,8 +107,8 @@ class LevelEditor(QGraphicsView):
         self.grid_snap = True
 
         self.spawn_line = 240
-        self.tick_minor = 100
-        self.tick_major = 500
+        self.time_tick_minor = 100 # ms
+        self.time_tick_major = 500 # ms
         self.tick_margin_x = 0
         self.tick_len_minor = 6
         self.tick_len_major = 12
@@ -363,33 +363,59 @@ class LevelEditor(QGraphicsView):
         font.setPointSize(max(1, font.pointSize() - 4))
         painter.setFont(font)
 
-        # Determine visible world range
-        world_top = self.viewport_to_world_y(0)
-        world_bottom = self.viewport_to_world_y(480)
-
-        world_min = min(world_top, world_bottom)
-        world_max = max(world_top, world_bottom)
-
-        start_tick = int(world_min // self.tick_minor) * self.tick_minor
-        end_tick = int(world_max // self.tick_minor) * self.tick_minor
-
-        for t in range(start_tick, end_tick + self.tick_minor, self.tick_minor):
-            y = self.world_to_screen_y(t)
-            is_major = (t % self.tick_major) == 0
-            tick_len = self.tick_len_major if is_major else self.tick_len_minor
-            painter.drawLine(self.tick_margin_x, int(y),
-                             self.tick_margin_x + tick_len, int(y))
-
-            if is_major:
-                painter.drawText(self.tick_margin_x + tick_len + 4, int(y)+2, f"{t}")
-
-        # Current timeline position
+        # Get current scroll speed
         scroll_speed = 0.0
         if self.model and self.level_row >= 0:
             idx = defsdb.levels.index(self.level_row, LevelsModel.COL_SPEED)
             if idx.isValid():
                 scroll_speed = defsdb.levels.data(idx, Qt.ItemDataRole.EditRole) or 0.0
 
+        if scroll_speed > 0.0:
+            # Determine visible world range in pixels
+            world_top = self.viewport_to_world_y(0)
+            world_bottom = self.viewport_to_world_y(480)
+
+            # Convert world pixel to time (ms)
+            time_min = min(world_top, world_bottom) / scroll_speed
+            time_max = max(world_top, world_bottom) / scroll_speed
+
+            start_time_tick = int(time_min // self.time_tick_minor) * self.time_tick_minor
+            end_time_tick = int(time_max // self.time_tick_minor) * self.time_tick_minor
+
+            for t_ms in range(start_time_tick, end_time_tick + self.time_tick_minor, self.time_tick_minor):
+                # Convert back to world Y (px) to find screen position
+                world_y = t_ms * scroll_speed
+                y = self.world_to_screen_y(world_y)
+                is_major = (t_ms % self.time_tick_major) == 0
+                tick_len = self.tick_len_major if is_major else self.tick_len_minor
+                painter.drawLine(self.tick_margin_x, int(y),
+                                 self.tick_margin_x + tick_len, int(y))
+
+                if is_major:
+                    painter.drawText(self.tick_margin_x + tick_len + 4, int(y)+2, f"{t_ms}ms")
+        else:
+            # No scroll speed... just pixels I guess?
+            world_top = self.viewport_to_world_y(0)
+            world_bottom = self.viewport_to_world_y(480)
+            world_min = min(world_top, world_bottom)
+            world_max = max(world_top, world_bottom)
+
+            tick_minor = 100
+            tick_major = 500
+            start_tick = int(world_min // tick_minor) * tick_minor
+            end_tick = int(world_max // tick_minor) * tick_minor
+
+            for t in range(start_tick, end_tick + tick_minor, tick_minor):
+                y = self.world_to_screen_y(t)
+                is_major = (t % tick_major) == 0
+                tick_len = self.tick_len_major if is_major else self.tick_len_minor
+                painter.drawLine(self.tick_margin_x, int(y),
+                                 self.tick_margin_x + tick_len, int(y))
+
+                if is_major:
+                    painter.drawText(self.tick_margin_x + tick_len + 4, int(y)+2, f"{t}px")
+
+        # Current timeline position
         if scroll_speed > 0.0:
             label_text = f"{int(self.current_pos)} px ({int(self.current_pos / scroll_speed)}ms)"
         else:
@@ -432,7 +458,7 @@ class LevelEditor(QGraphicsView):
         super().drawBackground(painter, rect)
 
         self.draw_grid(painter)
-        self.draw_screen_boundaries(painter)
+        #self.draw_screen_boundaries(painter)
         self.draw_screen_edges(painter)
         self.draw_timeline(painter)
 
