@@ -8,20 +8,7 @@
   "events": [
     {
       "type": "StartFiring",
-      "delay": 500,
-      "lifetime": 3000,
-      "offset": [
-        0.0,
-        0.0
-      ],
-      "projectile": "boomerang",
-      "spawns_per_step": 8,
-      "speed": 0.2,
-      "start_angle": 0.0,
-      "step_angle": 45.0,
-      "target": 1,
-      "target_tracking": 0,
-      "tracking_delay": 500
+      "weapon": "boss_pattern1"
     },
     {
       "type": "MoveTo",

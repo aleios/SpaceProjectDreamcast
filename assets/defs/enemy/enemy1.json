@@ -8,18 +8,7 @@
   "events": [
     {
       "type": "StartFiring",
-      "delay": 500,
-      "lifetime": 2000,
-      "name": "Emitter",
-      "offset": [
-        0.0,
-        15.0
-      ],
-      "projectile": "basic",
-      "spawns_per_step": 1,
-      "speed": 0.2,
-      "start_angle": 90.0,
-      "step_angle": 0.0
+      "weapon": "enemy_basic"
     },
     {
       "type": "MoveTo",

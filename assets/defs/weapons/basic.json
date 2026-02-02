@@ -1,0 +1,35 @@
+{
+  "emitters": [
+    {
+      "projectile": "basic",
+      "spawns_per_step": 1,
+      "delay": 500,
+      "start_angle": 270.0,
+      "step_angle": 0.0,
+      "speed": 0.3,
+      "lifetime": 2000,
+      "offset": [
+        10.0,
+        0.0
+      ],
+      "target": 0,
+      "name": "Emitter 1"
+    },
+    {
+      "projectile": "basic",
+      "spawns_per_step": 1,
+      "delay": 500,
+      "start_angle": 270.0,
+      "step_angle": 0.0,
+      "speed": 0.3,
+      "lifetime": 2000,
+      "offset": [
+        -10.0,
+        0.0
+      ],
+      "target": 0,
+      "name": "Emitter 2"
+    }
+  ],
+  "mode": 1
+}

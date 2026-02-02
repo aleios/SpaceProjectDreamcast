@@ -6,10 +6,7 @@
       "boss",
       "enemy1"
     ],
-    "projectiles": [
-      "basic",
-      "boomerang"
-    ]
+    "projectiles": []
   },
   "events": [
     {
