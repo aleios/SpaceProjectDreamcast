@@ -16,11 +16,13 @@ class pageAnimations(QWidget, Ui_pageAnimations):
         self.lvAnimations.setModel(defsdb.animations)
         self.lvAnimations.selectionModel().currentChanged.connect(self.selection_changed)
 
+        self.cbTexture.setModel(defsdb.sprites)
+
         self.fieldMapper = QDataWidgetMapper(self)
         self.fieldMapper.setModel(defsdb.animations)
         self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
 
-        self.fieldMapper.addMapping(self.tbTexture, defsdb.AnimationModel.COL_TEXTURE)
+        self.fieldMapper.addMapping(self.cbTexture, defsdb.AnimationModel.COL_TEXTURE, b'currentText')
         self.fieldMapper.addMapping(self.sbGlobalOriginX, defsdb.AnimationModel.COL_ORIGIN_X)
         self.fieldMapper.addMapping(self.sbGlobalOriginY, defsdb.AnimationModel.COL_ORIGIN_Y)
 

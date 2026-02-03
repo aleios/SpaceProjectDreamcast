@@ -55,9 +55,6 @@ class Ui_pageAnimations(object):
         self.label = QtWidgets.QLabel(parent=self.groupBox)
         self.label.setObjectName("label")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label)
-        self.tbTexture = QtWidgets.QLineEdit(parent=self.groupBox)
-        self.tbTexture.setObjectName("tbTexture")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.tbTexture)
         self.label_2 = QtWidgets.QLabel(parent=self.groupBox)
         self.label_2.setObjectName("label_2")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label_2)
@@ -86,12 +83,15 @@ class Ui_pageAnimations(object):
         self.btnNewClip.setObjectName("btnNewClip")
         self.verticalLayout_2.addWidget(self.btnNewClip)
         self.formLayout.setLayout(2, QtWidgets.QFormLayout.ItemRole.FieldRole, self.verticalLayout_2)
+        self.cbTexture = QtWidgets.QComboBox(parent=self.groupBox)
+        self.cbTexture.setObjectName("cbTexture")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.cbTexture)
         self.horizontalLayout_3.addWidget(self.groupBox)
         self.stackedControls.addWidget(self.page)
         self.horizontalLayout.addWidget(self.stackedControls)
 
         self.retranslateUi(pageAnimations)
-        self.stackedControls.setCurrentIndex(0)
+        self.stackedControls.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(pageAnimations)
 
     def retranslateUi(self, pageAnimations):

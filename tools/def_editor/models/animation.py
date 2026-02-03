@@ -379,11 +379,13 @@ class AnimationModel(QAbstractTableModel):
         return any(item.get('modified') for item in self._data_list) or len(self._pending_deletions) > 0
 
     def add(self, name):
+        from tools.def_editor import defsdb
         self.beginInsertRows(QModelIndex(), len(self._data_list), len(self._data_list))
+        tex = defsdb.sprites.data(defsdb.sprites.index(0, 0)) or ""
         self._data_list.append({
             "name": name,
             "modified": True,
-            "texture": "",
+            "texture": tex,
             "origin": [0.0,0.0],
             "clips": []
         })

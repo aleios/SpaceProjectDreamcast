@@ -2,6 +2,7 @@ from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
 import json
 from dataclasses import dataclass, asdict, field
 from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, PlayerModel, AnimationModel, WeaponSetModel, FontsModel
+from tools.def_editor.models.sprites import SpritesModel
 
 #
 # -- Game settings models --
@@ -78,6 +79,7 @@ fonts = FontsModel()
 
 # Animation models
 animations = AnimationModel()
+sprites = SpritesModel()
 
 levels = LevelsModel()
 
@@ -92,6 +94,7 @@ def reload_defs():
     levels.load(assets_path)
 
     fonts.load(assets_path)
+    sprites.load(assets_path)
 
     try:
         with open(assets_path + "/settings.json", "r") as f:
