@@ -25,8 +25,6 @@ Without these the game will abort.
 
 - animations/ui
 - sprites/ui
-- sprites/font_16x16
-- fonts/main_font
 
 ## Asset Attribution
 
