@@ -2,6 +2,7 @@ from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
 import json
 from dataclasses import dataclass, asdict, field
 from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, PlayerModel, AnimationModel, WeaponSetModel, FontsModel
+from tools.def_editor.models import CollectablesModel
 from tools.def_editor.models.sprites import SpritesModel
 
 #
@@ -68,6 +69,7 @@ projectile_defs = ProjectileModel()
 enemy_defs = EnemyModel()
 player_def = PlayerModel()
 weaponset_defs = WeaponSetModel()
+collectable_defs = CollectablesModel()
 
 # Game settings models
 game_settings = GameSettingsData()
@@ -86,15 +88,16 @@ levels = LevelsModel()
 assets_path = ""
 
 def reload_defs():
+    sprites.load(assets_path)
+    fonts.load(assets_path)
+    animations.load(assets_path)
+
     projectile_defs.load(assets_path)
     weaponset_defs.load(assets_path)
     enemy_defs.load(assets_path)
+    collectable_defs.load(assets_path)
 
-    animations.load(assets_path)
     levels.load(assets_path)
-
-    fonts.load(assets_path)
-    sprites.load(assets_path)
 
     try:
         with open(assets_path + "/settings.json", "r") as f:
@@ -112,9 +115,11 @@ def reload_defs():
     print("Defs reloaded")
 
 def save_pending_defs():
+    collectable_defs.save(assets_path)
     projectile_defs.save(assets_path)
     weaponset_defs.save(assets_path)
     enemy_defs.save(assets_path)
+
     animations.save(assets_path)
     levels.save(assets_path)
 

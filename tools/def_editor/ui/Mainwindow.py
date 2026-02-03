@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1920, 1080)
+        MainWindow.resize(1319, 910)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -34,6 +34,9 @@ class Ui_MainWindow(object):
         self.tab_3 = pageEnemies()
         self.tab_3.setObjectName("tab_3")
         self.tabsPages.addTab(self.tab_3, "")
+        self.tab_8 = pageCollectables()
+        self.tab_8.setObjectName("tab_8")
+        self.tabsPages.addTab(self.tab_8, "")
         self.tab_4 = pageAnimations()
         self.tab_4.setObjectName("tab_4")
         self.tabsPages.addTab(self.tab_4, "")
@@ -49,7 +52,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1920, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1319, 30))
         self.menubar.setObjectName("menubar")
         self.menuSettings = QtWidgets.QMenu(parent=self.menubar)
         self.menuSettings.setObjectName("menuSettings")
@@ -71,12 +74,14 @@ class Ui_MainWindow(object):
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_2), _translate("MainWindow", "Projectiles"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_7), _translate("MainWindow", "Weapon Sets"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_3), _translate("MainWindow", "Enemies"))
+        self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_8), _translate("MainWindow", "Collectables"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_4), _translate("MainWindow", "Animations"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_5), _translate("MainWindow", "Levels"))
         self.btnSave.setText(_translate("MainWindow", "Save"))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
         self.actionPaths.setText(_translate("MainWindow", "Paths"))
 from pageanimations import pageAnimations
+from pagecollectables import pageCollectables
 from pageenemies import pageEnemies
 from pagegamesettings import pageGameSettings
 from pageleveleditor import pageLevelEditor

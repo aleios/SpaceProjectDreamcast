@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1319</width>
+    <height>910</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,6 +45,11 @@
         <string>Enemies</string>
        </attribute>
       </widget>
+      <widget class="pageCollectables" name="tab_8">
+       <attribute name="title">
+        <string>Collectables</string>
+       </attribute>
+      </widget>
       <widget class="pageAnimations" name="tab_4">
        <attribute name="title">
         <string>Animations</string>
@@ -72,7 +77,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1920</width>
+     <width>1319</width>
      <height>30</height>
     </rect>
    </property>
@@ -131,6 +136,12 @@
    <class>pageWeaponsets</class>
    <extends>QWidget</extends>
    <header>pageweaponsets.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pageCollectables</class>
+   <extends>QWidget</extends>
+   <header>pagecollectables.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

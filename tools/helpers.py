@@ -11,8 +11,14 @@ def write_float(output_file, val):
 def write_ubyte(output_file, val):
     output_file.write(struct.pack("B", val))
 
+def write_byte(output_file, val):
+    output_file.write(struct.pack("b", val))
+
 def write_ushort(output_file, val):
     output_file.write(struct.pack("<H", val))
+
+def write_short(output_file, val):
+    output_file.write(struct.pack("<h", val))
 
 def write_magicnum(output_file, magicnum):
     output_file.write(magicnum.encode())

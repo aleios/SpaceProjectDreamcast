@@ -97,11 +97,14 @@ class DefModel(QAbstractTableModel):
                 name = os.path.splitext(os.path.basename(file_path))[0]
 
                 with open(file_path, "r") as f:
-                    data = json.load(f)
-                    data["name"] = name
-                    data["modified"] = False
-                    self._ensure_keys(data)
-                    self._data_list.append(data)
+                    try:
+                        data = json.load(f)
+                        data["name"] = name
+                        data["modified"] = False
+                        self._ensure_keys(data)
+                        self._data_list.append(data)
+                    except json.JSONDecodeError:
+                        pass
 
         self.endResetModel()
 

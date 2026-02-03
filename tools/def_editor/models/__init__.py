@@ -7,3 +7,4 @@ from .weaponset import WeaponSetModel, WeaponSetListModel
 from .player import PlayerModel
 from .animation import AnimationModel, ClipListModel, ClipFramesModel
 from .fonts import FontsModel
+from .collectables import CollectablesModel

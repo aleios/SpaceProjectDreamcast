@@ -5,68 +5,69 @@ from tools.def_editor import defsdb
 
 class LevelEventDialog(QDialog, Ui_levelEventDialog):
 
-    def map_spawn(self):
-        ev_data = self.event['event']
+    def map_spawn(self, ev_data):
         self.cbSpawnerEnemyDef.setCurrentText(ev_data.get('def', ''))
 
-    def save_spawn(self):
-        self.event['event']['def'] = self.cbSpawnerEnemyDef.currentText()
+    def save_spawn(self, ev_data):
+        ev_data['def'] = self.cbSpawnerEnemyDef.currentText()
 
-    def map_music(self):
-        ev_data = self.event['event']
+    def map_music(self, ev_data):
         self.tbMusicKey.setText(ev_data.get('key', ''))
         self.sbMusicFadeIn.setValue(ev_data.get('fade_in', 0.0))
         self.sbMusicFadeOut.setValue(ev_data.get('fade_out', 0.0))
 
-    def save_music(self):
-        ev_data = self.event['event']
+    def save_music(self, ev_data):
         ev_data['key'] = self.tbMusicKey.text()
         ev_data['fade_in'] = self.sbMusicFadeIn.value()
         ev_data['fade_out'] = self.sbMusicFadeOut.value()
 
-    def map_wait_clear(self):
-        ev_data = self.event['event']
+    def map_wait_clear(self, ev_data):
         self.sbWaitClearTimeout.setValue(ev_data.get('timeout', 0.0))
         pass
 
-    def save_wait_clear(self):
-        self.event['event']['timeout'] = self.sbWaitClearTimeout.value()
+    def save_wait_clear(self, ev_data):
+        ev_data['timeout'] = self.sbWaitClearTimeout.value()
 
-    def map_delay(self):
-        ev_data = self.event['event']
+    def map_delay(self, ev_data):
         self.sbDelayDuration.setValue(ev_data.get('duration', 0.0))
         pass
 
-    def save_delay(self):
-        self.event['event']['duration'] = self.sbDelayDuration.value()
+    def save_delay(self, ev_data):
+        ev_data['duration'] = self.sbDelayDuration.value()
 
-    def map_starfield_speed(self):
-        ev_data = self.event['event']
+    def map_starfield_speed(self, ev_data):
         self.sbStarfieldSpeed.setValue(ev_data.get('speed', 0.0))
         self.sbStarfieldDuration.setValue(ev_data.get('duration', 0.0))
         self.cbStarfieldBlocks.setChecked(ev_data.get('block', False))
         pass
 
-    def save_starfield_speed(self):
-        ev_data = self.event['event']
+    def save_starfield_speed(self, ev_data):
         ev_data['speed'] = self.sbStarfieldSpeed.value()
         ev_data['duration'] = self.sbStarfieldDuration.value()
         ev_data['block'] = self.cbStarfieldBlocks.isChecked()
 
-    def map_clear(self):
-        ev_data = self.event['event']
+    def map_clear(self, ev_data):
         self.cbClearProjPlayer.setChecked(ev_data.get('player_projectiles', False))
         self.cbClearProjEnemies.setChecked(ev_data.get('enemy_projectiles', False))
         self.cbClearEnemies.setChecked(ev_data.get('enemies', False))
         self.cbClearCollectables.setChecked(ev_data.get('collectables', False))
         pass
 
-    def save_clear(self):
-        ev_data = self.event['event']
+    def save_clear(self, ev_data):
         ev_data['player_projectiles'] = self.cbClearProjPlayer.isChecked()
         ev_data['enemy_projectiles'] = self.cbClearProjEnemies.isChecked()
         ev_data['enemies'] = self.cbClearEnemies.isChecked()
         ev_data['collectables'] = self.cbClearCollectables.isChecked()
+
+    def map_spawn_collectable(self, ev_data):
+        idx = self.cbSpawnCollectable.findText(ev_data['collectable'])
+        if idx != -1:
+            self.cbSpawnCollectable.setCurrentIndex(idx)
+        else:
+            self.cbSpawnCollectable.setCurrentIndex(0)
+
+    def save_spawn_collectable(self, ev_data):
+        ev_data['collectable'] = self.cbSpawnCollectable.currentText()
 
     def __init__(self, event, new_ev, parent=None):
         super().__init__(parent)
@@ -80,6 +81,9 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
 
         self.cbSpawnerEnemyDef.setModel(defsdb.enemy_defs)
         self.cbSpawnerEnemyDef.setCurrentIndex(0)
+
+        self.cbSpawnCollectable.setModel(defsdb.collectable_defs)
+        self.cbSpawnCollectable.setCurrentIndex(0)
 
         if not new_ev:
             self.load_event()
@@ -111,7 +115,8 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
         'wait_clear': map_wait_clear,
         'delay': map_delay,
         'starfield_speed': map_starfield_speed,
-        'clear': map_clear
+        'clear': map_clear,
+        'spawn_collectable': map_spawn_collectable
     }
 
     savers = {
@@ -120,7 +125,8 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
         'wait_clear': save_wait_clear,
         'delay': save_delay,
         'starfield_speed': save_starfield_speed,
-        'clear': save_clear
+        'clear': save_clear,
+        'spawn_collectable': save_spawn_collectable
     }
 
     def load_event(self):
@@ -132,7 +138,7 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
         if idx < 0:
             return
         self.cbEventType.setCurrentIndex(idx)
-        self.mappers[ev_type](self)
+        self.mappers[ev_type](self, self.event['event'])
 
     def save_event(self):
         self.event['pos'][0] = self.sbPosX.value()
@@ -140,4 +146,4 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
 
         ev_type = self.cbEventType.currentText()
         self.event['event'] = {'type': ev_type}
-        self.savers[ev_type](self)
+        self.savers[ev_type](self, self.event['event'])
