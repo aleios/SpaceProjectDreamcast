@@ -67,10 +67,10 @@ void enemy_step(enemy_t* enemy, float delta_time) {
         soundengine_play_sfx(enemy->explode_sound);
 
         // TODO: Drop chance from def
-        if (rand_probablity(60)) {
-            int type = rand_between(0, COLLECTABLE_TYPE_COUNT-1);
-            collectablepool_spawn(gamestate_collectable_pool(), type, enemy->transform.pos);
-        }
+        // if (rand_probablity(60)) {
+        //     int type = rand_between(0, COLLECTABLE_TYPE_COUNT-1);
+        //     collectablepool_spawn(gamestate_collectable_pool(), type, enemy->transform.pos);
+        // }
         enemypool_despawn(gamestate_enemy_pool(), enemy);
     }
 }

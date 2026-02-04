@@ -158,8 +158,16 @@ bool level_init(level_t* level, const char* file) {
                  ev->event.clear.collectables = collectables != 0;
                  break;
              }
+             case LEVEL_EVENT_SPAWN_COLLECTABLE: {
+                 if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
+                     printf("Failed to read collectable spawn definition from level file: %s\n", path_buf);
+                     goto read_fail;
+                 }
+                 ev->event.collectable.def = collectabledefcache_get(str_buf);
+                 break;
+             }
              default:
-                 printf("Failed to read level. Invalid opcode.\n");
+                 printf("Failed to read level. Invalid opcode (%d).\n", opcode);
                  goto read_fail;
              }
          }
@@ -245,6 +253,11 @@ static void level_process_event(level_t* level, levelevent_timepair_t* pair) {
             level->is_blocked = ev->starfield.block;
         }
         break;
+    case LEVEL_EVENT_SPAWN_COLLECTABLE: {
+        const float y = (level->current_pos - pair->pos.y);
+        collectablepool_spawn(gamestate_collectable_pool(), ev->collectable.def, shz_vec2_init(pair->pos.x, y));
+        break;
+    }
     }
     case LEVEL_EVENT_CLEAR: {
         if (ev->clear.player_projectiles) {

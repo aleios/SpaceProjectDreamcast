@@ -1,0 +1,10 @@
+{
+  "animation": "ui",
+  "animation_key": "powerup",
+  "lifetime": 5000,
+  "sfx": "pickup",
+  "collider_radius": 10.0,
+  "health": 0,
+  "lives": 0,
+  "weapon": 1
+}

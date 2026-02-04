@@ -1,7 +1,7 @@
 {
   "emitters": [
     {
-      "delay": 500,
+      "delay": 5000,
       "lifetime": 3000,
       "offset": [
         0.0,
@@ -16,6 +16,38 @@
       "target_tracking": 0,
       "tracking_delay": 500,
       "name": "Emitter 1"
+    },
+    {
+      "name": "Emitter 2",
+      "projectile": "basic",
+      "spawns_per_step": 8,
+      "delay": 1000,
+      "start_angle": 25.0,
+      "step_angle": 45.0,
+      "speed": 0.12,
+      "lifetime": 5000,
+      "offset": [
+        0.0,
+        10.0
+      ],
+      "target": 0
+    },
+    {
+      "name": "Emitter 3",
+      "projectile": "boomerang",
+      "spawns_per_step": 1,
+      "delay": 19000,
+      "start_angle": 0.0,
+      "step_angle": 0.0,
+      "speed": 0.15,
+      "lifetime": 6000,
+      "offset": [
+        0.0,
+        0.0
+      ],
+      "target": 2,
+      "target_tracking": 2,
+      "tracking_delay": 0
     }
   ],
   "mode": 0

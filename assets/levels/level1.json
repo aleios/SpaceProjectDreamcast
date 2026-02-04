@@ -31,6 +31,26 @@
     },
     {
       "pos": [
+        160.68,
+        515.25
+      ],
+      "event": {
+        "type": "spawn_collectable",
+        "collectable": "health"
+      }
+    },
+    {
+      "pos": [
+        391.86,
+        537.63
+      ],
+      "event": {
+        "type": "spawn_collectable",
+        "collectable": "power"
+      }
+    },
+    {
+      "pos": [
         488,
         672
       ],

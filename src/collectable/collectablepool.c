@@ -17,8 +17,6 @@ static void collectablepool_rebind(collectable_t* c) {
 void collectablepool_init(collectablepool_t* pool) {
     memset(pool->collectables, 0, sizeof(collectable_t) * MAX_COLLECTABLES);
     pool->total = 0;
-
-    pool->pickup_sound = soundengine_load_sfx("pickup");
 }
 
 void collectablepool_destroy(collectablepool_t* pool) {
@@ -28,14 +26,14 @@ void collectablepool_destroy(collectablepool_t* pool) {
     pool->total = 0;
 }
 
-collectable_t* collectablepool_spawn(collectablepool_t* pool, collectabletype_t type, shz_vec2_t position) {
+collectable_t* collectablepool_spawn(collectablepool_t* pool, collectabledef_t* def, shz_vec2_t position) {
     if (pool->total >= MAX_COLLECTABLES) {
         return nullptr;
     }
 
     collectable_t* collectable = &pool->collectables[pool->total++];
 
-    collectable_init(collectable, type);
+    collectable_init(collectable, def);
     collectable->transform.pos = position;
     collectable->lifetime = 10000.0f;
 
@@ -79,27 +77,12 @@ void collectablepool_step(collectablepool_t* pool, float delta_time) {
         c->collider.center = c->transform.pos;
         if (collider_test_circle(&c->collider, &player->collider)) {
 
-            // Apply effect
-            switch (c->type) {
-            case COLLECTABLE_HEALTH:
-                if (g_gamestate.health < gamesettings_max_health()) {
-                    g_gamestate.health += 1;
-                }
-                break;
-            case COLLECTABLE_POWER:
-                if (g_gamestate.current_weapon < player_get_total_weapons(gamestate_get_player())-1) {
-                    g_gamestate.current_weapon += 1;
-                }
-                break;
-            case COLLECTABLE_LIFE:
-                if (g_gamestate.lives < gamesettings_max_lives()) {
-                    g_gamestate.lives += 1;
-                }
-                break;
-            default:
-                break;
-            }
-            soundengine_play_sfx(pool->pickup_sound);
+            // Apply effects
+            gamestate_add_health(c->health);
+            gamestate_add_lives(c->lives);
+            gamestate_add_weapon_power(c->weapon);
+
+            soundengine_play_sfx(c->sfx);
 
             // Despawn
             collectablepool_despawn(pool, i);

@@ -32,3 +32,4 @@ DEFINE_CACHE(fontcache, spritefont_t, spritefont_init, spritefont_destroy);
 DEFINE_CACHE(projdefcache, projectiledef_t, projectiledef_init, projectiledef_destroy);
 DEFINE_CACHE(enemydefcache, enemydef_t, enemydef_init, enemydef_destroy);
 DEFINE_CACHE(weaponsetcache, weaponsetdef_t, weaponsetdef_init, weaponsetdef_destroy);
+DEFINE_CACHE(collectabledefcache, collectabledef_t, collectabledef_init, collectabledef_destroy);

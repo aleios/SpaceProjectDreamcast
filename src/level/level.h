@@ -1,5 +1,6 @@
 #pragma once
 #include "../enemy/enemy_def.h"
+#include "../defs/collectable_def.h"
 #include "../util/strpool.h"
 
 typedef enum LevelEventType {
@@ -9,6 +10,7 @@ typedef enum LevelEventType {
     LEVEL_EVENT_DELAY,             // <| Delay further events for x ms
     LEVEL_EVENT_STARFIELD_SPEED,   // <| Set background starfield speed
     LEVEL_EVENT_CLEAR,             // <| Clear active projectiles and/or enemies.
+    LEVEL_EVENT_SPAWN_COLLECTABLE  // <| Spawns a collectable
 } leveleventtype_t;
 
 typedef struct EnemyTimePair {
@@ -47,6 +49,10 @@ typedef struct ClearParams {
     bool collectables;
 } clearparams_t;
 
+typedef struct SpawnCollectableParams {
+    collectabledef_t* def;
+} spawncollectableparams_t;
+
 typedef struct LevelEvent {
     leveleventtype_t type;
     union {
@@ -56,6 +62,7 @@ typedef struct LevelEvent {
         starfieldparams_t starfield;
         waitclearparams_t waitclear;
         clearparams_t clear;
+        spawncollectableparams_t collectable;
     };
 } levelevent_t;
 

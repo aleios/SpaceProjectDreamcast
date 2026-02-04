@@ -1,0 +1,10 @@
+{
+  "animation": "ui",
+  "animation_key": "health",
+  "lifetime": 5000,
+  "sfx": "pickup",
+  "collider_radius": 6.0,
+  "health": 1,
+  "lives": 0,
+  "weapon": 0
+}

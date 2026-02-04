@@ -4,6 +4,7 @@
 #include "../defs/projectile_def.h"
 #include "../enemy/enemy_def.h"
 #include "../renderer/sprite_font.h"
+#include "../defs/collectable_def.h"
 
 // Rendering
 texture_t* texcache_get(const char* key);
@@ -24,3 +25,6 @@ void enemydefcache_release(enemydef_t* data);
 
 weaponsetdef_t* weaponsetcache_get(const char* key);
 void weaponsetcache_release(weaponsetdef_t* data);
+
+collectabledef_t* collectabledefcache_get(const char* key);
+void collectabledefcache_release(collectabledef_t* data);
