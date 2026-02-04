@@ -53,6 +53,12 @@ romdisk/defs/weapons/%.dat: assets/defs/weapons/%.json
 	@mkdir -p $(dir $@)
 	python tools/convert_weaponset_def.py $< $@
 
+COLLECTABLEDEF_SRCS := $(shell find assets/defs/collectable -type f -name '*.json' | sort)
+COLLECTABLEDEFS := $(COLLECTABLEDEF_SRCS:assets/defs/collectable/%.json=romdisk/defs/collectable/%.dat)
+romdisk/defs/collectable/%.dat: assets/defs/collectable/%.json
+	@mkdir -p $(dir $@)
+	python tools/convert_collectable.py $< $@
+
 LEVEL_SRCS := $(shell find assets/levels -type f -name '*.json' | sort)
 LEVELS := $(LEVEL_SRCS:assets/levels/%.json=romdisk/levels/%.dat)
 romdisk/levels/%.dat: assets/levels/%.json
@@ -75,7 +81,7 @@ romdisk/fonts/%.dat: assets/fonts/%.json
 	@mkdir -p $(dir $@)
 	python tools/convert_font.py $< $@
 
-ASSETS := $(GAMESETTINGS) $(PLAYER) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(WEAPONSETDEFS) $(LEVELS) $(FONTS)
+ASSETS := $(GAMESETTINGS) $(PLAYER) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(WEAPONSETDEFS) $(COLLECTABLEDEFS) $(LEVELS) $(FONTS)
 
 # Build targets
 .PHONY: all clean rebuild-cdi rm-elf rm-disc

@@ -80,8 +80,11 @@ class DefModel(QAbstractTableModel):
         for col_info in self._COLUMN_MAP.values():
             key = col_info['key']
             col_type = col_info['type']
+            default = col_info.get('default', None)
+            if default is None:
+                default = col_type()
             if key not in data:
-                data[key] = col_type()
+                data[key] = default
                 missing_key = True
         if missing_key:
             data['modified'] = True

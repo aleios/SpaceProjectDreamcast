@@ -1,7 +1,7 @@
-from PyQt6.QtWidgets import QWidget, QDataWidgetMapper
+from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QMessageBox, QInputDialog
 
 from tools.def_editor import defsdb
-from models import CollectablesModel
+from models import CollectablesModel, ClipListModel
 from ui.Collectables import Ui_pageCollectables
 
 class pageCollectables(QWidget, Ui_pageCollectables):
@@ -22,6 +22,9 @@ class pageCollectables(QWidget, Ui_pageCollectables):
 
         self.mapper.addMapping(self.cbAnimation, CollectablesModel.COL_ANIM, b'currentText')
         self.mapper.addMapping(self.cbClip, CollectablesModel.COL_ANIM_KEY, b'currentText')
+        self.mapper.addMapping(self.sbLifetime, CollectablesModel.COL_LIFETIME)
+        self.mapper.addMapping(self.tbSFX, CollectablesModel.COL_SFX)
+        self.mapper.addMapping(self.sbColliderRadius, CollectablesModel.COL_COLLIDER_RADIUS)
         self.mapper.addMapping(self.sbHealth, CollectablesModel.COL_EFFECT_HEALTH)
         self.mapper.addMapping(self.sbLives, CollectablesModel.COL_EFFECT_LIVES)
         self.mapper.addMapping(self.sbWeaponPower, CollectablesModel.COL_EFFECT_WEAPON)
@@ -30,6 +33,27 @@ class pageCollectables(QWidget, Ui_pageCollectables):
 
         current_anim = self.cbAnimation.currentIndex()
         self.on_animation_changed(current_anim)
+
+        self.btnNewCollectable.clicked.connect(self.new_collectable)
+
+    def new_collectable(self):
+        val, res = QInputDialog.getText(self, "Add collectable...", "Name")
+        val = val.strip()
+
+        if res:
+            if defsdb.collectable_defs.exists(val):
+                QMessageBox.critical(self, "Error", "Error: Item already exists.")
+            else:
+                initial_data = { "name": val }
+                if defsdb.animations.rowCount() > 0:
+                    anim_name = defsdb.animations.data(defsdb.animations.index(0, defsdb.AnimationModel.COL_NAME))
+                    initial_data["animation"] = anim_name
+
+                    clip_model = defsdb.animations.get_clip_list_model(0)
+                    if clip_model.rowCount() > 0:
+                        animation_key = clip_model.data(clip_model.index(0, ClipListModel.COL_NAME))
+                        initial_data["animation_key"] = animation_key
+                defsdb.collectable_defs.add(initial_data)
 
     def index_changed(self, new, old):
         if new.isValid():

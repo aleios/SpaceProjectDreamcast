@@ -16,6 +16,9 @@ def parse_collectable(input_file, output_fname):
 
         helpers.write_str(output_file, anim)
         helpers.write_str(output_file, key)
+        helpers.write_float(output_file, settings.get('lifetime', 0.0))
+        helpers.write_str(output_file, settings.get('sfx', ''))
+        helpers.write_float(output_file, settings.get('collider_radius', 0.0))
         helpers.write_byte(output_file, settings.get('health', 0))
         helpers.write_byte(output_file, settings.get('lives', 0))
         helpers.write_byte(output_file, settings.get('weapon', 0))

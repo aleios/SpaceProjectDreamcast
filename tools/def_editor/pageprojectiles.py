@@ -18,6 +18,9 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
         self.lvProjectiles.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.lvProjectiles.customContextMenuRequested.connect(self.ctx_menu)
 
+        self.cbAnimation.setModel(defsdb.animations)
+        self.cbAnimation.currentIndexChanged.connect(self.on_animation_changed)
+
         self.btnNewProjectile.pressed.connect(self.add_projectile)
 
         self.controlStack.setCurrentIndex(0)
@@ -33,10 +36,10 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
 
         # Initial indices
         self.fieldMapper.setCurrentIndex(0)
-        self.cbAnimation.setCurrentIndex(0)
 
-        self.cbAnimation.setModel(defsdb.animations)
-        self.cbAnimation.currentIndexChanged.connect(self.on_animation_changed)
+        current_anim = self.cbAnimation.currentIndex()
+        self.on_animation_changed(current_anim)
+
         self.cbAnimationClip.currentIndexChanged.connect(self.on_animation_clip_changed)
 
     def on_animation_changed(self, index):

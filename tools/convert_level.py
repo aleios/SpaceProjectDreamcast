@@ -29,13 +29,17 @@ def write_clear_ev(output_file, ev):
     helpers.write_ubyte(output_file, ev.get("enemies", False) and 1 or 0)
     helpers.write_ubyte(output_file, ev.get("collectables", False) and 1 or 0)
 
+def write_spawn_collectable_ev(output_file, ev):
+    helpers.write_str(output_file, ev.get("collectable", ""))
+
 writers = [
     write_spawn_ev,
     write_music_ev,
     write_wait_clear_ev,
     write_delay_ev,
     write_starfield_speed_ev,
-    write_clear_ev
+    write_clear_ev,
+    write_spawn_collectable_ev
 ]
 
 types = [
@@ -44,7 +48,8 @@ types = [
     "wait_clear",
     "delay",
     "starfield_speed",
-    "clear"
+    "clear",
+    "spawn_collectable"
 ]
 
 def parse_level(input_file, output_fname):
