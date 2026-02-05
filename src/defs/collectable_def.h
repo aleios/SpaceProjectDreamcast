@@ -8,6 +8,7 @@ typedef struct CollectableDef {
     float lifetime;
     uint32_t sfx;
     float collider_radius;
+    float speed;
 
     int health;
     int lives;

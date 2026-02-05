@@ -25,6 +25,7 @@ class pageCollectables(QWidget, Ui_pageCollectables):
         self.mapper.addMapping(self.sbLifetime, CollectablesModel.COL_LIFETIME)
         self.mapper.addMapping(self.tbSFX, CollectablesModel.COL_SFX)
         self.mapper.addMapping(self.sbColliderRadius, CollectablesModel.COL_COLLIDER_RADIUS)
+        self.mapper.addMapping(self.sbSpeed, CollectablesModel.COL_SPEED)
         self.mapper.addMapping(self.sbHealth, CollectablesModel.COL_EFFECT_HEALTH)
         self.mapper.addMapping(self.sbLives, CollectablesModel.COL_EFFECT_LIVES)
         self.mapper.addMapping(self.sbWeaponPower, CollectablesModel.COL_EFFECT_WEAPON)

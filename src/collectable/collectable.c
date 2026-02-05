@@ -10,9 +10,7 @@ void collectable_init(collectable_t* collectable, collectabledef_t* def) {
     // TODO: Animator
     collectable->clip = def->clip;
 
-    collectable->sprite.frame = collectable->clip->frames[0].uv;
-    collectable->sprite.size  = collectable->clip->frames[0].size;
-    collectable->transform.origin = collectable->clip->origin;
+    animator_init(&collectable->animator, &collectable->sprite, collectable->clip);
 
     collectable->collider.center = collectable->transform.pos;
     collectable->collider.radius = def->collider_radius;
@@ -23,9 +21,15 @@ void collectable_init(collectable_t* collectable, collectabledef_t* def) {
     collectable->lives = def->lives;
     collectable->weapon = def->weapon;
     collectable->sfx = def->sfx;
+
+    collectable->speed = def->speed;
 }
 
 void collectable_destroy(collectable_t* collectable) {
     sprite_destroy(&collectable->sprite);
     collectable->lifetime = 0.0f;
+}
+
+void collectable_step(collectable_t* collectable, float delta_time) {
+    animator_step(&collectable->animator, delta_time);
 }

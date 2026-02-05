@@ -35,7 +35,6 @@ collectable_t* collectablepool_spawn(collectablepool_t* pool, collectabledef_t* 
 
     collectable_init(collectable, def);
     collectable->transform.pos = position;
-    collectable->lifetime = 10000.0f;
 
     return collectable;
 }
@@ -64,9 +63,10 @@ void collectablepool_step(collectablepool_t* pool, float delta_time) {
     for (int i = 0; i < pool->total; i++) {
         collectable_t* c = &pool->collectables[i];
 
+        collectable_step(c, delta_time);
+
         c->lifetime -= delta_time;
 
-        //printf("Lifetime (%d): %f\n", i, c->lifetime);
         if (c->lifetime <= 0.0f) {
             collectablepool_despawn(pool, i);
             i--;
@@ -90,7 +90,7 @@ void collectablepool_step(collectablepool_t* pool, float delta_time) {
             continue;
         }
 
-        c->transform.pos.y += 0.1f * delta_time;
+        c->transform.pos.y += c->speed * delta_time;
     }
 }
 

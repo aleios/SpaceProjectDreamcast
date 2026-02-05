@@ -55,6 +55,12 @@ bool collectabledef_init(collectabledef_t *def, const char* key) {
     }
     def->collider_radius = collider_radius;
 
+    float speed;
+    if (!READUTIL_READ_VALIDATE(file, speed)) {
+        goto error_close;
+    }
+    def->speed = speed;
+
     // Effects
     uint8_t health;
     if (!READUTIL_READ_VALIDATE(file, health)) {

@@ -132,4 +132,6 @@ def save_pending_defs():
         game_settings.modified = False
 
 def is_dirty():
-    return projectile_defs.isDirty() or weaponset_defs.isDirty() or enemy_defs.isDirty() or animations.isDirty() or game_settings.modified or player_def.is_dirty()
+    return (projectile_defs.isDirty() or weaponset_defs.isDirty() or enemy_defs.isDirty() or
+            collectable_defs.isDirty() or
+            animations.isDirty() or game_settings.modified or player_def.is_dirty())
