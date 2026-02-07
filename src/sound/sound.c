@@ -151,6 +151,10 @@ void soundengine_step(float delta_time) {
 }
 
 uint32_t soundengine_load_sfx(const char* key) {
+    if (!str_valid(key)) {
+        return SFXHND_INVALID;
+    }
+
     // Check if already loaded
     resourcecache_entry_t* entry = resourcecache_get_or_insert(&g_soundEngine.sfx_cache, key);
     if (entry->data != nullptr) {

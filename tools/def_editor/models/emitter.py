@@ -2,7 +2,8 @@ from PyQt6.QtCore import QAbstractTableModel, QModelIndex, Qt
 
 class EmitterModel(QAbstractTableModel):
     COL_NAME, COL_PROJECTILE, COL_SPAWNS, COL_DELAY, COL_START_ANGLE, COL_STEP_ANGLE, COL_SPEED, COL_LIFETIME, COL_OFFSETX, COL_OFFSETY = range(10)
-    COL_TARGET, COL_TARGET_TRACKING, COL_TRACKING_DELAY = range(10, 13)
+    COL_FIRE_SOUND = 10
+    COL_TARGET, COL_TARGET_TRACKING, COL_TRACKING_DELAY = range(11, 14)
 
     MAP = {
         COL_NAME: {'key': 'name', 'type': str, 'default': 'Unnamed' },
@@ -21,6 +22,7 @@ class EmitterModel(QAbstractTableModel):
             'key': 'offset_y', 'type': float, 'default': 0.0,
             'export_cond': lambda d: False
         },
+        COL_FIRE_SOUND: {'key': 'fire_sound', 'type': str, 'default': ''},
 
         COL_TARGET: {'key': 'target', 'type': int, 'default': 0},
         COL_TARGET_TRACKING: {

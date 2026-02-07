@@ -25,6 +25,8 @@ typedef struct Emitter {
     projectiletrackingtype_t tracking_type; //< Snapshotted or continuous tracking.
     float targeting_delay;     //< How long before the projectile 'locks on' to the target.
 
+    uint32_t fire_sound; //< Sound to play when the emitter is fired.
+
     struct {
         float fire_timer;  //< Accumulator
         float angle;       //< Current angle the emitter is firing at.

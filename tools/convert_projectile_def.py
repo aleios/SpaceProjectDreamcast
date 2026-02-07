@@ -11,6 +11,7 @@ def parse_proj_def(input_file, output_fname):
     damage = data.get("damage", 1)
     collider_radius = data.get("collider_radius", 1.0)
     rotates = data.get("rotates", False)
+    hit_sound = data.get("hit_sound", "")
     
     with open(output_fname, "wb") as output_file:
         helpers.write_magicnum(output_file, 'PDEF')
@@ -19,7 +20,7 @@ def parse_proj_def(input_file, output_fname):
         helpers.write_ushort(output_file, damage)
         helpers.write_float(output_file, collider_radius)
         helpers.write_ushort(output_file, rotates)
-
+        helpers.write_str(output_file, hit_sound)
 
 def main():
     input_fname = sys.argv[-2]

@@ -17,7 +17,7 @@ def parse_collectable(input_file, output_fname):
         helpers.write_str(output_file, anim)
         helpers.write_str(output_file, key)
         helpers.write_float(output_file, settings.get('lifetime', 0.0))
-        helpers.write_str(output_file, settings.get('sfx', ''))
+        helpers.write_str(output_file, settings.get('pickup_sound', ''))
         helpers.write_float(output_file, settings.get('collider_radius', 0.0))
         helpers.write_float(output_file, settings.get('speed', 0.1))
         helpers.write_byte(output_file, settings.get('health', 0))

@@ -1,5 +1,5 @@
 #include "weaponset.h"
-
+#include "../sound/sound.h"
 #include <stdlib.h>
 
 void weaponset_init(weaponset_t* set, weaponsetdef_t* def) {
@@ -27,6 +27,8 @@ static bool weaponset_update_emitter(emitter_t* emitter, projectilepool_t* pool,
         constexpr float inv_tau = 0.159154943f;
         constexpr float tau     = 6.283185307f;
         emitter->runtime.angle = emitter->runtime.angle - tau * shz_floorf(emitter->runtime.angle * inv_tau);
+
+        soundengine_play_sfx(emitter->fire_sound);
 
         emitter->runtime.fire_timer = emitter->delay;
         return true;

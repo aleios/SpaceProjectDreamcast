@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QWidget, QDataWidgetMapper
 from PyQt6.QtGui import QGuiApplication
 from tools.def_editor.ui.Emittersettings import Ui_emitterSettings
 import tools.def_editor.defsdb as defsdb
-from tools.def_editor.models.emitter import EmitterModel
+from tools.def_editor.models import EmitterModel, OptionalComboProxyModel
 import json
 import copy
 
@@ -17,6 +17,10 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
         self.model = EmitterModel()
         self.mapper = QDataWidgetMapper()
         self.mapper.setModel(self.model)
+
+        self.sfx_model = OptionalComboProxyModel(defsdb.sfx, parent=self.cbFireSound)
+        self.cbFireSound.setModel(self.sfx_model)
+        self.sfx_model.bind(self.cbFireSound, self.model, EmitterModel.COL_FIRE_SOUND)
 
         self.mapper.addMapping(self.cbProjectile, EmitterModel.COL_PROJECTILE, b"currentText")
         self.mapper.addMapping(self.sbSpawnPerStep, EmitterModel.COL_SPAWNS)
@@ -37,6 +41,7 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
         self.btnPasteEmitter.clicked.connect(self.paste_emitter)
 
         self.mapper.setCurrentIndex(0)
+        self.sfx_model.set_row(0)
 
         self.target_updated(self.cbTarget.currentIndex())
 
@@ -55,6 +60,7 @@ class EmitterSettings(QWidget, Ui_emitterSettings):
     def set_emitter(self, emitter_dict):
         self.model.set_emitters([emitter_dict])
         self.mapper.toFirst()
+        self.sfx_model.set_row(0)
 
     def copy_emitter(self):
         if not self.model.emitters:

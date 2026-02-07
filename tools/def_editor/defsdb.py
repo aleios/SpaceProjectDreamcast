@@ -1,9 +1,10 @@
 from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
 import json
 from dataclasses import dataclass, asdict, field
-from models import EnemyModel, ProjectileModel, LevelsModel, PlaylistModel, PlayerModel, AnimationModel, WeaponSetModel, FontsModel
-from tools.def_editor.models import CollectablesModel
-from tools.def_editor.models.sprites import SpritesModel
+from models import (EnemyModel, ProjectileModel, LevelsModel, PlaylistModel,
+                    PlayerModel, AnimationModel, WeaponSetModel, FontsModel,
+                    CollectablesModel,
+                    SpritesModel, MusicModel, SfxModel)
 
 #
 # -- Game settings models --
@@ -82,13 +83,18 @@ fonts = FontsModel()
 # Animation models
 animations = AnimationModel()
 sprites = SpritesModel()
+music = MusicModel()
+sfx = SfxModel()
 
 levels = LevelsModel()
 
 assets_path = ""
 
 def reload_defs():
+    music.load(assets_path)
+    sfx.load(assets_path)
     sprites.load(assets_path)
+
     fonts.load(assets_path)
     animations.load(assets_path)
 

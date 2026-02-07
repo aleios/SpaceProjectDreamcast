@@ -35,6 +35,8 @@ def write_emitter(output_file, emitter):
     write_float(output_file, emitter.get("offset", [0.0, 0.0])[0])
     write_float(output_file, emitter.get("offset", [0.0, 0.0])[1])
 
+    write_str(output_file, emitter.get("fire_sound", ""))
+
     # Target and tracking
     target = emitter.get("target", 0)
     write_ubyte(output_file, target)

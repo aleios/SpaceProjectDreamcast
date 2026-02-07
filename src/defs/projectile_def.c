@@ -1,6 +1,7 @@
 #include "projectile_def.h"
 #include "../util/readutils.h"
 #include "../cache/caches.h"
+#include "../sound/sound.h"
 
 bool projectiledef_init(projectiledef_t* def, const char* key) {
     
@@ -45,9 +46,14 @@ bool projectiledef_init(projectiledef_t* def, const char* key) {
 
     fs_read(def_file, &def->collider_radius, sizeof(float));
 
-    uint8_t rotates;
+    uint16_t rotates;
     fs_read(def_file, &rotates, sizeof(rotates));
     def->sprite_rotates = rotates > 0;
+
+    if (!readutil_readstr(def_file, name_buffer, sizeof(name_buffer))) {
+        return false;
+    }
+    def->hit_sound = soundengine_load_sfx(name_buffer);
 
     return true;
 }

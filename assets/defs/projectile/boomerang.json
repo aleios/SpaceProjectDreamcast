@@ -3,5 +3,6 @@
   "animation": "projectiles",
   "animation_key": "boomerang",
   "rotates": true,
-  "collider_radius": 6.0
+  "collider_radius": 6.0,
+  "hit_sound": ""
 }

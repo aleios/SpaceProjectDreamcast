@@ -25,4 +25,6 @@ typedef struct Projectile {
     float targeting_delay;
     shz_vec2_t targeting_snapshot;
 
+    uint32_t hit_sound;
+
 } projectile_t;

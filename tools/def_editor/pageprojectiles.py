@@ -1,9 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QInputDialog, QMessageBox, QDataWidgetMapper
 from PyQt6.QtCore import Qt
 
-from tools.def_editor.models import ClipListModel
+from models import ClipListModel, OptionalComboProxyModel
 from ui.Projectiles import Ui_pageProjectiles
-
 from tools.def_editor import defsdb
 import os
 
@@ -26,6 +25,10 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
         self.controlStack.setCurrentIndex(0)
         
         # Set up mappings
+        self.sfx_model = OptionalComboProxyModel(defsdb.sfx, parent=self.cbHitSound)
+        self.cbHitSound.setModel(self.sfx_model)
+        self.sfx_model.bind(self.cbHitSound, defsdb.projectile_defs, defsdb.ProjectileModel.COL_HIT_SOUND)
+
         self.fieldMapper = QDataWidgetMapper(self)
         self.fieldMapper.setModel(defsdb.projectile_defs)
         self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
@@ -36,11 +39,13 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
 
         # Initial indices
         self.fieldMapper.setCurrentIndex(0)
+        self.sfx_model.set_row(0)
 
         current_anim = self.cbAnimation.currentIndex()
         self.on_animation_changed(current_anim)
 
         self.cbAnimationClip.currentIndexChanged.connect(self.on_animation_clip_changed)
+
 
     def on_animation_changed(self, index):
         if index < 0 or self.cbAnimation.signalsBlocked():
@@ -92,6 +97,7 @@ class pageProjectiles(QWidget, Ui_pageProjectiles):
             self.cbAnimationClip.blockSignals(True)
 
             self.fieldMapper.setCurrentIndex(new.row())
+            self.sfx_model.set_row(new.row())
             self.cbAnimation.setCurrentText(data.get('animation', ""))
 
             # Change anim and clip

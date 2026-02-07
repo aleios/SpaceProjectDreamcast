@@ -105,9 +105,6 @@ class Ui_levelEventDialog(object):
         self.label_5 = QtWidgets.QLabel(parent=self.page_2)
         self.label_5.setObjectName("label_5")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label_5)
-        self.tbMusicKey = QtWidgets.QLineEdit(parent=self.page_2)
-        self.tbMusicKey.setObjectName("tbMusicKey")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.tbMusicKey)
         self.label_6 = QtWidgets.QLabel(parent=self.page_2)
         self.label_6.setObjectName("label_6")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label_6)
@@ -122,6 +119,9 @@ class Ui_levelEventDialog(object):
         self.sbMusicFadeOut.setMaximum(10000000.0)
         self.sbMusicFadeOut.setObjectName("sbMusicFadeOut")
         self.formLayout.setWidget(2, QtWidgets.QFormLayout.ItemRole.FieldRole, self.sbMusicFadeOut)
+        self.cbMusicKey = QtWidgets.QComboBox(parent=self.page_2)
+        self.cbMusicKey.setObjectName("cbMusicKey")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.cbMusicKey)
         self.stackedEventControls.addWidget(self.page_2)
         self.page_3 = QtWidgets.QWidget()
         self.page_3.setObjectName("page_3")
@@ -225,7 +225,7 @@ class Ui_levelEventDialog(object):
         self.verticalLayout.addWidget(self.bbControls)
 
         self.retranslateUi(levelEventDialog)
-        self.stackedEventControls.setCurrentIndex(6)
+        self.stackedEventControls.setCurrentIndex(1)
         self.bbControls.accepted.connect(levelEventDialog.accept) # type: ignore
         self.bbControls.rejected.connect(levelEventDialog.reject) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(levelEventDialog)

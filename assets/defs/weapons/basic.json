@@ -13,7 +13,8 @@
         0.0
       ],
       "target": 0,
-      "name": "Emitter 1"
+      "name": "Emitter 1",
+      "fire_sound": "pewpew"
     },
     {
       "projectile": "basic",
@@ -28,7 +29,8 @@
         0.0
       ],
       "target": 0,
-      "name": "Emitter 2"
+      "name": "Emitter 2",
+      "fire_sound": "pewpew"
     }
   ],
   "mode": 1

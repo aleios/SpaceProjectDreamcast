@@ -18,9 +18,6 @@ class Ui_levelSettingsDialog(object):
         self.label = QtWidgets.QLabel(parent=levelSettingsDialog)
         self.label.setObjectName("label")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label)
-        self.tbInitialMusic = QtWidgets.QLineEdit(parent=levelSettingsDialog)
-        self.tbInitialMusic.setObjectName("tbInitialMusic")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.tbInitialMusic)
         self.buttonBox = QtWidgets.QDialogButtonBox(parent=levelSettingsDialog)
         self.buttonBox.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Ok)
@@ -33,6 +30,9 @@ class Ui_levelSettingsDialog(object):
         self.sbScrollSpeed.setSingleStep(0.1)
         self.sbScrollSpeed.setObjectName("sbScrollSpeed")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.ItemRole.FieldRole, self.sbScrollSpeed)
+        self.cbInitialMusic = QtWidgets.QComboBox(parent=levelSettingsDialog)
+        self.cbInitialMusic.setObjectName("cbInitialMusic")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.cbInitialMusic)
 
         self.retranslateUi(levelSettingsDialog)
         self.buttonBox.accepted.connect(levelSettingsDialog.accept) # type: ignore

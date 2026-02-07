@@ -173,6 +173,7 @@ SHZ_FORCE_INLINE void player_check_collision(player_t* player) {
             if(g_gamestate.health <= 0) {
                 player_explode(player);
             }
+            soundengine_play_sfx(p->hit_sound);
             projectilepool_release(projpool, i);
             --i;
         }

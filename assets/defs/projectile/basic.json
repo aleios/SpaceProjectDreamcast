@@ -3,5 +3,6 @@
   "animation": "projectiles",
   "animation_key": "basic",
   "rotates": true,
-  "collider_radius": 5.0
+  "collider_radius": 5.0,
+  "hit_sound": "hit"
 }

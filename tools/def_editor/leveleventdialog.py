@@ -12,12 +12,14 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
         ev_data['def'] = self.cbSpawnerEnemyDef.currentText()
 
     def map_music(self, ev_data):
-        self.tbMusicKey.setText(ev_data.get('key', ''))
+        mus_idx = self.cbMusicKey.findText(ev_data.get('key', ''))
+        if mus_idx >= 0:
+            self.cbMusicKey.setCurrentIndex(mus_idx)
         self.sbMusicFadeIn.setValue(ev_data.get('fade_in', 0.0))
         self.sbMusicFadeOut.setValue(ev_data.get('fade_out', 0.0))
 
     def save_music(self, ev_data):
-        ev_data['key'] = self.tbMusicKey.text()
+        ev_data['key'] = self.cbMusicKey.currentText()
         ev_data['fade_in'] = self.sbMusicFadeIn.value()
         ev_data['fade_out'] = self.sbMusicFadeOut.value()
 
@@ -84,6 +86,9 @@ class LevelEventDialog(QDialog, Ui_levelEventDialog):
 
         self.cbSpawnCollectable.setModel(defsdb.collectable_defs)
         self.cbSpawnCollectable.setCurrentIndex(0)
+
+        self.cbMusicKey.setModel(defsdb.music)
+        self.cbMusicKey.setCurrentIndex(0)
 
         if not new_ev:
             self.load_event()

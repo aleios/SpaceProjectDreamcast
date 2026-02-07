@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "../cache/caches.h"
+#include "../sound/sound.h"
 #include "../util/readutils.h"
 
 bool emitter_read(emitter_t* emitter, file_t file) {
@@ -28,6 +29,11 @@ bool emitter_read(emitter_t* emitter, file_t file) {
     fs_read(file, &y, sizeof(float));
 
     emitter->offset = shz_vec2_init(x, y);
+
+    if (!readutil_readstr(file, str_buf, sizeof(str_buf))) {
+        return false;
+    }
+    emitter->fire_sound = soundengine_load_sfx(str_buf);
 
     uint8_t target;
     fs_read(file, &target, sizeof(target));

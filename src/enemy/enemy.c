@@ -56,6 +56,7 @@ void enemy_step(enemy_t* enemy, float delta_time) {
 
         if(collider_test_circle(&enemy->collider, &p->collider)) {
             enemy->health -= p->damage;
+            soundengine_play_sfx(p->hit_sound);
             projectilepool_release(projpool, i);
             --i;
         }

@@ -41,7 +41,7 @@ Asset URL: https://davidkbd.itch.io/interstellar-edm-metal-music-pack
 License: CC By 4.0 (https://creativecommons.org/licenses/by/4.0/)
 
 Modifications:
-- Converted to ADX format
+- Converted to ADX format (using https://github.com/Isaac-Lozano/radx)
 
 ### Sprites
 

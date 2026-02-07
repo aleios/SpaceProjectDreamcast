@@ -142,6 +142,8 @@ void projectilepool_spawn(projectilepool_t* pool, emitter_t* emitter, shz_vec2_t
     p->target_uid = ENTITY_NULL;
     p->tracking_type = emitter->tracking_type;
 
+    p->hit_sound = def->hit_sound;
+
     switch(emitter->target) {
     case PROJECTILETARGET_NEAREST: {
 

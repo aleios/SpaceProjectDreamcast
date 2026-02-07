@@ -169,9 +169,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="tbSFX"/>
-          </item>
           <item row="5" column="0">
            <widget class="QLabel" name="label_10">
             <property name="text">
@@ -208,6 +205,9 @@
              <double>0.100000000000000</double>
             </property>
            </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="cbSFX"/>
           </item>
          </layout>
         </widget>
