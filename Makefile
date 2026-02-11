@@ -16,7 +16,8 @@ ADX_LIB := $(ADX_DIR)/libADXL.a
 CFLAGS += -I$(KOS_BASE)/utils -gz -std=gnu23 -O3 \
  			-fomit-frame-pointer -flto -fbuiltin -ffast-math -ffp-contract=fast -mfsrra -mfsca \
  			-fmerge-all-constants -funroll-loops -fno-PIC -fipa-pta \
- 			-fvisibility=hidden -flto -MMD -MP -I$(ADX_DIR)/include
+ 			-fvisibility=hidden -flto -MMD -MP -I$(ADX_DIR)/include \
+ 			-DNDEBUG
 LDFLAGS += -ffast-math -flto -L$(ADX_DIR) -lADXL
 
 include $(KOS_BASE)/Makefile.rules
@@ -27,7 +28,7 @@ SPRITES := $(SPRITE_SRCS:assets/sprites/%.png=romdisk/sprites/%.dt)
 romdisk/sprites/%.dt: assets/sprites/%.png
 	@mkdir -p $(dir $@)
 	@echo "[Texture Convert] $@"
-	$(KOS_BASE)/utils/pvrtex/pvrtex -i $< -o $@ -f ARGB1555 -p staging/pv.png
+	$(KOS_BASE)/utils/pvrtex/pvrtex -i $< -o $@ -f ARGB1555
 
 ANIM_SRCS := $(shell find assets/animations -type f -name '*.json' | sort)
 ANIMS := $(ANIM_SRCS:assets/animations/%.json=romdisk/animations/%.anim)

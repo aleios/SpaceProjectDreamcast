@@ -17,12 +17,8 @@ bool texture_init(texture_t* tex, const char* key) {
         return false;
     }
 
-    int fileLen = 0;
-    fs_seek(tex_file, 0, SEEK_END);
-    fileLen = fs_tell(tex_file);
-    fs_seek(tex_file, 0, SEEK_SET);
-
-    if(fileLen <= 0) {
+    const ssize_t file_len = fs_total(tex_file);
+    if(file_len <= 0) {
         fs_close(tex_file);
         return false;
     }
@@ -37,7 +33,7 @@ bool texture_init(texture_t* tex, const char* key) {
 
     tex->width = fDtGetWidth(&header);
     tex->height = fDtGetHeight(&header);
-    tex->format = header.pvr_type & 0xFFC00000;
+    tex->format = (int)(header.pvr_type & 0xFFC00000);
 
     size_t size_bytes = fDtGetTextureSize(&header);
 

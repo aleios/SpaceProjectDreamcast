@@ -84,47 +84,58 @@ bool enemydef_init(enemydef_t* def, const char* key) {
 
     const file_t def_file = fs_open(path, O_RDONLY);
 
+    if (def_file < 0) {
+        return false;
+    }
+
     // Read magic number
     char magic_num[4];
-    fs_read(def_file, magic_num, sizeof(char) * 4);
+    if (!READUTIL_READ_VALIDATE_EX(def_file, magic_num, sizeof(char) * 4)) {
+        goto error_close;
+    }
 
     if(magic_num[0] != 'E' && magic_num[1] != 'D' && magic_num[2] != 'E' && magic_num[3] != 'F') {
-        fs_close(def_file);
-        return false;
+        goto error_close;
     }
 
     char str_buf[256];
     if(!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
-        return false;
+        goto error_close;
     }
     def->anim = animcache_get(str_buf);
 
     // Animation clips
     if(!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
-        return false;
+        goto error_close;
     }
     def->clip_idle = animation_get_clip(def->anim, str_buf);
 
     if(!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
-        return false;
+        goto error_close;
     }
     def->clip_left = animation_get_clip(def->anim, str_buf);
 
     if(!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
-        return false;
+        goto error_close;
     }
     def->clip_right = animation_get_clip(def->anim, str_buf);
 
     // Health
-    fs_read(def_file, &def->health, sizeof(uint16_t));
+    if (!READUTIL_READ_VALIDATE(def_file, def->health)) {
+        goto error_close;
+    }
 
     // Read VM
-    fs_read(def_file, &def->total_events, sizeof(def->total_events));
+    if (!READUTIL_READ_VALIDATE(def_file, def->total_events)) {
+        goto error_close;
+    }
 
     for(int i = 0; i < def->total_events; ++i) {
         event_t* ev = &def->event_stack[i];
         uint8_t opcode;
-        fs_read(def_file, &opcode, sizeof(opcode));
+        if (!READUTIL_READ_VALIDATE(def_file, opcode)) {
+            goto error_close;
+        }
 
         ev->type = (eventtype_t)opcode;
 
@@ -138,9 +149,12 @@ bool enemydef_init(enemydef_t* def, const char* key) {
         case EVENT_DELAY:
             enemydef_read_delay_ev(def_file, ev);
             break;
-        case EVENT_EXIT_SCREEN:
-            fs_read(def_file, &ev->exit.speed, sizeof(float));
+        case EVENT_EXIT_SCREEN: {
+            if (!READUTIL_READ_VALIDATE(def_file, ev->exit.speed)) {
+                goto error_close;
+            }
             break;
+        }
         case EVENT_REPEAT:
             enemydef_read_repeat_ev(def_file, ev);
             break;
@@ -149,7 +163,11 @@ bool enemydef_init(enemydef_t* def, const char* key) {
         }
     }
 
+    fs_close(def_file);
     return true;
+error_close:
+    fs_close(def_file);
+    return false;
 }
 
 void enemydef_destroy(enemydef_t* def){

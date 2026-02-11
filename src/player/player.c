@@ -58,46 +58,52 @@ static bool player_load(player_t* player) {
     // Read animation
     char path_buf[256];
     if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
-        return false;
+        goto error_close;
     }
     player->anim = animcache_get(path_buf);
     if (!player->anim) {
-        return false;
+        goto error_close;
     }
 
     // Read idle clip
     if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
-        return false;
+        goto error_close;
     }
     player->clip_idle = animation_get_clip(player->anim, path_buf);
     if (!player->clip_idle) {
-        return false;
+        goto error_close;
     }
 
     // Read left and right clips (optional fields)
     if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
-        return false;
+        goto error_close;
     }
     player->clip_left = animation_get_clip(player->anim, path_buf);
 
     if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
-        return false;
+        goto error_close;
     }
     player->clip_right = animation_get_clip(player->anim, path_buf);
 
     // Physics
-    fs_read(player_file, &player->speed, sizeof(float));
+    if (!READUTIL_READ_VALIDATE(player_file, player->speed)) {
+        goto error_close;
+    }
 
     // Weapons
     uint16_t total_weapons;
-    fs_read(player_file, &total_weapons, sizeof(total_weapons));
+    if (!READUTIL_READ_VALIDATE(player_file, total_weapons)) {
+        goto error_close;
+    }
     player->total_weapons = total_weapons;
 
     player->weapons = malloc(sizeof(weaponset_t) * total_weapons);
     for (int weapid = 0; weapid < total_weapons; ++weapid) {
         weaponset_t* weap = &player->weapons[weapid];
 
-        readutil_readstr(player_file, path_buf, sizeof(path_buf));
+        if (!readutil_readstr(player_file, path_buf, sizeof(path_buf))) {
+            goto error_close;
+        }
 
         weaponsetdef_t* def = weaponsetcache_get(path_buf);
         weaponset_init(weap, def);
@@ -105,6 +111,10 @@ static bool player_load(player_t* player) {
 
     fs_close(player_file);
     return true;
+error_close:
+    player_destroy(player);
+    fs_close(player_file);
+    return false;
 }
 
 void player_init(player_t* player) {
@@ -137,6 +147,7 @@ void player_destroy(player_t* player) {
     sprite_destroy(&player->sprite);
 
     free(player->weapons);
+    player->weapons = nullptr;
 
     player->clip_idle = nullptr;
     player->clip_left = nullptr;

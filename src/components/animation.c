@@ -19,6 +19,7 @@ bool animation_init(animation_t* anim, const char* key) {
 
     char magic_num[4];
     uint16_t total_clips = 0;
+    anim->total_clips = 0;
 
     // Read and verify header
     if (fs_read(anim_file, magic_num, 4) != 4 || 
@@ -42,11 +43,11 @@ bool animation_init(animation_t* anim, const char* key) {
         goto error_close;
     }
 
-    anim->total_clips = total_clips;
-    anim->clips = malloc(sizeof(animationclip_t) * total_clips);
+    anim->clips = calloc(total_clips, sizeof(animationclip_t));
     if (!anim->clips) {
         goto error_close;
     }
+    anim->total_clips = total_clips;
 
     for (int i = 0; i < total_clips; ++i) {
         animationclip_t* clip = &anim->clips[i];
@@ -55,33 +56,40 @@ bool animation_init(animation_t* anim, const char* key) {
         clip->frames = nullptr;
 
         if (!readutil_readstr(anim_file, name_buffer, sizeof(name_buffer))) {
-            anim->total_clips = i;
             goto error_destroy;
         }
         clip->name = strdup(name_buffer);
 
         // Read in properties.
-        fs_read(anim_file, &clip->frame_time, sizeof(float));
-        fs_read(anim_file, &clip->loop_mode, sizeof(uint8_t));
-        fs_read(anim_file, &clip->origin, sizeof(shz_vec2_t));
-        fs_read(anim_file, &clip->total_frames, sizeof(uint16_t));
+        if (!READUTIL_READ_VALIDATE(anim_file, clip->frame_time)) {
+            goto error_destroy;
+        }
+
+        if (!READUTIL_READ_VALIDATE(anim_file, clip->loop_mode)) {
+            goto error_destroy;
+        }
+
+        if (!READUTIL_READ_VALIDATE(anim_file, clip->origin)) {
+            goto error_destroy;
+        }
+
+        if (!READUTIL_READ_VALIDATE(anim_file, clip->total_frames)) {
+            goto error_destroy;
+        }
 
         // Sanity check
         if (clip->total_frames == 0 || clip->total_frames > 1024) {
-             anim->total_clips = i + 1;
              goto error_destroy;
         }
 
         clip->frames = malloc(sizeof(animationframe_t) * clip->total_frames);
         if (!clip->frames) {
-            anim->total_clips = i + 1;
             goto error_destroy;
         }
 
         // Read frames
         const size_t frames_size = sizeof(animationframe_t) * clip->total_frames;
         if (fs_read(anim_file, clip->frames, frames_size) != frames_size) {
-            anim->total_clips = i + 1;
             goto error_destroy;
         }
     }
