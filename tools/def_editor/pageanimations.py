@@ -69,7 +69,7 @@ class pageAnimations(QWidget, Ui_pageAnimations):
 
         temp_clip_data = clips_data[clip_index]
         frames_model = ClipFramesModel(temp_clip_data, clips_model_copy)
-        dlg = ClipDialog(clips_model_copy, clip_index, frames_model, global_origin, self.tbTexture.text())
+        dlg = ClipDialog(clips_model_copy, clip_index, frames_model, global_origin, self.cbTexture.currentText())
         res = dlg.exec()
 
         if res:
