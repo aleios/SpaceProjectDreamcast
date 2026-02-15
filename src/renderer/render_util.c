@@ -70,8 +70,10 @@ void render_textured_quad_direct(shz_vec4_t src, shz_vec4_t dst, float rotation,
     spr->dx = p4.x; spr->dy = p4.y;
     pvr_dr_commit(spr);
 
-    void* unused = render_target();
-    pvr_dr_commit(unused);
+    // Note: sprite is 64-bytes, commit does 32, so submit the last 32.
+    // It's already laid out in SQ2.
+    void* spr_continued = render_target();
+    pvr_dr_commit(spr_continued);
 }
 
 void render_textured_quad_ext(texture_t* tex, shz_vec4_t src, shz_vec4_t dst, float rotation, shz_vec2_t origin) {
