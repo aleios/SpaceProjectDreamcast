@@ -1,6 +1,6 @@
 {
   "health": 3,
-  "collision_radius": 8.0,
+  "collision_radius": 22.0,
   "animation": "enemies",
   "idle_key": "enemy1_idle",
   "left_key": "",
@@ -29,5 +29,6 @@
       "speed": 0.0,
       "target": "SINE"
     }
-  ]
+  ],
+  "score": 1
 }

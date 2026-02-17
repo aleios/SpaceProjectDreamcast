@@ -21,9 +21,8 @@ void enemy_init(enemy_t* enemy, enemydef_t* def, int pool_index) {
 
     // Set health.
     enemy->health = def->health;
-
-    // TODO: Determine based on def.
-    enemy->collider.radius = 20.0f;
+    enemy->collider.radius = def->collision_radius;
+    enemy->score = def->score;
 
     enemy->explode_sound = soundengine_load_sfx("boom");
 }
@@ -72,6 +71,9 @@ void enemy_step(enemy_t* enemy, float delta_time) {
         //     int type = rand_between(0, COLLECTABLE_TYPE_COUNT-1);
         //     collectablepool_spawn(gamestate_collectable_pool(), type, enemy->transform.pos);
         // }
+
+        gamestate_add_score(enemy->score);
+
         enemypool_despawn(gamestate_enemy_pool(), enemy);
     }
 }

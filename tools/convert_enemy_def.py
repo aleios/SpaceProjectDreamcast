@@ -76,6 +76,8 @@ def parse_proj_def(input_file, output_fname):
     right_key = data.get('right_key', '')
 
     health = data.get('health', 1)
+    collision_radius = data.get('collision_radius', 1.0)
+    score = data.get('score', 1)
 
     events = data.get('events', [])
 
@@ -87,6 +89,8 @@ def parse_proj_def(input_file, output_fname):
         helpers.write_str(output_file, right_key)
 
         helpers.write_ushort(output_file, health)
+        helpers.write_float(output_file, collision_radius)
+        helpers.write_short(output_file, score)
 
         write_events(output_file, events)
 

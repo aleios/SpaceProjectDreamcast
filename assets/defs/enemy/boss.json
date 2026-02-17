@@ -1,6 +1,6 @@
 {
   "health": 30,
-  "collision_radius": 8.0,
+  "collision_radius": 25.0,
   "animation": "enemies",
   "idle_key": "enemy2_idle",
   "left_key": "",
@@ -17,5 +17,6 @@
       "x": 320.0,
       "y": 250.0
     }
-  ]
+  ],
+  "score": 1
 }

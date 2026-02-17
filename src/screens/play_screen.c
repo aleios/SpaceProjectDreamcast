@@ -143,8 +143,6 @@ void play_screen_do_play(float delta_time) {
     projectilepool_step(gamestate_enemy_projpool(), delta_time);
 
     collectablepool_step(gamestate_collectable_pool(), delta_time);
-
-    g_gamestate.score += 1;
 }
 
 void play_screen_do_fade_out(float delta_time) {

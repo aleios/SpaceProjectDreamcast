@@ -23,6 +23,7 @@ def parse_collectable(input_file, output_fname):
         helpers.write_byte(output_file, settings.get('health', 0))
         helpers.write_byte(output_file, settings.get('lives', 0))
         helpers.write_byte(output_file, settings.get('weapon', 0))
+        helpers.write_short(output_file, settings.get('score', 0))
 
 def main():
     input_fname = sys.argv[-2]

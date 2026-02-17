@@ -34,6 +34,7 @@ class pageCollectables(QWidget, Ui_pageCollectables):
         self.mapper.addMapping(self.sbHealth, CollectablesModel.COL_EFFECT_HEALTH)
         self.mapper.addMapping(self.sbLives, CollectablesModel.COL_EFFECT_LIVES)
         self.mapper.addMapping(self.sbWeaponPower, CollectablesModel.COL_EFFECT_WEAPON)
+        self.mapper.addMapping(self.sbScore, CollectablesModel.COL_EFFECT_SCORE)
 
         self.mapper.setCurrentIndex(0)
         self.sfx_model.set_row(0)

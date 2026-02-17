@@ -25,6 +25,7 @@ class pageEnemies(QWidget, Ui_pageEnemies):
         # Map fields to controls
         self.fieldMapper.addMapping(self.sbHealth, defsdb.EnemyModel.COL_HEALTH)
         self.fieldMapper.addMapping(self.sbColliderRadius, defsdb.EnemyModel.COL_COLLISION_RADIUS)
+        self.fieldMapper.addMapping(self.sbScore, defsdb.EnemyModel.COL_SCORE)
 
         # Model animation
         self.cbAnimation.setModel(defsdb.animations)

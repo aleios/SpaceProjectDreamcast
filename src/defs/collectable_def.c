@@ -80,6 +80,12 @@ bool collectabledef_init(collectabledef_t *def, const char* key) {
     }
     def->weapon = weapon;
 
+    int16_t score;
+    if (!READUTIL_READ_VALIDATE(file, score)) {
+        goto error_close;
+    }
+    def->score = score;
+
 
     fs_close(file);
     return true;

@@ -13,6 +13,7 @@ typedef struct CollectableDef {
     int health;
     int lives;
     int weapon;
+    int score;
 } collectabledef_t;
 
 bool collectabledef_init(collectabledef_t *def, const char* key);

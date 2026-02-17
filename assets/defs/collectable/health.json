@@ -7,5 +7,6 @@
   "lives": 0,
   "weapon": 0,
   "speed": 0.1,
-  "pickup_sound": "pickup"
+  "pickup_sound": "pickup",
+  "score": 0
 }

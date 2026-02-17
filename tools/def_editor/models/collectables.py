@@ -3,7 +3,7 @@ from .datadef import DefModel
 
 class CollectablesModel(DefModel):
     (COL_NAME, COL_MODIFIED, COL_ANIM, COL_ANIM_KEY, COL_LIFETIME,
-     COL_PICKUP_SOUND, COL_COLLIDER_RADIUS, COL_SPEED, COL_EFFECT_HEALTH, COL_EFFECT_LIVES, COL_EFFECT_WEAPON) = range(11)
+     COL_PICKUP_SOUND, COL_COLLIDER_RADIUS, COL_SPEED, COL_EFFECT_HEALTH, COL_EFFECT_LIVES, COL_EFFECT_WEAPON, COL_EFFECT_SCORE) = range(12)
     MAP = {
         COL_NAME: {'key': 'name', 'type': str},
         COL_MODIFIED: {'key': 'modified', 'type': bool},
@@ -13,9 +13,10 @@ class CollectablesModel(DefModel):
         COL_PICKUP_SOUND: { 'key': 'pickup_sound', 'type': str, 'default': '' },
         COL_COLLIDER_RADIUS: {'key': 'collider_radius', 'type': float, 'default': 1.0 },
         COL_SPEED: { 'key': 'speed', 'type': float, 'default': 0.1 },
-        COL_EFFECT_HEALTH: {'key': 'health', 'type': int},
-        COL_EFFECT_LIVES: {'key': 'lives', 'type': int},
-        COL_EFFECT_WEAPON: {'key': 'weapon', 'type': int}
+        COL_EFFECT_HEALTH: {'key': 'health', 'type': int, 'default': 0 },
+        COL_EFFECT_LIVES: {'key': 'lives', 'type': int, 'default': 0 },
+        COL_EFFECT_WEAPON: {'key': 'weapon', 'type': int, 'default': 0 },
+        COL_EFFECT_SCORE: {'key': 'score', 'type': int, 'default': 0 }
     }
 
     def __init__(self, *args, **kwargs):

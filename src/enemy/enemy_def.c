@@ -125,6 +125,18 @@ bool enemydef_init(enemydef_t* def, const char* key) {
         goto error_close;
     }
 
+    // Collider radius
+    if (!READUTIL_READ_VALIDATE(def_file, def->collision_radius)) {
+        goto error_close;
+    }
+
+    // Score
+    int16_t score;
+    if (!READUTIL_READ_VALIDATE(def_file, score)) {
+        goto error_close;
+    }
+    def->score = score;
+
     // Read VM
     if (!READUTIL_READ_VALIDATE(def_file, def->total_events)) {
         goto error_close;

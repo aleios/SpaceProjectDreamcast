@@ -81,6 +81,7 @@ void collectablepool_step(collectablepool_t* pool, float delta_time) {
             gamestate_add_health(c->health);
             gamestate_add_lives(c->lives);
             gamestate_add_weapon_power(c->weapon);
+            gamestate_add_score(c->score);
 
             soundengine_play_sfx(c->sfx);
 

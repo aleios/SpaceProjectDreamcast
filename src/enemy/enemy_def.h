@@ -11,7 +11,9 @@ typedef struct EnemyDef {
     animationclip_t* clip_left;
     animationclip_t* clip_right;
 
-    uint16_t health; // hmmm
+    uint16_t health;
+    float collision_radius;
+    int16_t score;
 
     uint8_t total_events;
     event_t event_stack[MAX_EVENTS];

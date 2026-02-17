@@ -20,6 +20,7 @@ typedef struct Collectable {
     int health;
     int lives;
     int weapon;
+    int score;
 } collectable_t;
 
 void collectable_init(collectable_t* collectable, collectabledef_t* def);

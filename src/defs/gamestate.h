@@ -84,3 +84,10 @@ SHZ_FORCE_INLINE void gamestate_add_weapon_power(int power) {
     g_gamestate.current_weapon += power;
     g_gamestate.current_weapon = iclamp32(g_gamestate.current_weapon, 0, player_get_total_weapons(player)-1);
 }
+
+SHZ_FORCE_INLINE void gamestate_add_score(int score) {
+    g_gamestate.score += score;
+    if (g_gamestate.score < 0){
+        g_gamestate.score = 0;
+    }
+}

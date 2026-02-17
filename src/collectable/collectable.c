@@ -7,7 +7,6 @@ void collectable_init(collectable_t* collectable, collectabledef_t* def) {
     transform_init(&collectable->transform);
     sprite_init(&collectable->sprite, &collectable->transform, def->anim->tex);
 
-    // TODO: Animator
     collectable->clip = def->clip;
 
     animator_init(&collectable->animator, &collectable->sprite, collectable->clip);
@@ -20,6 +19,7 @@ void collectable_init(collectable_t* collectable, collectabledef_t* def) {
     collectable->health = def->health;
     collectable->lives = def->lives;
     collectable->weapon = def->weapon;
+    collectable->score = def->score;
     collectable->sfx = def->sfx;
 
     collectable->speed = def->speed;

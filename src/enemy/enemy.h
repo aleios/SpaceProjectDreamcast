@@ -11,6 +11,7 @@ typedef struct Enemy {
     entityid_t uid;
     bool is_dead;
     int health;
+    int score;
     bool is_immune;
 
     transform_t transform;
