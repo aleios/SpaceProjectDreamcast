@@ -70,23 +70,6 @@ void render() {
     pvr_scene_finish();
 }
 
-// float shz_smoothstepf(float edge0, float edge1, float x) SHZ_NOEXCEPT {
-//     if (x <= edge0) return 0.0f;
-//     if (x >= edge1) return 1.0f;
-//
-//     float diff = edge1 - edge0;
-//
-//     // Fast Reciprocal
-//     float inv_diff = shz_inv_sqrtf(diff);
-//     inv_diff *= inv_diff;
-//
-//     // scale and bias
-//     float t = (x - edge0) * inv_diff;
-//
-//     // polynomial: t^2 * (3 - 2t)
-//     return t * t * shz_fmaf(t, -2.0f, 3.0f);
-// }
-
 //48*32
 static uint8_t vmu_ico[192] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
