@@ -1,7 +1,5 @@
 #include "render_util.h"
 
-pvr_dr_state_t g_dr_state = 0;
-
 void render_set_sprite_header(texture_t* tex) {
     if(!tex) {
         return;

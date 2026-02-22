@@ -57,8 +57,6 @@ void render() {
 
     pvr_scene_begin();
 
-    render_dr_begin();
-
     pvr_list_begin(PVR_LIST_OP_POLY);
     screens_render_op();
     pvr_list_finish();
