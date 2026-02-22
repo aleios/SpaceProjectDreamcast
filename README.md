@@ -17,6 +17,16 @@ For dc-load:
 For disc:
 > make cdi
 
+Library versions:
+
+Generally following updates to KOS master and sh4zam master.
+
+KOS SHA: 0ea3b8f4a23f4f05e4105d1a3196ab3ed24ddedf
+
+Compiler: gcc 15.2
+
+DC tool version used: dcload-ip 2.0.3
+
 ### Current hardcoded asset paths
 
 Will be replaced with configurable values eventually but required for now.
