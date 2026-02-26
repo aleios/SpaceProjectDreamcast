@@ -31,20 +31,20 @@ void render_rect(shz_vec4_t rect, pvr_list_t list, uint32_t color) {
 
 void render_textured_quad_direct(shz_vec4_t src, shz_vec4_t dst, float rotation, shz_vec2_t origin) {
     // Sprite vertices.
-    shz_vec4_t p1 = { .x = 0.0f,   .y = 0.0f,  .z = 0.01f, .w = 1.0f };
-    shz_vec4_t p2 = { .x = dst.z,  .y = 0.0f,  .z = 0.01f, .w = 1.0f };
-    shz_vec4_t p3 = { .x = dst.z,  .y = dst.w, .z = 0.01f, .w = 1.0f };
-    shz_vec4_t p4 = { .x = 0.0f,   .y = dst.w, .z = 0.01f, .w = 1.0f };
+    shz_vec2_t p1 = shz_vec2_init(0.0f, 0.0f);
+    shz_vec2_t p2 = shz_vec2_init(dst.z, 0.0f);
+    shz_vec2_t p3 = shz_vec2_init(dst.z, dst.w);
+    shz_vec2_t p4 = shz_vec2_init(0.0f, dst.w);
 
     // Transform vertices
     shz_xmtrx_init_translation(dst.x, dst.y, 0.0f);
     shz_xmtrx_apply_rotation_z(rotation);
     shz_xmtrx_translate(-origin.x, -origin.y, 0.0f);
 
-    p1 = shz_xmtrx_transform_vec4(p1);
-    p2 = shz_xmtrx_transform_vec4(p2);
-    p3 = shz_xmtrx_transform_vec4(p3);
-    p4 = shz_xmtrx_transform_vec4(p4);
+    p1 = shz_xmtrx_transform_point2(p1);
+    p2 = shz_xmtrx_transform_point2(p2);
+    p3 = shz_xmtrx_transform_point2(p3);
+    p4 = shz_xmtrx_transform_point2(p4);
 
     float u0 = src.x;
     float v0 = src.y;
