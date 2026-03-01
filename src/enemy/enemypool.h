@@ -21,3 +21,5 @@ void enemypool_step(enemypool_t* pool, float delta_time);
 SHZ_FORCE_INLINE int enemypool_active(enemypool_t* pool) {
     return pool->total;
 }
+
+void enemypool_render_debug(enemypool_t* pool);

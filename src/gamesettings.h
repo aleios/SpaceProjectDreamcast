@@ -3,9 +3,13 @@
 #include "renderer/sprite_font.h"
 #include "util/strpool.h"
 
-typedef struct GameOptions {
+typedef struct SHZ_PACKED GameOptions {
     uint8_t music_volume;
     uint8_t sfx_volume;
+
+    uint8_t player_collider;
+    uint8_t enemy_collider;
+    uint8_t projectile_collider;
 } gameoptions_t;
 
 typedef struct GameSettings {
@@ -47,4 +51,16 @@ SHZ_FORCE_INLINE int gamesettings_total_levels() {
 
 SHZ_FORCE_INLINE spritefont_t* gamesettings_main_font() {
     return g_gamesettings.main_font;
+}
+
+SHZ_FORCE_INLINE bool gamesettings_player_collider() {
+    return g_gamesettings.options.player_collider;
+}
+
+SHZ_FORCE_INLINE bool gamesettings_enemy_collider() {
+    return g_gamesettings.options.enemy_collider;
+}
+
+SHZ_FORCE_INLINE bool gamesettings_projectile_collider() {
+    return g_gamesettings.options.projectile_collider;
 }

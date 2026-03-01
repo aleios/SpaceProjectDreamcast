@@ -4,6 +4,7 @@
   "left_clip": "left",
   "right_clip": "right",
   "speed": 0.2,
+  "collider_radius": 5.0,
   "weapons": [
     "basic",
     "boomerang"

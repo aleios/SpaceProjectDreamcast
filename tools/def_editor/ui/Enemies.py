@@ -109,7 +109,7 @@ class Ui_pageEnemies(object):
         self.formLayout.setWidget(5, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label)
         self.sbColliderRadius = QtWidgets.QDoubleSpinBox(parent=self.groupBox)
         self.sbColliderRadius.setMinimum(1.0)
-        self.sbColliderRadius.setMaximum(300.0)
+        self.sbColliderRadius.setMaximum(1024.0)
         self.sbColliderRadius.setObjectName("sbColliderRadius")
         self.formLayout.setWidget(5, QtWidgets.QFormLayout.ItemRole.FieldRole, self.sbColliderRadius)
         self.label_9 = QtWidgets.QLabel(parent=self.groupBox)

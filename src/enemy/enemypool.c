@@ -82,3 +82,10 @@ void enemypool_step(enemypool_t* pool, float delta_time) {
         }
     } 
 }
+
+void enemypool_render_debug(enemypool_t* pool) {
+
+    for (int i = 0; i < pool->total; ++i) {
+        collider_render(&pool->enemies[i]->collider);
+    }
+}

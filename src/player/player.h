@@ -38,3 +38,5 @@ SHZ_FORCE_INLINE shz_vec2_t player_get_position(player_t* player) {
 SHZ_FORCE_INLINE int player_get_total_weapons(player_t* player) {
     return player->total_weapons;
 }
+
+void player_render_debug(player_t* player);

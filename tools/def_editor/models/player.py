@@ -7,13 +7,14 @@ from tools.def_editor.models.weaponset import WeaponSetListModel
 
 
 class PlayerModel(QAbstractTableModel):
-    COL_ANIMATION, COL_IDLE_CLIP, COL_LEFT_CLIP, COL_RIGHT_CLIP, COL_SPEED, COL_WEAPONS = range(6)
+    COL_ANIMATION, COL_IDLE_CLIP, COL_LEFT_CLIP, COL_RIGHT_CLIP, COL_SPEED, COL_COLLIDER_RADIUS, COL_WEAPONS = range(7)
     _data = {
         'animation': '',
         'idle_clip': '',
         'left_clip': '',
         'right_clip': '',
         'speed': 0.2,
+        'collider_radius': 1.0,
         'weapons': []
     }
 
@@ -24,7 +25,7 @@ class PlayerModel(QAbstractTableModel):
         return 1
 
     def columnCount(self, parent=None):
-        return 6
+        return 7
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         col = index.column()
@@ -33,6 +34,7 @@ class PlayerModel(QAbstractTableModel):
         if col == self.COL_LEFT_CLIP: return self._data['left_clip']
         if col == self.COL_RIGHT_CLIP: return self._data['right_clip']
         if col == self.COL_SPEED: return self._data['speed']
+        if col == self.COL_COLLIDER_RADIUS: return self._data['collider_radius']
         if col == self.COL_WEAPONS: return self._data['weapons']
         return None
 
@@ -47,6 +49,7 @@ class PlayerModel(QAbstractTableModel):
             if col == self.COL_LEFT_CLIP: self._data['left_clip'] = value
             if col == self.COL_RIGHT_CLIP: self._data['right_clip'] = value
             if col == self.COL_SPEED: self._data['speed'] = float(value)
+            if col == self.COL_COLLIDER_RADIUS: self._data['collider_radius'] = float(value)
             
             self._data['modified'] = True
             self.dataChanged.emit(index, index, [role, Qt.ItemDataRole.DisplayRole])

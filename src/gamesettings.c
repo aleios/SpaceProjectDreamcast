@@ -34,14 +34,7 @@ static void gamesettings_read_vmu() {
             free(data_buffer);
             return;
         }
-
-        uint8_t mus_vol = pkg.data[0];
-        uint8_t sfx_vol = pkg.data[1];
-
-        g_gamesettings.options = (gameoptions_t){
-            .music_volume = mus_vol,
-            .sfx_volume = sfx_vol
-        };
+        g_gamesettings.options = *((gameoptions_t*)pkg.data);
 
         free(data_buffer);
     }
@@ -83,7 +76,10 @@ bool gamesettings_load() {
     // Load VMU settings
     g_gamesettings.options = (gameoptions_t){
         .music_volume = 255,
-        .sfx_volume = 255
+        .sfx_volume = 255,
+        .player_collider = false,
+        .enemy_collider = false,
+        .projectile_collider = false
     };
     gamesettings_read_vmu();
 

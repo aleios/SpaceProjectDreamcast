@@ -12,3 +12,5 @@ bool collider_test_box(boxcollider_t* a, boxcollider_t* b);
 bool collider_test_circle(circlecollider_t* a, circlecollider_t* b);
 bool collider_test_circle_box(circlecollider_t* a, boxcollider_t* b);
 bool collider_test_point_box(shz_vec2_t point, shz_vec4_t box);
+
+void collider_render(circlecollider_t* collider);

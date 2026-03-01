@@ -1,6 +1,8 @@
 #include "collider.h"
 #include <stdio.h>
 
+#include "../renderer/render_util.h"
+
 bool collider_test_box(boxcollider_t* a, boxcollider_t* b) {
     return !(a->x > b->x + b->z ||
              b->x > a->x + a->z ||
@@ -17,10 +19,6 @@ bool collider_test_circle(circlecollider_t* a, circlecollider_t* b) {
     float dist_sq = shz_vec4_dot(d, d);
     float rad_sum = a->radius + b->radius;
     return dist_sq <= (rad_sum * rad_sum);
-
-    // float dist = shz_vec2_distance_sqr(a->center, b->center);
-    // float rad_sum = a->radius + b->radius;
-    // return dist <= (rad_sum * rad_sum);
 }
 
 bool collider_test_circle_box(circlecollider_t* a, boxcollider_t* b) {
@@ -33,21 +31,6 @@ bool collider_test_circle_box(circlecollider_t* a, boxcollider_t* b) {
     shz_vec4_t d = shz_vec4_init(dist_x, dist_y, 0.0f, 0.0f);
     float dist_sq = shz_vec4_dot(d, d);
     return dist_sq <= (a->radius * a->radius);
-
-
-    //shz_vec2_t test_pos = a->center;
-    // if(test_pos.x < b->x) {
-    //     test_pos.x = b->x;
-    // } else if(test_pos.x > b->x + b->z) {
-    //     test_pos.x = b->x + b->z;
-    // }
-    
-    // if(test_pos.y < b->y) {
-    //     test_pos.y = b->y;
-    // } else if(test_pos.y > b->y + b->w) {
-    //     test_pos.y = b->y + b->w;
-    // }
-    // return (shz_vec2_distance_sqr(a->center, test_pos) <= a->radius * a->radius);
 }
 
 bool collider_test_point_box(shz_vec2_t point, shz_vec4_t box) {
@@ -55,4 +38,8 @@ bool collider_test_point_box(shz_vec2_t point, shz_vec4_t box) {
            point.x <= box.x + box.z && 
            point.y >= box.y && 
            point.y <= box.y + box.w;
+}
+
+void collider_render(circlecollider_t* collider) {
+    render_circle(collider->center, collider->radius, PVR_LIST_TR_POLY, 0xBB0033FF);
 }

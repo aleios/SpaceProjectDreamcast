@@ -18,6 +18,7 @@ class pagePlayer(QWidget, Ui_pagePlayer):
         self.fieldMapper.addMapping(self.cbIdleClip, defsdb.player_def.COL_IDLE_CLIP, b'currentText')
         self.fieldMapper.addMapping(self.cbLeftClip, defsdb.player_def.COL_LEFT_CLIP, b'currentText')
         self.fieldMapper.addMapping(self.cbRightClip, defsdb.player_def.COL_RIGHT_CLIP, b'currentText')
+        self.fieldMapper.addMapping(self.sbColliderRadius, defsdb.player_def.COL_COLLIDER_RADIUS)
 
         # Animation clips
         self.cbAnimation.setModel(defsdb.animations)

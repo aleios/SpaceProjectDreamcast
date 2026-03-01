@@ -34,3 +34,5 @@ void projectilepool_clear(projectilepool_t* pool);
 
 void projectilepool_step(projectilepool_t* pool, float delta_time);
 void projectilepool_render(projectilepool_t* pool);
+
+void projectilepool_render_debug(projectilepool_t* pool);

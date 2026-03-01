@@ -211,6 +211,19 @@ void play_screen_render_tr() {
 
     sprite_renderer_render();
 
+    // Debug renders
+    if (gamesettings_player_collider()) {
+        player_render_debug(gamestate_get_player());
+    }
+    if (gamesettings_enemy_collider()) {
+        enemypool_render_debug(gamestate_enemy_pool());
+    }
+    if (gamesettings_projectile_collider()) {
+        projectilepool_render_debug(gamestate_player_projpool());
+        projectilepool_render_debug(gamestate_enemy_projpool());
+    }
+
+    // State and UI rendering
     if (play_state == PLAY_STATE_PAUSED) {
         shz_vec2_t pos = shz_vec2_init(SCREEN_HALF_WIDTH - (16.0f * 3), SCREEN_HALF_HEIGHT);
 

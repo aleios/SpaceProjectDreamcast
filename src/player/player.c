@@ -90,6 +90,12 @@ static bool player_load(player_t* player) {
         goto error_close;
     }
 
+    float collider_radius;
+    if (!READUTIL_READ_VALIDATE(player_file, collider_radius)) {
+        goto error_close;
+    }
+    player->collider.radius = collider_radius;
+
     // Weapons
     uint16_t total_weapons;
     if (!READUTIL_READ_VALIDATE(player_file, total_weapons)) {
@@ -132,10 +138,6 @@ void player_init(player_t* player) {
     animator_init(&player->animator, &player->sprite, player->clip_idle);
 
     sprite_renderer_add(&player->sprite);
-
-    //player->speed = 0.2f;
-    player->transform.origin = shz_vec2_init(24.0f, 29.0f);
-    player->collider.radius = 1.0f;
 
     player->boom = soundengine_load_sfx("boom");
 }
@@ -282,4 +284,8 @@ void player_set_position(player_t* player, shz_vec2_t pos) {
 
 void player_move(player_t* player, shz_vec2_t offset) {
     player->transform.pos = shz_vec2_add(player->transform.pos, offset);
+}
+
+void player_render_debug(player_t* player) {
+    collider_render(&player->collider);
 }

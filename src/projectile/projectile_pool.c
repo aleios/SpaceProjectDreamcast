@@ -280,3 +280,9 @@ void projectilepool_render(projectilepool_t* pool) {
         render_sprite(&pool->projectiles[i].sprite);
     }
 }
+
+void projectilepool_render_debug(projectilepool_t* pool) {
+    for(int i = 0; i < pool->active_projectiles; ++i) {
+        collider_render(&pool->projectiles[i].collider);
+    }
+}
