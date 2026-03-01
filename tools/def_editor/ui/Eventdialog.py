@@ -79,14 +79,16 @@ class Ui_eventDialog(object):
         self.label_2.setObjectName("label_2")
         self.formLayout_4.setWidget(0, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label_2)
         self.sbMoveX = QtWidgets.QDoubleSpinBox(parent=self.page)
-        self.sbMoveX.setMaximum(640.0)
+        self.sbMoveX.setMinimum(-100000.0)
+        self.sbMoveX.setMaximum(100000.0)
         self.sbMoveX.setObjectName("sbMoveX")
         self.formLayout_4.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.sbMoveX)
         self.label_3 = QtWidgets.QLabel(parent=self.page)
         self.label_3.setObjectName("label_3")
         self.formLayout_4.setWidget(1, QtWidgets.QFormLayout.ItemRole.LabelRole, self.label_3)
         self.sbMoveY = QtWidgets.QDoubleSpinBox(parent=self.page)
-        self.sbMoveY.setMaximum(480.0)
+        self.sbMoveY.setMinimum(-10000.0)
+        self.sbMoveY.setMaximum(10000.0)
         self.sbMoveY.setObjectName("sbMoveY")
         self.formLayout_4.setWidget(1, QtWidgets.QFormLayout.ItemRole.FieldRole, self.sbMoveY)
         self.stackedMoveTarget.addWidget(self.page)
@@ -214,7 +216,7 @@ class Ui_eventDialog(object):
         self.verticalLayout.addWidget(self.buttonBox)
 
         self.retranslateUi(eventDialog)
-        self.stackedControls.setCurrentIndex(3)
+        self.stackedControls.setCurrentIndex(0)
         self.stackedMoveTarget.setCurrentIndex(1)
         self.buttonBox.accepted.connect(eventDialog.accept) # type: ignore
         self.buttonBox.rejected.connect(eventDialog.reject) # type: ignore

@@ -78,7 +78,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedControls">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageMoveTo">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -164,8 +164,11 @@
            </item>
            <item row="0" column="1">
             <widget class="QDoubleSpinBox" name="sbMoveX">
+             <property name="minimum">
+              <double>-100000.000000000000000</double>
+             </property>
              <property name="maximum">
-              <double>640.000000000000000</double>
+              <double>100000.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -178,8 +181,11 @@
            </item>
            <item row="1" column="1">
             <widget class="QDoubleSpinBox" name="sbMoveY">
+             <property name="minimum">
+              <double>-10000.000000000000000</double>
+             </property>
              <property name="maximum">
-              <double>480.000000000000000</double>
+              <double>10000.000000000000000</double>
              </property>
             </widget>
            </item>
