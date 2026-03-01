@@ -81,6 +81,14 @@ def parse_animation(key, anim_data, atlas_width, atlas_height):
         print(f"Invalid or unknown loop_mode. Must be between 0 and 2. (0 = forward, 1 = backward, 2 = ping pong) '{key}'")
         exit(1)
 
+    # TODO: Should swap to per-frame origin instead.
+    if flip_h:
+        frame_w = float(frames[0][2])
+        origin[0] = frame_w - origin[0]
+    if flip_v:
+        frame_h = float(frames[0][3])
+        origin[1] = frame_h - origin[1]
+
     # Compute UVs
     for i, frame in enumerate(frames):
 
