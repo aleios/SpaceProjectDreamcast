@@ -14,7 +14,8 @@ static void menu_recalc_positions(menu_t* menu) {
     for (int i = 0; i < menu->total; ++i) {
         const auto item = &menu->options[i];
         shz_vec2_t sz = spritefont_str_size(font, item->label);
-        if (sz.x > menu->max_label_width) menu->max_label_width = sz.x;
+        if (sz.x > menu->max_label_width && item->type != OPTION_ITEM_LABEL)
+            menu->max_label_width = sz.x;
         total_option_height += font->cell_height;
     }
 
@@ -182,18 +183,18 @@ void menu_render(menu_t* menu) {
         // Render option value (if applicable)
         switch (option->type) {
         case OPTION_ITEM_NUMERIC: {
-                char val_buf[12];
-                snprintf(val_buf, sizeof(val_buf), "%d", option->numeric.value);
-                shz_vec2_t val_pos = option->pos;
-                val_pos.x += menu->max_label_width + (font->cell_width);
-                spritefont_render(font, val_buf, val_pos, color);
-                break;
+            char val_buf[12];
+            snprintf(val_buf, sizeof(val_buf), "%d", option->numeric.value);
+            shz_vec2_t val_pos = option->pos;
+            val_pos.x += menu->max_label_width + (font->cell_width);
+            spritefont_render(font, val_buf, val_pos, color);
+            break;
         }
         case OPTION_ITEM_BOOLEAN: {
-                shz_vec2_t val_pos = option->pos;
-                val_pos.x += menu->max_label_width + (font->cell_width);
-                spritefont_render(font, option->boolean.value ? "True" : "False", val_pos, color);
-                break;
+            shz_vec2_t val_pos = option->pos;
+            val_pos.x += menu->max_label_width + (font->cell_width);
+            spritefont_render(font, option->boolean.value ? "True" : "False", val_pos, color);
+            break;
         }
         default:
             break;
