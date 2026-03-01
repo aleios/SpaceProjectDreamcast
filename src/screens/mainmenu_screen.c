@@ -37,9 +37,6 @@ void mainmenu_screen_init() {
     menu_add_button_ex(&main_menu, "Start", mainmenu_start_select, g_gamesettings.total_levels > 0);
     menu_add_button(&main_menu, "Select Level", mainmenu_level_select);
     menu_add_button(&main_menu, "Options", mainmenu_options_select);
-
-    menu_add_numeric_ex(&main_menu, "Test", 0, 100, 1, 0, nullptr, false);
-    menu_add_boolean(&main_menu, "Unga", false);
 }
 
 void mainmenu_screen_cleanup() {
