@@ -157,7 +157,7 @@ void menu_step(menu_t* menu, float delta_time) {
                 if (option->numeric.changed)
                     option->numeric.changed(option->numeric.value);
             } else if (option->type == OPTION_ITEM_BOOLEAN) {
-                option->boolean.value = (dpad_dir + joy_dir) > 0;//!option->boolean.value;
+                option->boolean.value = (dpad_dir + joy_dir) > 0;
                 if (option->boolean.changed)
                     option->boolean.changed(option->boolean.value);
             }

@@ -3,6 +3,7 @@
 #include <sh4zam/shz_sh4zam.h>
 
 typedef enum MenuOptionType {
+    OPTION_ITEM_LABEL,
     OPTION_ITEM_BUTTON,
     OPTION_ITEM_NUMERIC,
     OPTION_ITEM_BOOLEAN

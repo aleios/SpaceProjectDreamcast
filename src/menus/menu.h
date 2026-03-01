@@ -21,6 +21,14 @@ void menu_destroy(menu_t* menu);
 int menu_add_option(menu_t* menu, menuoption_t option);
 
 // Option constructors
+SHZ_FORCE_INLINE int menu_add_label(menu_t* menu, const char* label) {
+    return menu_add_option(menu, (menuoption_t){
+        .label = label,
+        .type = OPTION_ITEM_LABEL,
+        .enabled = false
+    });
+}
+
 SHZ_FORCE_INLINE int menu_add_button_ex(menu_t* menu, const char* label, menubtn_cb cb, bool enabled) {
     return menu_add_option(menu, (menuoption_t){
         .label = label,
