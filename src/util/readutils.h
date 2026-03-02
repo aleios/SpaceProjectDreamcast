@@ -7,8 +7,18 @@
 #define DC_FS_TYPE "pc"
 #endif
 
+static inline char port_to_letter(int port) {
+    switch (port) {
+    case 1: return 'b';
+    case 2: return 'c';
+    case 3: return 'd';
+    default:
+        return 'a';
+    }
+}
+
 static inline bool path_build(char out[static 1], size_t out_size, const char* fs, const char* root, const char* key, const char* ext) {
-    int n = snprintf(out, out_size, "/%s/%s/%s.%s", fs, root, key, ext);
+    const int n = snprintf(out, out_size, "/%s/%s/%s.%s", fs, root, key, ext);
     return (n >= 0) && ((size_t)n < out_size);
 }
 
@@ -18,6 +28,12 @@ static inline bool path_build_rd(char out[static 1], size_t out_size, const char
 
 static inline bool path_build_cd(char out[static 1], size_t out_size, const char* root, const char* key, const char* ext) {
     return path_build(out, out_size, DC_FS_TYPE, root, key, ext);
+}
+
+static inline bool path_build_vmu(char out[static 1], size_t out_size, int port, int unit, const char* key) {
+    const char port_letter = port_to_letter(port);
+    const int n = snprintf(out, out_size, "/vmu/%c%d/%s", port_letter, unit, key);
+    return (n >= 0) && ((size_t)n < out_size);
 }
 
 inline static bool str_valid(const char* str) {

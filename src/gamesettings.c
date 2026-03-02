@@ -10,7 +10,10 @@ static void gamesettings_read_vmu() {
     maple_device_t* vmu = maple_enum_type(0, MAPLE_FUNC_MEMCARD);
     if (vmu) {
 
-        file_t f = fs_open("/vmu/a1/spjconf", O_META);
+        char path[256];
+        path_build_vmu(path, sizeof(path), vmu->port, vmu->unit, "spjconf");
+
+        file_t f = fs_open(path, O_META);
         if (f < 0) {
             return;
         }
@@ -113,7 +116,11 @@ bool gamesettings_save() {
     }
 
     // Write package to file
-    const file_t f = fs_open("/vmu/a1/spjconf", O_WRONLY | O_TRUNC | O_CREAT);
+    // TODO: More ideal to have some selection of VMU instead of first encountered.
+    char path[256];
+    path_build_vmu(path, sizeof(path), vmu->port, vmu->unit, "spjconf");
+
+    const file_t f = fs_open(path, O_WRONLY | O_TRUNC | O_CREAT);
     if (f < 0) {
         free(data);
         return false;
