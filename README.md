@@ -21,7 +21,7 @@ Library versions:
 
 Generally following updates to KOS master and sh4zam master.
 
-KOS SHA: 0ea3b8f4a23f4f05e4105d1a3196ab3ed24ddedf
+KOS SHA: 73f25c951ebf75b20e93c0e08bc62287cc93ac93
 
 Compiler: gcc 15.2
 
