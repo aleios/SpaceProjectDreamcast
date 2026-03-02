@@ -8,7 +8,7 @@
 
 void enemy_init(enemy_t* enemy, enemydef_t* def, int pool_index) {
     enemy->pool_index = pool_index;
-    enemy->is_dead = false;
+    enemy->flags.raw_flags = 0x0;
 
     transform_init(&enemy->transform);
     sprite_init(&enemy->sprite, &enemy->transform, def->anim->tex);
@@ -34,15 +34,26 @@ void enemy_destroy(enemy_t* enemy) {
 }
 
 void enemy_step(enemy_t* enemy, float delta_time) {
-    if(enemy->is_dead)
+    if(enemy->flags.dead)
         return;
 
     vm_step(&enemy->vm, delta_time);
 
     animator_step(&enemy->animator, delta_time);
 
-    // TODO: Take into account sprite size.
-    if(enemy->transform.pos.x <= -20.0f || enemy->transform.pos.x >= SCREEN_WIDTH + 20.0f) {
+    // Check for out of bounds.
+    const float dist_x = enemy->transform.pos.x - SCREEN_HALF_WIDTH;
+    const float dist_y = enemy->transform.pos.y - SCREEN_HALF_HEIGHT;
+    const shz_vec4_t screen_dist = shz_vec4_init(dist_x, dist_y, 0.0f, 0.0f);
+    const bool oob = shz_vec4_dot(screen_dist, screen_dist) > SCREEN_BOUND_RADIUS;
+
+    // Check if initially out of bounds, but now inbounds.
+    if (!enemy->flags.entered && !oob) {
+        enemy->flags.entered = 1;
+    }
+
+    // If out of bounds and has already entered the playfield, then despawn it.
+    if (enemy->flags.entered && oob) {
         enemypool_despawn(gamestate_enemy_pool(), enemy);
         return;
     }
@@ -65,12 +76,6 @@ void enemy_step(enemy_t* enemy, float delta_time) {
     if (enemy->health <= 0) {
 
         soundengine_play_sfx(enemy->explode_sound);
-
-        // TODO: Drop chance from def
-        // if (rand_probablity(60)) {
-        //     int type = rand_between(0, COLLECTABLE_TYPE_COUNT-1);
-        //     collectablepool_spawn(gamestate_collectable_pool(), type, enemy->transform.pos);
-        // }
 
         gamestate_add_score(enemy->score);
 

@@ -23,7 +23,7 @@ static bool get_entity_pos_by_uid(entityid_t uid, shz_vec2_t* out) {
 
     for (int i = 0; i < pool->total; i++) {
         enemy_t* e = pool->enemies[i];
-        if (!e || e->is_dead)
+        if (!e || enemy_is_dead(e))
             continue;
         if (e->uid == uid) {
             *out = e->transform.pos;
@@ -39,7 +39,7 @@ static bool find_strongest_target(entityid_t* out) {
     uint32_t strongest_uid = 0;
     for (int i = 0; i < pool->total; i++) {
         enemy_t* e = pool->enemies[i];
-        if (!e || e->is_dead)
+        if (!e || enemy_is_dead(e))
             continue;
 
         if (strongest_uid == 0 || e->health > strongest_hp) {
@@ -61,7 +61,7 @@ static bool find_nearest_target(shz_vec2_t pos, entityid_t* out) {
     uint32_t closest_uid = 0;
     for (int i = 0; i < pool->total; i++) {
         enemy_t* e = pool->enemies[i];
-        if (!e || e->is_dead)
+        if (!e || enemy_is_dead(e))
             continue;
 
         const float dist = shz_vec2_distance_sqr(e->transform.pos, pos);

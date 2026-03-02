@@ -46,13 +46,13 @@ enemy_t* enemypool_spawn(enemypool_t* pool, enemydef_t* def) {
 }
 
 void enemypool_despawn(enemypool_t* pool, enemy_t* enemy) {
-    enemy->is_dead = true;
+    enemy_set_dead(enemy);
 }
 
 void enemypool_clear(enemypool_t* pool) {
     for (int i = 0; i < pool->total; i++) {
         enemy_t* e = pool->enemies[i];
-        e->is_dead = true;
+        enemy_set_dead(e);
     }
 }
 
@@ -67,7 +67,7 @@ void enemypool_step(enemypool_t* pool, float delta_time) {
     // Clean up the dead.
     for (int i = pool->total - 1; i >= 0; i--) {
         enemy_t* e = pool->enemies[i];
-        if (e->is_dead) {
+        if (enemy_is_dead(e)) {
             int last_idx = pool->total - 1;
             
             // Swap last enemy into this slot

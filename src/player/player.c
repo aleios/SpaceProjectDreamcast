@@ -196,7 +196,7 @@ SHZ_FORCE_INLINE void player_check_collision(player_t* player) {
     enemypool_t* enemy_pool = gamestate_enemy_pool();
     for(int i = 0; i < enemy_pool->total; ++i) {
         enemy_t* enemy = enemy_pool->enemies[i];
-        if (enemy->is_dead)
+        if (enemy_is_dead(enemy))
             continue;
 
         enemy->collider.center = enemy->transform.pos;
