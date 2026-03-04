@@ -10,35 +10,24 @@ static void gamesettings_read_vmu() {
     maple_device_t* vmu = maple_enum_type(0, MAPLE_FUNC_MEMCARD);
     if (vmu) {
 
-        char path[256];
-        path_build_vmu(path, sizeof(path), vmu->port, vmu->unit, "spjconf");
-
-        file_t f = fs_open(path, O_META);
-        if (f < 0) {
-            return;
-        }
-        size_t len = fs_total(f);
-        if (len <= 0) {
+        uint8_t* data_buffer;
+        int len;
+        if (vmufs_read(vmu, "spjconf", (void*)&data_buffer, &len) != 0) {
             return;
         }
 
-        uint8_t* data_buffer = malloc(len * sizeof(uint8_t));
-        fs_read(f, data_buffer, len * sizeof(uint8_t));
         vmu_pkg_t pkg;
         if (vmu_pkg_parse(data_buffer, len * sizeof(uint8_t), &pkg) != 0) {
-            fs_close(f);
-            free(data_buffer);
-            return;
+            goto fail;
         }
 
         // Read the settings.
         if (pkg.data_len <= 0 || pkg.data == nullptr) {
-            fs_close(f);
-            free(data_buffer);
-            return;
+            goto fail;
         }
         g_gamesettings.options = *((gameoptions_t*)pkg.data);
 
+fail:
         free(data_buffer);
     }
 }
@@ -91,6 +80,7 @@ bool gamesettings_load() {
 
 bool gamesettings_save() {
 
+    // TODO: VMU selection screen.
     maple_device_t* vmu = maple_enum_type(0, MAPLE_FUNC_MEMCARD);
     if (!vmu)
         return false;
@@ -109,29 +99,19 @@ bool gamesettings_save() {
 
     uint8_t* data;
     int data_len;
-
-    // printf("Saving: %d\n", pkg.data_len);
     if (vmu_pkg_build(&pkg, &data, &data_len) < 0) {
-        return false;
+        goto fail;
     }
 
-    // Write package to file
-    // TODO: More ideal to have some selection of VMU instead of first encountered.
-    char path[256];
-    path_build_vmu(path, sizeof(path), vmu->port, vmu->unit, "spjconf");
-
-    const file_t f = fs_open(path, O_WRONLY | O_TRUNC | O_CREAT);
-    if (f < 0) {
-        free(data);
-        return false;
+    if (vmufs_write(vmu, "spjconf", data, data_len, VMUFS_OVERWRITE) < 0) {
+        goto fail;
     }
-
-    fs_write(f, data, data_len);
-    fs_close(f);
 
     free(data);
-
     return true;
+fail:
+    free(data);
+    return false;
 }
 
 void gamesettings_destroy() {
