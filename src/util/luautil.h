@@ -19,3 +19,11 @@ typedef struct LuaEnumEntry {
 
 void lua_readonly_table(lua_State* L, const char* name);
 void lua_readonly_enum(lua_State* L, const char* name, const lua_enum_entry_t* entries);
+
+inline bool luaL_optboolean(lua_State* L, int index, bool default_val) {
+    if (lua_isnoneornil(L, index)) {
+        return default_val;
+    }
+    luaL_checktype(L, index, LUA_TBOOLEAN);
+    return lua_toboolean(L, index);
+}

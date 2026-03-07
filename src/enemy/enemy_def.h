@@ -1,6 +1,7 @@
 #pragma once
 #include "../renderer/texture.h"
 #include "../components/animation.h"
+#include "../scripting/script.h"
 
 #include "enemy_event.h"
 
@@ -18,8 +19,7 @@ typedef struct EnemyDef {
     uint8_t total_events;
     event_t event_stack[MAX_EVENTS];
 
-    char* lua_script;
-    int lua_script_len;
+    script_t* script;
 } enemydef_t;
 
 bool enemydef_init(enemydef_t* def, const char* key);

@@ -82,7 +82,13 @@ romdisk/fonts/%.dat: assets/fonts/%.json
 	@mkdir -p $(dir $@)
 	python tools/convert_font.py $< $@
 
-ASSETS := $(GAMESETTINGS) $(PLAYER) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(WEAPONSETDEFS) $(COLLECTABLEDEFS) $(LEVELS) $(FONTS)
+SCRIPT_SRCS := $(shell find assets/scripts -type f -name '*.lua' | sort)
+SCRIPTS := $(SCRIPT_SRCS:assets/scripts/%.lua=romdisk/scripts/%.lua)
+romdisk/scripts/%.lua: assets/scripts/%.lua
+	@mkdir -p $(dir $@)
+	cp $< $@
+
+ASSETS := $(GAMESETTINGS) $(PLAYER) $(SPRITES) $(ANIMS) $(ENEMYDEFS) $(PROJECTILEDEFS) $(WEAPONSETDEFS) $(COLLECTABLEDEFS) $(LEVELS) $(FONTS) $(SCRIPTS)
 
 # Build targets
 .PHONY: all clean rebuild-cdi rm-elf rm-disc

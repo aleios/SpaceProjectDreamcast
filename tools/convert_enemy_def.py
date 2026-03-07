@@ -81,6 +81,8 @@ def parse_proj_def(input_file, output_fname):
 
     events = data.get('events', [])
 
+    script = data.get('script', '')
+
     with open(output_fname, "wb") as output_file:
         helpers.write_magicnum(output_file, 'EDEF')
         helpers.write_str(output_file, animation)
@@ -93,6 +95,8 @@ def parse_proj_def(input_file, output_fname):
         helpers.write_short(output_file, score)
 
         write_events(output_file, events)
+
+        helpers.write_str(output_file, script)
 
 
 def main():

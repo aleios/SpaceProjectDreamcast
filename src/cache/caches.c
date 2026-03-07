@@ -33,3 +33,6 @@ DEFINE_CACHE(projdefcache, projectiledef_t, projectiledef_init, projectiledef_de
 DEFINE_CACHE(enemydefcache, enemydef_t, enemydef_init, enemydef_destroy);
 DEFINE_CACHE(weaponsetcache, weaponsetdef_t, weaponsetdef_init, weaponsetdef_destroy);
 DEFINE_CACHE(collectabledefcache, collectabledef_t, collectabledef_init, collectabledef_destroy);
+
+// Scripting
+DEFINE_CACHE(scriptcache, script_t, script_init, script_destroy);

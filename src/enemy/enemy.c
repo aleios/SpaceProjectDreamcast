@@ -9,7 +9,7 @@
 #include "../util/luautil.h"
 
 // -- Lua setup --
-void enemy_script_init(enemy_t* enemy, lua_State* L, const char* script, size_t script_len);
+void enemy_script_init(enemy_t* enemy, script_t* script);
 void enemy_script_destroy(enemy_t* enemy);
 // -- End Lua Setup --
 
@@ -68,52 +68,8 @@ void enemy_init(enemy_t* enemy, enemydef_t* def, int pool_index, shz_vec2_t init
     for (int i = 0; i < ENEMY_WEAPON_SLOTS; ++i) {
         weaponset_init(&enemy->event_sys.weapons[i], wdef);
     }
-    const char* tmp_script = R"(
-state = 0
 
-function init()
-    local x, y = enemy:pos()
-    enemy:move_to(x, y + math.random(40, 350))
-    state = 0
-end
-
-function collided_boundary(direction)
-    if state == 0 then
-        if direction == Direction.Left then
-            enemy:move_direction(0, 0.1)
-            enemy:activate_weapon(0)
-        elseif direction == Direction.Right then
-            enemy:move_direction(180, 0.1)
-            enemy:deactivate_weapon(0)
-        end
-    end
-end
-
-function target_arrive()
-    if state == 0 then
-        enemy:move_direction(0, 0.1)
-    elseif state == 1 then
-        enemy:move_to_player(0.15)
-    end
-end
-
-function damaged(damage)
-    if enemy:health() < 2 and state == 0 then
-        state = 1
-        enemy:move_to_player(0.15)
-    end
-end
-
-return {
-    handlers = {
-        init = init,
-        on_collide_boundary = collided_boundary,
-        on_target_arrive = target_arrive,
-        on_damage = damaged
-    }
-}
-    )";
-    enemy_script_init(enemy, gamestate_lua(), tmp_script, strlen(tmp_script) * sizeof(char));
+    enemy_script_init(enemy, def->script);
 }
 
 void enemy_destroy(enemy_t* enemy) {

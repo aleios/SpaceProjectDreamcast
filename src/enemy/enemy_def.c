@@ -175,6 +175,11 @@ bool enemydef_init(enemydef_t* def, const char* key) {
         }
     }
 
+    if (!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
+        goto error_close;
+    }
+    def->script = scriptcache_get(str_buf);
+
     fs_close(def_file);
     return true;
 error_close:

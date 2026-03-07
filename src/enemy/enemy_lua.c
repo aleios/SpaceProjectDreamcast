@@ -1,4 +1,5 @@
 #include "enemy.h"
+#include "../cache/caches.h"
 #include "../util/luautil.h"
 #include "../defs/gamestate.h"
 
@@ -15,7 +16,7 @@ static void enemy_push_lua(lua_State* L, enemy_t* enemy) {
     lua_setfield(L, -2, "enemy");
 }
 
-void enemy_script_init(enemy_t* enemy, lua_State* L, const char* script, size_t script_len) {
+void enemy_script_init(enemy_t* enemy, script_t* script) {
 
     auto handlers = &enemy->event_sys.handlers;
     handlers->init = LUA_NOREF;
@@ -26,16 +27,11 @@ void enemy_script_init(enemy_t* enemy, lua_State* L, const char* script, size_t 
     handlers->on_despawn = LUA_NOREF;
     handlers->on_step = LUA_NOREF;
 
+    auto L = gamestate_lua();
     int top = lua_gettop(L);
 
-    printf("Loading script with size: %u\n", script_len);
-    // Load script
-    if (luaL_loadbuffer(L, script, script_len, nullptr) != LUA_OK) {
-        printf("Lua error: %s\n", lua_tostring(L, -1));
-        lua_pop(L, 1);
-        return;
-    }
-    printf("Script loaded\n");
+    // Load script bytecode to stack.
+    script_load(script);
 
     // Create environment for enemy script
     lua_newtable(L);
@@ -95,9 +91,6 @@ void enemy_script_init(enemy_t* enemy, lua_State* L, const char* script, size_t 
     handlers->on_despawn = lua_optional_ref(L, -1, "on_despawn");
 
     handlers->on_step = lua_optional_ref(L, -1, "on_step");
-
-    printf("Handlers:\nCollideBound: %d\nCollidePlayer: %d\nDamage: %d\nTargetArrive: %d\nDespawn: %d\nStep: %d\n\n",
-        handlers->on_collide_boundary, handlers->on_collide_player, handlers->on_damage, handlers->on_target_arrive, handlers->on_despawn, handlers->on_step);
 
     lua_pop(L, 2);
 
@@ -246,8 +239,6 @@ static int move_to(lua_State* L) {
     auto tx = (float)luaL_checknumber(L, 2);
     auto ty = (float)luaL_checknumber(L, 3);
 
-    printf("Move to: (%f, %f)\n", tx, ty);
-
     const auto task = &enemy->event_sys.movement_task;
     task->active = true;
     task->type = MOVE_POINT;
@@ -257,13 +248,24 @@ static int move_to(lua_State* L) {
     return 0;
 }
 
+// args: angle, speed, period, [amplitude=1.0]
 static int move_sine(lua_State* L) {
     enemy_t* enemy = enemy_check(L, 1);
+
+    auto angle = (float)luaL_checknumber(L, 2);
+    auto speed = (float)luaL_checknumber(L, 3);
+    auto period = (float)luaL_checknumber(L, 4);
+    auto amplitude = (float)luaL_optnumber(L, 5, 1.0f);
 
     const auto task = &enemy->event_sys.movement_task;
     task->active = true;
     task->type = MOVE_SINE;
-    task->speed = 0.1f;
+    task->speed = speed;
+
+    const float scale = shz_clampf(period, 0.0f, 1.0f);
+    task->sine.omega = 2.0f * SHZ_F_PI * (scale * 2.0f);
+    task->sine.amplitude = amplitude;
+    task->sine.angle = angle;
 
     return 0;
 }
@@ -274,10 +276,7 @@ static int move_to_player(lua_State* L) {
 
     const auto speed = (float)luaL_checknumber(L, 2);
 
-    bool continuous = true;
-    if (lua_isboolean(L, 3)) {
-        continuous = (bool)lua_toboolean(L, 3);
-    }
+    const bool continuous = luaL_optboolean(L, 3, true);
 
     const auto task = &enemy->event_sys.movement_task;
     task->active = true;
