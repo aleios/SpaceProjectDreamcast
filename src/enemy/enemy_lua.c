@@ -146,8 +146,6 @@ void enemy_script_destroy(enemy_t* enemy) {
 
     luaL_unref(L, LUA_REGISTRYINDEX, enemy->event_sys.env_index);
     enemy->event_sys.env_index = LUA_NOREF;
-
-    lua_gc(L, LUA_GCCOLLECT, 0);
 }
 
 static enemy_t* enemy_check(lua_State* L, int idx) {
@@ -304,6 +302,24 @@ static int move_stop(lua_State* L) {
 // --
 // Projectile tasks
 // --
+static int load_weapon(lua_State* L) {
+    enemy_t* enemy = enemy_check(L, 1);
+
+    const auto slot = (int)luaL_checkinteger(L, 2);
+    const auto def_name = luaL_checkstring(L, 3);
+
+    if (slot < 0 || slot >= ENEMY_WEAPON_SLOTS) {
+        return 0;
+    }
+
+    const auto task = &enemy->event_sys.weapons[slot];
+
+    auto def = weaponsetcache_get(def_name);
+    weaponset_init(task, def);
+
+    return 0;
+}
+
 static int activate_weapon(lua_State* L) {
     enemy_t* enemy = enemy_check(L, 1);
     const auto slot = (int)luaL_checkinteger(L, 2);
@@ -313,8 +329,6 @@ static int activate_weapon(lua_State* L) {
         return 0;
     }
     const auto task = &enemy->event_sys.weapons[slot];
-    //task->active = true;
-    //task->weapon.firing = true;
     task->firing = true;
     return 0;
 }
@@ -329,7 +343,6 @@ static int deactivate_weapon(lua_State* L) {
     }
     const auto task = &enemy->event_sys.weapons[slot];
     task->firing = false;
-    //task->active = false;
     return 0;
 }
 

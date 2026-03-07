@@ -114,7 +114,6 @@ return {
 }
     )";
     enemy_script_init(enemy, gamestate_lua(), tmp_script, strlen(tmp_script) * sizeof(char));
-    printf("ENEMY GOOD\n");
 }
 
 void enemy_destroy(enemy_t* enemy) {
