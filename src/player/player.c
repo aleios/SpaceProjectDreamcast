@@ -1,5 +1,7 @@
 #include "player.h"
 
+#include <lua/lauxlib.h>
+
 #include "../gamesettings.h"
 #include "../cache/caches.h"
 #include "../renderer/sprite_renderer.h"
@@ -288,4 +290,56 @@ void player_move(player_t* player, shz_vec2_t offset) {
 
 void player_render_debug(player_t* player) {
     collider_render(&player->collider);
+}
+
+int player_health_lua(lua_State* L) {
+
+    // Technically player doesn't own health but providing it through it anyway.
+    const auto udata = (player_t**)luaL_checkudata(L, 1, "PlayerMT");
+    (void)udata;
+
+    // Setter
+    if (lua_gettop(L) >= 2) {
+        const auto nh = (int)luaL_checkinteger(L, 2);
+        g_gamestate.health = nh;
+        return 0;
+    }
+
+    // Getter
+    lua_pushinteger(L, g_gamestate.health);
+    return 1;
+}
+
+int player_position_lua(lua_State* L) {
+    const auto udata = (player_t**)luaL_checkudata(L, 1, "PlayerMT");
+    player_t* player = *udata;
+
+    // Setter
+    if (lua_gettop(L) >= 2) {
+        const auto nx = (float)luaL_checknumber(L, 2);
+        const auto ny = (float)luaL_checknumber(L, 3);
+
+        player->transform.pos.x = nx;
+        player->transform.pos.y = ny;
+        return 0;
+    }
+
+    // Getter
+    lua_pushnumber(L, player->transform.pos.x);
+    lua_pushnumber(L, player->transform.pos.y);
+    return 2;
+}
+
+void player_register_lua(lua_State* L) {
+    if (luaL_newmetatable(L, "PlayerMT")) {
+        lua_pushcfunction(L, player_health_lua);
+        lua_setfield(L, -2, "health");
+
+        lua_pushcfunction(L, player_position_lua);
+        lua_setfield(L, -2, "pos");
+
+        lua_pushvalue(L, -1);
+        lua_setfield(L, -2, "__index");
+    }
+    lua_pop(L, 1);
 }
