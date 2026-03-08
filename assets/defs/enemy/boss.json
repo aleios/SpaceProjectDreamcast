@@ -5,19 +5,6 @@
   "idle_key": "enemy2_idle",
   "left_key": "",
   "right_key": "",
-  "events": [
-    {
-      "type": "StartFiring",
-      "weapon": "boss_pattern1"
-    },
-    {
-      "type": "MoveTo",
-      "speed": 0.1,
-      "target": "POINT",
-      "x": 320.0,
-      "y": 250.0
-    }
-  ],
   "script": "boss",
   "score": 1
 }

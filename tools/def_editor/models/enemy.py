@@ -1,7 +1,7 @@
 from .datadef import DefModel
 
 class EnemyModel(DefModel):
-    COL_NAME, COL_MODIFIED, COL_ANIM, COL_IDLE_KEY, COL_LEFT_KEY, COL_RIGHT_KEY, COL_HEALTH, COL_COLLISION_RADIUS, COL_SCORE, COL_EVENTS = range(10)
+    COL_NAME, COL_MODIFIED, COL_ANIM, COL_IDLE_KEY, COL_LEFT_KEY, COL_RIGHT_KEY, COL_HEALTH, COL_COLLISION_RADIUS, COL_SCORE, COL_SCRIPT = range(10)
     MAP = {
         COL_NAME: {'key': 'name', 'type': str},
         COL_MODIFIED: {'key': 'modified', 'type': bool},
@@ -12,7 +12,7 @@ class EnemyModel(DefModel):
         COL_HEALTH: { 'key': 'health', 'type': int, 'default': 1 },
         COL_COLLISION_RADIUS: { 'key': 'collision_radius', 'type': float },
         COL_SCORE: { 'key': 'score', 'type': int, 'default': 1 },
-        COL_EVENTS: { 'key': 'events', 'type': list }
+        COL_SCRIPT: { 'key': 'script', 'type': str }
     }
     def __init__(self, *args, **kwargs):
         super().__init__("enemy", self.MAP, *args, **kwargs)
