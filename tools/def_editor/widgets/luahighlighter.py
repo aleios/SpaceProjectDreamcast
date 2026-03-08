@@ -46,7 +46,7 @@ class LuaHighlighter(QSyntaxHighlighter):
 
         # Reserved keywords
         keyword_format = QTextCharFormat()
-        keyword_format.setForeground(QColor(157, 208, 226, 255))
+        keyword_format.setForeground(QColor(255, 153, 153, 255))
 
         keywords = [
             "end",
@@ -84,7 +84,7 @@ class LuaHighlighter(QSyntaxHighlighter):
 
 
         func_format = QTextCharFormat()
-        func_format.setForeground(QColor(0, 255, 0, 255))
+        func_format.setForeground(QColor(157, 208, 226, 255))
 
         self.rules.append({
             'pattern': QRegularExpression('\\b[A-Za-z0-9_]+(?=\\()'),
@@ -93,7 +93,7 @@ class LuaHighlighter(QSyntaxHighlighter):
 
         # Engine provided types
         engine_type_format = QTextCharFormat()
-        engine_type_format.setForeground(QColor(255, 0, 0, 255))
+        engine_type_format.setForeground(QColor(204, 153, 255, 255))
 
         types = [
             "player",
