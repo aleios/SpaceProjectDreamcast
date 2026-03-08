@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QDataWidgetMapper
+from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QMessageBox, QInputDialog
 
 from ui.Scripts import Ui_pageScripts
 
@@ -20,10 +20,11 @@ class pageScripts(QWidget, Ui_pageScripts):
 
         self.mapper = QDataWidgetMapper(self)
         self.mapper.setModel(defsdb.scripts)
-
         self.mapper.addMapping(self.teSource, ScriptModel.COL_SOURCE, b'plainText')
 
         self.mapper.setCurrentIndex(0)
+
+        self.btnNewScript.clicked.connect(self.new_script)
 
     def index_changed(self, new):
         if new.isValid():
@@ -31,3 +32,13 @@ class pageScripts(QWidget, Ui_pageScripts):
             self.mapper.setCurrentIndex(new.row())
         else:
             self.stackedControls.setCurrentIndex(0)
+
+    def new_script(self):
+        val, res = QInputDialog.getText(self, "Add script...", "Name")
+        val = val.strip()
+
+        if res:
+            if defsdb.scripts.exists(val):
+                QMessageBox.critical(self, "Error", "Error: Item already exists.")
+            else:
+                defsdb.scripts.add(val)

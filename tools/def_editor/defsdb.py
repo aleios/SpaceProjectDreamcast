@@ -125,12 +125,14 @@ def reload_defs():
     print("Defs reloaded")
 
 def save_pending_defs():
+    scripts.save(assets_path)
+    animations.save(assets_path)
+
     collectable_defs.save(assets_path)
     projectile_defs.save(assets_path)
     weaponset_defs.save(assets_path)
     enemy_defs.save(assets_path)
 
-    animations.save(assets_path)
     levels.save(assets_path)
 
     player_def.save(assets_path)
