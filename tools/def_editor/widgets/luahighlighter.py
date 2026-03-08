@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QRegularExpression
+from PyQt6.QtCore import QRegularExpression, QResource
 from PyQt6.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
 
@@ -9,7 +9,42 @@ class LuaHighlighter(QSyntaxHighlighter):
 
         self.rules = []
 
-        # Keywords
+        # Primitive types
+        primitive_format = QTextCharFormat()
+        primitive_format.setForeground(QColor(0, 255, 255, 255))
+
+        primitives = [
+            # Bool
+            "true",
+            "false",
+
+            # number (missing some?)
+            "\\d+",
+            "\\d+.",
+            
+            # nil type
+            "nil"
+        ]
+
+        for prim in primitives:
+            self.rules.append({
+                'pattern': QRegularExpression("\\b" + prim + "\\b"),
+                'format': primitive_format
+            })
+
+        # Strings
+        str_format = QTextCharFormat()
+        str_format.setForeground(QColor(255, 204, 153, 255))
+        self.rules.append({
+            'pattern': QRegularExpression("\"[^\"]*\""),
+            'format': str_format
+        })
+        self.rules.append({
+            'pattern': QRegularExpression("\'[^\']*\'"),
+            'format': str_format
+        })
+
+        # Reserved keywords
         keyword_format = QTextCharFormat()
         keyword_format.setForeground(QColor(157, 208, 226, 255))
 
@@ -17,12 +52,28 @@ class LuaHighlighter(QSyntaxHighlighter):
             "end",
             "function",
             "return",
-            "local",
+            "break",
+
+            "for",
+            "in",
+            "until",
+            "repeat",
+            "while",
+            "do",
 
             "if",
             "then",
             "else",
-            "elseif"
+            "elseif",
+
+            "or",
+            "and",
+            "not",
+
+            "goto",
+
+            "global",
+            "local"
         ]
 
         for kwd in keywords:
@@ -47,7 +98,8 @@ class LuaHighlighter(QSyntaxHighlighter):
         types = [
             "player",
             "enemy",
-            "Constants"
+            "Constants",
+            "Direction"
         ]
 
         for kwd in types:
