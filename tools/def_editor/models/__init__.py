@@ -13,3 +13,4 @@ from .sprites import SpritesModel
 from .music import MusicModel
 from .sfx import SfxModel
 from .optionalproxy import OptionalComboProxyModel
+from .script import ScriptModel
