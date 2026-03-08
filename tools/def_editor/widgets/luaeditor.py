@@ -27,5 +27,7 @@ class LuaEditor(QPlainTextEdit):
             self.setFont(font)
             space_width = QFontMetricsF(font).horizontalAdvance(' ')
             self.setTabStopDistance(4.0 * space_width)
+        else:
+            super().wheelEvent(e)
 
 
