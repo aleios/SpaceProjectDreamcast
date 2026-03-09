@@ -79,8 +79,10 @@ class ScriptModel(QAbstractTableModel):
 
         # Delete pending files
         while self._pending_deletions:
-            p = self._pending_deletions.pop()
-            if os.path.exists(p): os.remove(p)
+            itm = self._pending_deletions.pop()
+            from tools.def_editor import defsdb
+            itm_path = os.path.join(f'{defsdb.assets_path}/scripts/{itm['name']}.lua')
+            if os.path.exists(itm_path): os.remove(itm_path)
 
         # Save script data to file.
         for row, item in enumerate(self.items):
@@ -119,6 +121,14 @@ return {
         from tools.def_editor import defsdb
         defsdb.scripts.dataChanged.emit(QModelIndex(), QModelIndex())
         self.endInsertRows()
+
+    def remove(self, index):
+        if not index.isValid():
+            return
+
+        self.beginRemoveRows(QModelIndex(), index.row(), index.row())
+        self._pending_deletions.append(self.items.pop(index.row()))
+        self.endRemoveRows()
 
     def exists(self, key):
         from tools.def_editor import defsdb
