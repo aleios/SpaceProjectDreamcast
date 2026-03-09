@@ -108,6 +108,50 @@ class LuaHighlighter(QSyntaxHighlighter):
                 'format': engine_type_format
             })
 
+        # Operators
+        operator_format = QTextCharFormat()
+        operator_format.setForeground(QColor(0, 255, 0, 255))
+        operators = [
+            r"\+",
+            r"\-",
+            r"\*",
+            r"/",
+            r"%", # Mod
+            r"\^", # Exponent
+            r"//", # Floor divide
+
+            # Assignment
+            "=",
+
+            # Comparison
+            "==",
+            "~=",
+            "<",
+            "<=",
+            ">",
+            ">=",
+
+            # Shift
+            ">>",
+            "<<",
+
+            # Bitwise
+            "&",
+            r"\|",
+            "~",
+
+            # Concat
+            r"\.\.",
+
+            # Length
+            "#"
+        ]
+
+        for op in operators:
+            self.rules.append({
+                'pattern': QRegularExpression(op),
+                'format': operator_format
+            })
 
     def highlightBlock(self, text):
 
