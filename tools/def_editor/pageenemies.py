@@ -1,12 +1,12 @@
-from PyQt6.QtWidgets import QWidget, QInputDialog, QMessageBox, QDataWidgetMapper
-from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QInputDialog, QMessageBox, QDataWidgetMapper, QLabel
 
-from tools.def_editor.models import ClipListModel
-from ui.Enemies import Ui_pageEnemies
-from eventdialog import EventDialog
 from tools.def_editor import defsdb
-import os
+from tools.def_editor.models import ClipListModel, BlankFieldProxyModel
+from tools.def_editor.models.enemy import TOTAL_WEAPON_SLOTS
+from tools.def_editor.widgets.datacombobox import DataComboBox
+from ui.Enemies import Ui_pageEnemies
+
 
 class pageEnemies(QWidget, Ui_pageEnemies):
     def __init__(self, *args, **kwargs):
@@ -18,17 +18,40 @@ class pageEnemies(QWidget, Ui_pageEnemies):
 
         self.controlStack.setCurrentIndex(0)
 
-        self.fieldMapper = QDataWidgetMapper(self)
-        self.fieldMapper.setModel(defsdb.enemy_defs)
-        self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
-
         # Map fields to controls
         self.cbScript.setModel(defsdb.scripts)
 
+        self.fieldMapper = QDataWidgetMapper(self)
+        self.fieldMapper.setModel(defsdb.enemy_defs)
+        self.fieldMapper.setOrientation(Qt.Orientation.Horizontal)
         self.fieldMapper.addMapping(self.sbHealth, defsdb.EnemyModel.COL_HEALTH)
         self.fieldMapper.addMapping(self.sbColliderRadius, defsdb.EnemyModel.COL_COLLISION_RADIUS)
         self.fieldMapper.addMapping(self.sbScore, defsdb.EnemyModel.COL_SCORE)
         self.fieldMapper.addMapping(self.cbScript, defsdb.EnemyModel.COL_SCRIPT)
+
+
+        # Blank field proxy on weaponset_defs
+        self.weaponset_mdl = BlankFieldProxyModel()
+        self.weaponset_mdl.setSourceModel(defsdb.weaponset_defs)
+
+        # Get model for weapon slots out of EnemyModel
+        self.slot_model = defsdb.enemy_defs.get_weaponslot_model(0)
+
+        # Setup slots combos
+        self.weap_slot_mapper = QDataWidgetMapper(self)
+        self.weap_slot_mapper.setModel(self.slot_model)
+        self.weap_slot_mapper.setOrientation(Qt.Orientation.Horizontal)
+        for i, x in enumerate(self.slot_model.slots):
+            if i >= TOTAL_WEAPON_SLOTS:
+                break
+            slot_label = QLabel(self)
+            slot_label.setText(f"Slot {i}")
+            slot_combo = DataComboBox(self)
+            slot_combo.setModel(self.weaponset_mdl)
+            self.gbWeaponSlots.layout().addWidget(slot_label)
+            self.gbWeaponSlots.layout().addWidget(slot_combo)
+            self.weap_slot_mapper.addMapping(slot_combo, i, b'data')
+        self.weap_slot_mapper.toFirst()
 
         # Model animation
         self.cbAnimation.setModel(defsdb.animations)
@@ -113,6 +136,7 @@ class pageEnemies(QWidget, Ui_pageEnemies):
             self.cbRightClip.blockSignals(True)
 
             self.fieldMapper.setCurrentIndex(new.row())
+            self.slot_model.set_row(new.row())
             self.cbAnimation.setCurrentText(data.get('animation', ""))
 
             anim_index = self.cbAnimation.currentIndex()
