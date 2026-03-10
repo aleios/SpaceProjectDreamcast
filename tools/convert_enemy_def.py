@@ -1,8 +1,8 @@
-import sys
 import json
-import struct
+import sys
 import helpers
-import math
+
+TOTAL_WEAPON_SLOTS = 5
 
 def parse_proj_def(input_file, output_fname):
     data = json.load(input_file)
@@ -18,6 +18,13 @@ def parse_proj_def(input_file, output_fname):
 
     script = data.get('script', '')
 
+    weapon_slots = data.get('weapon_slots', [""] * TOTAL_WEAPON_SLOTS)
+    weapon_slots_len = len(weapon_slots)
+    if weapon_slots_len < 5:
+        new_len = (5 - weapon_slots_len)
+        print(f"[Enemy Def] Warning: Weapon slots less than {TOTAL_WEAPON_SLOTS}. Padding with {new_len} slots")
+        weapon_slots.extend([""] * new_len)
+
     with open(output_fname, "wb") as output_file:
         helpers.write_magicnum(output_file, 'EDEF')
         helpers.write_str(output_file, animation)
@@ -30,6 +37,9 @@ def parse_proj_def(input_file, output_fname):
         helpers.write_short(output_file, score)
 
         helpers.write_str(output_file, script)
+
+        for x in weapon_slots:
+            helpers.write_str(output_file, x)
 
 
 def main():

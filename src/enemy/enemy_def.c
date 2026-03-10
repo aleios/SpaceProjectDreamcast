@@ -69,6 +69,19 @@ bool enemydef_init(enemydef_t* def, const char* key) {
     }
     def->script = scriptcache_get(str_buf);
 
+    // Weapon slots
+    for (int i = 0; i < ENEMY_WEAPON_SLOTS; ++i) {
+        if (!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
+            goto error_close;
+        }
+
+        if (str_valid(str_buf)) {
+            def->weapon_slots[i] = weaponsetcache_get(str_buf);
+        } else {
+            def->weapon_slots[i] = nullptr;
+        }
+    }
+
     fs_close(def_file);
     return true;
 error_close:

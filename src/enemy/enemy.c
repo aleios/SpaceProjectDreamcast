@@ -61,14 +61,18 @@ void enemy_init(enemy_t* enemy, enemydef_t* def, int pool_index, shz_vec2_t init
     // Setup default task states
     enemy->event_sys.movement_task.active = false;
 
-    // -- Temporary --
-
-    auto wdef = weaponsetcache_get("enemy_basic");
-
+    // Setup weapon slots
     for (int i = 0; i < ENEMY_WEAPON_SLOTS; ++i) {
-        weaponset_init(&enemy->event_sys.weapons[i], wdef);
+        if (def->weapon_slots[i] != nullptr) {
+            auto slot = &enemy->event_sys.weapons[i];
+            slot->valid = true;
+            weaponset_init(&slot->weapon, def->weapon_slots[i]);
+        } else {
+            enemy->event_sys.weapons[i].valid = false;
+        }
     }
 
+    // Script init
     enemy_script_init(enemy, def->script);
 }
 
@@ -162,8 +166,10 @@ void enemy_step(enemy_t* enemy, float delta_time) {
     // Script tasks
     enemy_do_movement(enemy, delta_time);
     for (int i = 0; i < ENEMY_WEAPON_SLOTS; ++i) {
-        auto weapon = &enemy->event_sys.weapons[i];
-        weaponset_step(weapon, gamestate_enemy_projpool(), enemy->transform.pos, delta_time);
+        const auto slot = &enemy->event_sys.weapons[i];
+        if (slot->valid) {
+            weaponset_step(&slot->weapon, gamestate_enemy_projpool(), enemy->transform.pos, delta_time);
+        }
     }
 
     // Update animations

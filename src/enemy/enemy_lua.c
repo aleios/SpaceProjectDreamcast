@@ -299,49 +299,52 @@ static int move_stop(lua_State* L) {
 }
 
 // --
-// Projectile tasks
+// Weapon slots
 // --
 static int load_weapon(lua_State* L) {
     enemy_t* enemy = enemy_check(L, 1);
 
-    const auto slot = (int)luaL_checkinteger(L, 2);
+    const auto slot_id = (int)luaL_checkinteger(L, 2);
     const auto def_name = luaL_checkstring(L, 3);
 
-    if (slot < 0 || slot >= ENEMY_WEAPON_SLOTS) {
+    if (slot_id < 0 || slot_id >= ENEMY_WEAPON_SLOTS) {
         return 0;
     }
 
-    const auto task = &enemy->event_sys.weapons[slot];
+    const auto weapon_slot = &enemy->event_sys.weapons[slot_id];
 
-    auto def = weaponsetcache_get(def_name);
-    weaponset_init(task, def);
+    const auto def = weaponsetcache_get(def_name);
+    weaponset_init(&weapon_slot->weapon, def);
+    weapon_slot->valid = true;
 
     return 0;
 }
 
 static int activate_weapon(lua_State* L) {
     enemy_t* enemy = enemy_check(L, 1);
-    const auto slot = (int)luaL_checkinteger(L, 2);
+    const auto slot_id = (int)luaL_checkinteger(L, 2);
 
-    if (slot < 0 || slot >= ENEMY_WEAPON_SLOTS) {
+    if (slot_id < 0 || slot_id >= ENEMY_WEAPON_SLOTS) {
         // TODO: Warn about slot index wrong.
         return 0;
     }
-    const auto task = &enemy->event_sys.weapons[slot];
-    task->firing = true;
+    const auto weapon_slot = &enemy->event_sys.weapons[slot_id];
+    if (weapon_slot->valid) {
+        weapon_slot->weapon.firing = true;
+    }
     return 0;
 }
 
 static int deactivate_weapon(lua_State* L) {
     enemy_t* enemy = enemy_check(L, 1);
-    const auto slot = (int)luaL_checkinteger(L, 2);
+    const auto slot_id = (int)luaL_checkinteger(L, 2);
 
-    if (slot < 0 || slot >= ENEMY_WEAPON_SLOTS) {
+    if (slot_id < 0 || slot_id >= ENEMY_WEAPON_SLOTS) {
         // TODO: Warn about slot index wrong.
         return 0;
     }
-    const auto task = &enemy->event_sys.weapons[slot];
-    task->firing = false;
+    const auto weapon = &enemy->event_sys.weapons[slot_id].weapon;
+    weapon->firing = false;
     return 0;
 }
 

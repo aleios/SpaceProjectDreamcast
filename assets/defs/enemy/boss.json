@@ -6,5 +6,12 @@
   "left_key": "",
   "right_key": "",
   "script": "boss",
-  "score": 1
+  "score": 1,
+  "weapon_slots": [
+    "boss_pattern1",
+    "",
+    "",
+    "",
+    ""
+  ]
 }

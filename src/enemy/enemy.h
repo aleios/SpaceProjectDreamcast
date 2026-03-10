@@ -7,6 +7,11 @@
 #include "enemy_def.h"
 #include "../entityid.h"
 
+typedef struct WeaponSlot {
+    bool valid;
+    weaponset_t weapon;
+} weaponslot_t;
+
 typedef union EnemyFlags {
     struct {
         uint8_t dead    : 1;
@@ -51,13 +56,12 @@ typedef struct EnemyMovementTask {
     };
 } enemy_movement_task_t;
 
-static constexpr int ENEMY_WEAPON_SLOTS = 5;
 typedef struct EnemyEventSystem {
     int env_index;
     enemy_event_handlers_t handlers;
 
     enemy_movement_task_t movement_task;
-    weaponset_t weapons[ENEMY_WEAPON_SLOTS];
+    weaponslot_t weapons[ENEMY_WEAPON_SLOTS];
     float current_delay;
 } enemy_eventsystem_t;
 
