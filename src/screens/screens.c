@@ -5,6 +5,7 @@
 #include "editor_screen.h"
 #include "load_screen.h"
 #include "options_screen.h"
+#include "gameover_screen.h"
 
 enum ScreenFlags {
     SCREEN_FLAGS_INIT,
@@ -73,7 +74,17 @@ static screen_t load_screen = {
 };
 
 static screen_t gameover_screen = {
-    .flags = 0,
+    .flags = SCREEN_FLAGS_CLEANUP_ON_LEAVE,
+    .init = gameover_screen_init,
+    .cleanup = gameover_screen_cleanup,
+
+    .enter = gameover_screen_enter,
+    .leave = gameover_screen_leave,
+
+    .step = gameover_screen_step,
+
+    .render_op = load_screen_render_op,
+    .render_tr = load_screen_render_tr
 };
 
 static screen_t options_screen = {
