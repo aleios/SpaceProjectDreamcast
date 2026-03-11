@@ -9,10 +9,10 @@ end
 function collided_boundary(direction)
     if state == 0 then
         if direction == Direction.Left then
-            enemy:move_direction(0, 0.1)
+            enemy:move_sine(0, 0.1, 0.5, 250.0)
             enemy:activate_weapon(0)
         elseif direction == Direction.Right then
-            enemy:move_direction(180, 0.1)
+            enemy:move_sine(180, 0.1, 0.5, 250.0)
             enemy:deactivate_weapon(0)
         end
     end

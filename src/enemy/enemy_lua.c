@@ -263,9 +263,13 @@ static int move_sine(lua_State* L) {
     task->speed = speed;
 
     const float scale = shz_clampf(period, 0.0f, 1.0f);
-    task->sine.omega = 2.0f * SHZ_F_PI * (scale * 2.0f);
+    task->sine.phase = 0.0f;
+    task->sine.omega = 2.0f * SHZ_F_PI * (scale * 2.0f) / 1000.0f;
     task->sine.amplitude = amplitude;
-    task->sine.angle = angle;
+
+    const shz_sincos_t sc_angle = shz_sincosf(SHZ_DEG_TO_RAD(angle));
+    task->sine.fwd  = shz_vec2_init(sc_angle.cos, sc_angle.sin);
+    task->sine.perp = shz_vec2_init(-sc_angle.sin, sc_angle.cos);
 
     return 0;
 }

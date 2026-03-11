@@ -120,6 +120,17 @@ static shz_vec2_t move_to_point(enemy_t* enemy, enemy_movement_task_t* task, flo
     return shz_vec2_scale(dir, speed);
 }
 
+static shz_vec2_t move_sine(enemy_t* enemy, enemy_movement_task_t* task, float speed, float delta_time) {
+    task->sine.phase += task->sine.omega * delta_time;
+    const shz_sincos_t sc = shz_sincosf(task->sine.phase);
+    float lateral_velocity = task->sine.amplitude * task->sine.omega * sc.cos;
+
+    return shz_vec2_add(
+        shz_vec2_scale(task->sine.fwd, speed),
+        shz_vec2_scale(task->sine.perp, lateral_velocity)
+    );
+}
+
 static void enemy_do_movement(enemy_t* enemy, float delta_time) {
     const auto move_task = &enemy->event_sys.movement_task;
     if (move_task->active) {
@@ -141,6 +152,10 @@ static void enemy_do_movement(enemy_t* enemy, float delta_time) {
         case MOVE_PLAYER_TARGET: {
             move_task->target = player_get_position(gamestate_get_player());
             velocity = move_to_point(enemy, move_task, step_speed);
+            break;
+        }
+        case MOVE_SINE: {
+            velocity = move_sine(enemy, move_task, step_speed, delta_time);
             break;
         }
         default:

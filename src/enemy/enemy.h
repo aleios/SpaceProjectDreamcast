@@ -6,6 +6,7 @@
 #include "../animator.h"
 #include "enemy_def.h"
 #include "../entityid.h"
+#include "../projectile/weaponset.h"
 
 typedef struct WeaponSlot {
     bool valid;
@@ -38,6 +39,14 @@ typedef struct EnemyEventHandlers {
 
 } enemy_event_handlers_t;
 
+typedef enum MoveType {
+    MOVE_POINT,
+    MOVE_PLAYER_INITIAL,
+    MOVE_PLAYER_TARGET,
+    MOVE_DIRECTIONAL,
+    MOVE_SINE,
+} movetype_t;
+
 typedef struct EnemyMovementTask {
     bool active;
     movetype_t type;
@@ -49,9 +58,11 @@ typedef struct EnemyMovementTask {
             float angle_step;
         } dir;
         struct {
+            float phase;
             float omega;
             float amplitude;
-            float angle;
+            shz_vec2_t fwd;
+            shz_vec2_t perp;
         } sine;
     };
 } enemy_movement_task_t;

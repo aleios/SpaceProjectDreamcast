@@ -2,8 +2,7 @@
 #include "../renderer/texture.h"
 #include "../components/animation.h"
 #include "../scripting/script.h"
-
-#include "enemy_event.h"
+#include "../defs/weaponset_def.h"
 
 static constexpr int ENEMY_WEAPON_SLOTS = 5;
 typedef struct EnemyDef {
@@ -16,9 +15,6 @@ typedef struct EnemyDef {
     uint16_t health;
     float collision_radius;
     int16_t score;
-
-    uint8_t total_events;
-    event_t event_stack[MAX_EVENTS];
 
     script_t* script;
 
