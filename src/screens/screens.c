@@ -26,9 +26,9 @@ typedef struct Screen {
     int32_t flags;
 } screen_t;
 
-void screens_noop() {}
+static void screens_noop() {}
 
-screen_t g_mainMenuScreen = {
+static screen_t mainmenu_screen = {
     .flags = SCREEN_FLAGS_CLEANUP_ON_LEAVE,
 
     .init = mainmenu_screen_init,
@@ -43,7 +43,7 @@ screen_t g_mainMenuScreen = {
     .render_tr = mainmenu_screen_render_tr,
 };
 
-screen_t g_playScreen = {
+static screen_t play_screen = {
     .flags = 0,
 
     .init = play_screen_init,
@@ -58,7 +58,7 @@ screen_t g_playScreen = {
     .render_tr = play_screen_render_tr,
 };
 
-screen_t g_loadScreen = {
+static screen_t load_screen = {
     .flags = SCREEN_FLAGS_CLEANUP_ON_LEAVE,
     .init = load_screen_init,
     .cleanup = load_screen_cleanup,
@@ -72,11 +72,11 @@ screen_t g_loadScreen = {
     .render_tr = load_screen_render_tr
 };
 
-screen_t g_gameoverScreen = {
+static screen_t gameover_screen = {
     .flags = 0,
 };
 
-screen_t g_optionsScreen = {
+static screen_t options_screen = {
     .flags = SCREEN_FLAGS_CLEANUP_ON_LEAVE,
 
     .init = options_screen_init,
@@ -107,15 +107,15 @@ screen_t g_editorScreen = {
 };
 #endif
 
-int8_t g_currentScreenId = -1;
-screen_t* g_currentScreen = nullptr;
+static int8_t current_screen_id = -1;
+static screen_t* current_screen = nullptr;
 
-screen_t* g_screens[] = {
-    [SCREEN_MAINMENU] = &g_mainMenuScreen,
-    [SCREEN_PLAY] = &g_playScreen,
-    [SCREEN_LOAD] = &g_loadScreen,
-    [SCREEN_GAMEOVER] = &g_gameoverScreen,
-    [SCREEN_OPTIONS] = &g_optionsScreen,
+static screen_t* screens[] = {
+    [SCREEN_MAINMENU] = &mainmenu_screen,
+    [SCREEN_PLAY] = &play_screen,
+    [SCREEN_LOAD] = &load_screen,
+    [SCREEN_GAMEOVER] = &gameover_screen,
+    [SCREEN_OPTIONS] = &options_screen,
 #ifdef BUILD_EDITOR
     [SCREEN_EDITOR] = &g_editorScreen
 #endif
@@ -125,38 +125,42 @@ void screens_set(screenid_t screen) {
     screens_set_with_data(screen, nullptr);
 }
 
+int8_t screens_current_id() {
+    return current_screen_id;
+}
+
 void screens_set_with_data(screenid_t screen, void* data) {
-    if(screen == g_currentScreenId || screen >= NUM_SCREENS) {
+    if(screen == current_screen_id || screen >= NUM_SCREENS) {
         return;
     }
 
-    if(g_currentScreen) {
-        g_currentScreen->leave();
+    if(current_screen) {
+        current_screen->leave();
 
-        if(g_currentScreen->flags & SCREEN_FLAGS_CLEANUP_ON_LEAVE) {
-            g_currentScreen->cleanup();
+        if(current_screen->flags & SCREEN_FLAGS_CLEANUP_ON_LEAVE) {
+            current_screen->cleanup();
         }
     }
 
-    g_currentScreenId = screen;
-    g_currentScreen = g_screens[screen];
+    current_screen_id = screen;
+    current_screen = screens[screen];
 
-    if(!(g_currentScreen->flags & SCREEN_FLAGS_INIT)) {
-        g_currentScreen->init();
-        g_currentScreen->flags |= SCREEN_FLAGS_INIT;
+    if(!(current_screen->flags & SCREEN_FLAGS_INIT)) {
+        current_screen->init();
+        current_screen->flags |= SCREEN_FLAGS_INIT;
     }
 
-    g_currentScreen->enter(data);
+    current_screen->enter(data);
 }
 
 void screens_step(float delta_time) {
-    g_currentScreen->step(delta_time);
+    current_screen->step(delta_time);
 }
 
 void screens_render_op() {
-    g_currentScreen->render_op();
+    current_screen->render_op();
 }
 
 void screens_render_tr() {
-    g_currentScreen->render_tr();
+    current_screen->render_tr();
 }
