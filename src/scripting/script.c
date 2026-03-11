@@ -18,11 +18,6 @@ static int script_writer(lua_State* L, const void* p, size_t sz, void* ud) {
 
     const auto buf = (membuffer_t*)ud;
     membuffer_write(buf, p, sz);
-    // auto buf = (tbuf_t*)ud;
-    //
-    // memcpy(&buf->data[buf->current], p, sz);
-    // buf->current += sz;
-
     return 0;
 }
 
