@@ -248,7 +248,7 @@ static int move_to(lua_State* L) {
     return 0;
 }
 
-// args: angle, speed, period, [amplitude=1.0]
+// args: angle, speed, period[0.0-1.0], [amplitude=1.0]
 static int move_sine(lua_State* L) {
     enemy_t* enemy = enemy_check(L, 1);
 
