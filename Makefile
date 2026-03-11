@@ -18,7 +18,7 @@ CFLAGS += -I$(KOS_BASE)/utils -gz -std=gnu23 -O3 \
  			-fmerge-all-constants -funroll-loops -fno-PIC -fipa-pta \
  			-fvisibility=hidden -flto -MMD -MP -I$(ADX_DIR)/include \
  			-DNDEBUG
-LDFLAGS += -ffast-math -flto -L$(ADX_DIR) -lADXL -llua
+LDFLAGS += -ffast-math -flto -L$(ADX_DIR) -lsh4zam -lADXL -llua
 
 include $(KOS_BASE)/Makefile.rules
 

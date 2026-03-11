@@ -1,9 +1,9 @@
 #include "membuffer.h"
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <arch/arch.h>
+#include <sh4zam/shz_sh4zam.h>
 
 static void membuffer_ensure(membuffer_t* buf, int length) {
     if (buf->len + length < buf->capacity) {
@@ -36,7 +36,7 @@ void membuffer_destroy(membuffer_t* buf) {
 
 void membuffer_write(membuffer_t* buf, const char* data, int len) {
     membuffer_ensure(buf, len);
-    memcpy(&buf->data[buf->len], data, len);
+    shz_memcpy(&buf->data[buf->len], data, len);
     buf->len += len;
 }
 

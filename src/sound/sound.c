@@ -53,7 +53,7 @@ void soundengine_cleanup() {
 }
 
 void soundengine_play_mus_ex(const char* key, bool loop, float fade_in_time, float fade_out_time) {
-    memcpy(g_soundEngine.current_music_key, key, sizeof(g_soundEngine.current_music_key));
+    shz_memcpy(g_soundEngine.current_music_key, key, sizeof(g_soundEngine.current_music_key));
 
     g_soundEngine.should_play = true;
     g_soundEngine.is_looping = loop;

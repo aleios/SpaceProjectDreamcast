@@ -1,7 +1,7 @@
 #include "strpool.h"
-
 #include <stdlib.h>
 #include <string.h>
+#include <sh4zam/shz_sh4zam.h>
 
 void strpool_init(strpool_t* pool, size_t capacity) {
     pool->capacity = capacity;
@@ -30,7 +30,7 @@ const char* strpool_alloc(strpool_t* pool, const char* str) {
     }
 
     char* dest = pool->buffer + pool->total;
-    memcpy(dest, str, len);
+    shz_memcpy(dest, str, len);
     pool->total += len;
     return dest;
 }
