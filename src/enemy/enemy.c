@@ -80,10 +80,11 @@ void enemy_destroy(enemy_t* enemy) {
 
     int despawn_ev = enemy->event_sys.handlers.on_despawn;
     if (despawn_ev != LUA_NOREF) {
-        lua_rawgeti(gamestate_lua(), LUA_REGISTRYINDEX, despawn_ev);
-        if (lua_pcall(gamestate_lua(), 0, 0, 0) != LUA_OK) {
-            printf("Lua error in on_despawn: %s\n", lua_tostring(gamestate_lua(), -1));
-            lua_pop(gamestate_lua(), 1);
+        const auto L = gamestate_lua();
+        lua_rawgeti(L, LUA_REGISTRYINDEX, despawn_ev);
+        if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+            printf("Lua error in on_despawn: %s\n", lua_tostring(L, -1));
+            lua_pop(L, 1);
         }
     }
 
@@ -105,10 +106,11 @@ static shz_vec2_t move_to_point(enemy_t* enemy, enemy_movement_task_t* task, flo
         // Trigger event
         int arrive_ev = enemy->event_sys.handlers.on_target_arrive;
         if (arrive_ev != LUA_NOREF) {
-            lua_rawgeti(gamestate_lua(), LUA_REGISTRYINDEX, arrive_ev);
-            if (lua_pcall(gamestate_lua(), 0, 0, 0) != LUA_OK) {
-                printf("Lua error in on_target_arrive: %s\n", lua_tostring(gamestate_lua(), -1));
-                lua_pop(gamestate_lua(), 1);
+            const auto L = gamestate_lua();
+            lua_rawgeti(L, LUA_REGISTRYINDEX, arrive_ev);
+            if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+                printf("Lua error in on_target_arrive: %s\n", lua_tostring(L, -1));
+                lua_pop(L, 1);
             }
         }
         return shz_vec2_init(0.0f, 0.0f);
@@ -155,11 +157,12 @@ void enemy_step(enemy_t* enemy, float delta_time) {
 
     const int step_ev = enemy->event_sys.handlers.on_step;
     if (step_ev != LUA_NOREF) {
-        lua_rawgeti(gamestate_lua(), LUA_REGISTRYINDEX, step_ev);
-        lua_pushnumber(gamestate_lua(), delta_time);
-        if (lua_pcall(gamestate_lua(), 1, 0, 0) != LUA_OK) {
-            printf("Lua error in on_step: %s\n", lua_tostring(gamestate_lua(), -1));
-            lua_pop(gamestate_lua(), 1);
+        const auto L = gamestate_lua();
+        lua_rawgeti(L, LUA_REGISTRYINDEX, step_ev);
+        lua_pushnumber(L, delta_time);
+        if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+            printf("Lua error in on_step: %s\n", lua_tostring(L, -1));
+            lua_pop(L, 1);
         }
     }
 
@@ -183,11 +186,12 @@ void enemy_step(enemy_t* enemy, float delta_time) {
     if (boundary_hit >= 0) {
         int collide_ev = enemy->event_sys.handlers.on_collide_boundary;
         if (collide_ev != LUA_NOREF) {
-            lua_rawgeti(gamestate_lua(), LUA_REGISTRYINDEX, collide_ev);
-            lua_pushinteger(gamestate_lua(), (lua_Integer)boundary_hit);
-            if (lua_pcall(gamestate_lua(), 1, 0, 0) != LUA_OK) {
-                printf("Lua error in on_collide_boundary: %s\n", lua_tostring(gamestate_lua(), -1));
-                lua_pop(gamestate_lua(), 1);
+            const auto L = gamestate_lua();
+            lua_rawgeti(L, LUA_REGISTRYINDEX, collide_ev);
+            lua_pushinteger(L, (lua_Integer)boundary_hit);
+            if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+                printf("Lua error in on_collide_boundary: %s\n", lua_tostring(L, -1));
+                lua_pop(L, 1);
             }
         }
     }
@@ -215,11 +219,12 @@ void enemy_step(enemy_t* enemy, float delta_time) {
             // Damage event
             int damage_ev = enemy->event_sys.handlers.on_damage;
             if (damage_ev != LUA_NOREF) {
-                lua_rawgeti(gamestate_lua(), LUA_REGISTRYINDEX, damage_ev);
-                lua_pushinteger(gamestate_lua(), (lua_Integer)p->damage);
-                if (lua_pcall(gamestate_lua(), 1, 0, 0) != LUA_OK) {
-                    printf("Lua error in on_damage: %s\n", lua_tostring(gamestate_lua(), -1));
-                    lua_pop(gamestate_lua(), 1);
+                const auto L = gamestate_lua();
+                lua_rawgeti(L, LUA_REGISTRYINDEX, damage_ev);
+                lua_pushinteger(L, (lua_Integer)p->damage);
+                if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+                    printf("Lua error in on_damage: %s\n", lua_tostring(L, -1));
+                    lua_pop(L, 1);
                 }
             }
 
