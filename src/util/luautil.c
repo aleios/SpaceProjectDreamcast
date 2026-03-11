@@ -31,3 +31,21 @@ void lua_readonly_enum(lua_State* L, const char* name, const lua_enum_entry_t* e
     // Setup readonly metatable
     lua_readonly_table(L, name);
 }
+
+bool lua_call_event(lua_State* L, int ref_id, int num_args, int num_results) {
+    if (ref_id == LUA_NOREF) {
+        return true;
+    }
+
+    // Grab function from the registry
+    lua_rawgeti(L, LUA_REGISTRYINDEX, ref_id);
+
+    // Move function before the arguments and thencall it.
+    lua_insert(L, -1 - num_args);
+    if (lua_pcall(L, num_args, num_results, 0) != LUA_OK) {
+        printf("Lua event error (ref: %d): %s\n", ref_id, lua_tostring(L, -1));
+        lua_pop(L, 1);
+        return false;
+    }
+    return true;
+}

@@ -27,3 +27,5 @@ inline bool luaL_optboolean(lua_State* L, int index, bool default_val) {
     luaL_checktype(L, index, LUA_TBOOLEAN);
     return lua_toboolean(L, index);
 }
+
+bool lua_call_event(lua_State* L, int ref_id, int num_args, int num_results);
