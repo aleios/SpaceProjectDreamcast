@@ -3,6 +3,7 @@
 #include "../animator.h"
 #include "../components/collider.h"
 #include "../projectile/weaponset.h"
+#include <lua/lua.h>
 
 typedef struct Player {
     sprite_t sprite;
@@ -40,3 +41,5 @@ SHZ_FORCE_INLINE int player_get_total_weapons(player_t* player) {
 }
 
 void player_render_debug(player_t* player);
+
+void player_register_lua(lua_State* L);

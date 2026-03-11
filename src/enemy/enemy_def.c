@@ -3,80 +3,6 @@
 
 #include "../cache/caches.h"
 
-void enemydef_read_move_ev(file_t def_file, event_t* ev) {
-    uint8_t move_type;
-    fs_read(def_file, &move_type, sizeof(move_type));
-    ev->move.type = move_type;
-
-    float speed;
-    fs_read(def_file, &speed, sizeof(float));
-    ev->move.speed = speed;
-
-    switch(move_type) {
-    case MOVE_POINT: {
-        float x, y;
-        fs_read(def_file, &x, sizeof(float));
-        fs_read(def_file, &y, sizeof(float));
-        ev->move.target = shz_vec2_init(x, y);
-        break;
-    }
-    case MOVE_DIRECTIONAL: {
-        float angle, angle_step, duration;
-        fs_read(def_file, &angle, sizeof(float));
-        fs_read(def_file, &angle_step, sizeof(float));
-        fs_read(def_file, &duration, sizeof(float));
-        ev->move.dir.angle = angle;
-        ev->move.dir.angle_step = angle_step;
-        ev->move.dir.duration = duration;
-        break;
-    }
-    case MOVE_SINE: {
-        float angle, omega, amplitude, duration;
-        fs_read(def_file, &angle, sizeof(float));
-        fs_read(def_file, &omega, sizeof(float));
-        fs_read(def_file, &amplitude, sizeof(float));
-        fs_read(def_file, &duration, sizeof(float));
-        ev->move.sine.angle = angle;
-        ev->move.sine.omega = omega;
-        ev->move.sine.amplitude = amplitude;
-        ev->move.sine.duration = duration;
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void enemydef_read_fire_ev(file_t def_file, event_t* ev) {
-    // Read name
-    char path_buf[256];
-    readutil_readstr(def_file, path_buf, sizeof(path_buf));
-
-    weaponsetdef_t* weapon = weaponsetcache_get(path_buf);
-    if (!weapon) {
-        arch_abort();
-    }
-
-    weaponset_init(&ev->fire.weapon, weapon);
-    weaponset_set_firing(&ev->fire.weapon, true);
-}
-
-void enemydef_read_delay_ev(file_t def_file, event_t* ev) {
-    float time;
-    fs_read(def_file, &time, sizeof(time));
-    ev->delay = time;
-}
-
-void enemydef_read_repeat_ev(file_t def_file, event_t* ev) {
-    uint16_t count;
-    fs_read(def_file, &count, sizeof(count));
-    ev->repeat.count = count;
-
-    uint16_t target;
-    fs_read(def_file, &target, sizeof(target));
-    ev->repeat.target = target;
-}
-
 bool enemydef_init(enemydef_t* def, const char* key) {
     
     char path[256];
@@ -137,41 +63,22 @@ bool enemydef_init(enemydef_t* def, const char* key) {
     }
     def->score = score;
 
-    // Read VM
-    if (!READUTIL_READ_VALIDATE(def_file, def->total_events)) {
+    // Script
+    if (!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
         goto error_close;
     }
+    def->script = scriptcache_get(str_buf);
 
-    for(int i = 0; i < def->total_events; ++i) {
-        event_t* ev = &def->event_stack[i];
-        uint8_t opcode;
-        if (!READUTIL_READ_VALIDATE(def_file, opcode)) {
+    // Weapon slots
+    for (int i = 0; i < ENEMY_WEAPON_SLOTS; ++i) {
+        if (!readutil_readstr(def_file, str_buf, sizeof(str_buf))) {
             goto error_close;
         }
 
-        ev->type = (eventtype_t)opcode;
-
-        switch(ev->type) {
-        case EVENT_MOVE_TO:
-            enemydef_read_move_ev(def_file, ev);
-            break;
-        case EVENT_START_FIRING:
-            enemydef_read_fire_ev(def_file, ev);
-            break;
-        case EVENT_DELAY:
-            enemydef_read_delay_ev(def_file, ev);
-            break;
-        case EVENT_EXIT_SCREEN: {
-            if (!READUTIL_READ_VALIDATE(def_file, ev->exit.speed)) {
-                goto error_close;
-            }
-            break;
-        }
-        case EVENT_REPEAT:
-            enemydef_read_repeat_ev(def_file, ev);
-            break;
-        default:
-            break;
+        if (str_valid(str_buf)) {
+            def->weapon_slots[i] = weaponsetcache_get(str_buf);
+        } else {
+            def->weapon_slots[i] = nullptr;
         }
     }
 

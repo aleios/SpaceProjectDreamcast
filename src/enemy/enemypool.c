@@ -22,7 +22,7 @@ void enemypool_destroy(enemypool_t* pool) {
     free(pool->enemies);
 }
 
-enemy_t* enemypool_spawn(enemypool_t* pool, enemydef_t* def) {
+enemy_t* enemypool_spawn(enemypool_t* pool, enemydef_t* def, shz_vec2_t initial_pos) {
     // Check capacity first. Resize if necessary
     if(pool->total >= pool->capacity) {
         pool->capacity *= 2;
@@ -34,8 +34,8 @@ enemy_t* enemypool_spawn(enemypool_t* pool, enemydef_t* def) {
         }
     }
 
-    enemy_t* enemy = malloc(sizeof(enemy_t));
-    enemy_init(enemy, def, pool->total);
+    enemy_t* enemy = calloc(1, sizeof(enemy_t));
+    enemy_init(enemy, def, pool->total, initial_pos);
     enemy->uid = pool->next_uid;
     pool->next_uid++;
     

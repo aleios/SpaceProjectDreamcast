@@ -5,30 +5,13 @@
   "idle_key": "enemy1_idle",
   "left_key": "",
   "right_key": "",
-  "events": [
-    {
-      "type": "StartFiring",
-      "weapon": "enemy_basic"
-    },
-    {
-      "type": "MoveTo",
-      "angle": 90,
-      "angle_step": 0,
-      "duration": 500,
-      "speed": 0.15,
-      "target": "DIRECTION",
-      "x": 10.0,
-      "y": 100.0
-    },
-    {
-      "type": "MoveTo",
-      "amplitude": 5.0,
-      "angle": 0,
-      "duration": 0,
-      "period": 2.0,
-      "speed": 0.0,
-      "target": "SINE"
-    }
-  ],
-  "score": 1
+  "script": "basic_enemy",
+  "score": 1,
+  "weapon_slots": [
+    "enemy_basic",
+    "",
+    "",
+    "",
+    ""
+  ]
 }

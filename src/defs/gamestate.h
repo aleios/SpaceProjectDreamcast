@@ -8,6 +8,7 @@
 #include "../starfield/starfield.h"
 #include "../collectable/collectablepool.h"
 #include "../util/math.h"
+#include <lua/lua.h>
 
 typedef struct GameState {
     player_t player;
@@ -29,6 +30,8 @@ typedef struct GameState {
 
     int playlist_index;
     bool is_playlist;
+
+    lua_State* lua_state;
 } gamestate_t;
 
 extern gamestate_t g_gamestate;
@@ -66,6 +69,10 @@ SHZ_FORCE_INLINE starfield_t* gamestate_starfield() {
 
 SHZ_FORCE_INLINE level_t* gamestate_level() {
     return &g_gamestate.level;
+}
+
+SHZ_FORCE_INLINE lua_State* gamestate_lua() {
+    return g_gamestate.lua_state;
 }
 
 SHZ_FORCE_INLINE void gamestate_add_health(int health) {

@@ -4,7 +4,8 @@ from dataclasses import dataclass, asdict, field
 from models import (EnemyModel, ProjectileModel, LevelsModel, PlaylistModel,
                     PlayerModel, AnimationModel, WeaponSetModel, FontsModel,
                     CollectablesModel,
-                    SpritesModel, MusicModel, SfxModel)
+                    SpritesModel, MusicModel, SfxModel, ScriptModel)
+
 
 #
 # -- Game settings models --
@@ -79,6 +80,7 @@ playlist_model = PlaylistModel(game_settings)
 
 # Resource models
 fonts = FontsModel()
+scripts = ScriptModel()
 
 # Animation models
 animations = AnimationModel()
@@ -96,6 +98,8 @@ def reload_defs():
     sprites.load(assets_path)
 
     fonts.load(assets_path)
+    scripts.load(assets_path)
+
     animations.load(assets_path)
 
     projectile_defs.load(assets_path)
@@ -121,12 +125,14 @@ def reload_defs():
     print("Defs reloaded")
 
 def save_pending_defs():
+    scripts.save(assets_path)
+    animations.save(assets_path)
+
     collectable_defs.save(assets_path)
     projectile_defs.save(assets_path)
     weaponset_defs.save(assets_path)
     enemy_defs.save(assets_path)
 
-    animations.save(assets_path)
     levels.save(assets_path)
 
     player_def.save(assets_path)

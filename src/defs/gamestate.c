@@ -1,12 +1,59 @@
 #include "gamestate.h"
 #include "../globals.h"
-#include <adx/adx.h>
-
 #include "../gamesettings.h"
 #include "../sound/sound.h"
 #include "../util/readutils.h"
+#include "../util/luautil.h"
+#include "direction.h"
+#include <lua/lualib.h>
 
 gamestate_t g_gamestate;
+
+static void register_lua_types(lua_State* L) {
+
+    // Entity types
+    player_register_lua(L);
+    enemy_register_lua(L);
+
+    // Common types and enums
+    direction_register_lua();
+
+    // Constants
+    {
+        lua_newtable(L);
+        lua_pushnumber(L, SCREEN_WIDTH);
+        lua_setfield(L, -2, "ScreenWidth");
+        lua_pushnumber(L, SCREEN_HEIGHT);
+        lua_setfield(L, -2, "ScreenHeight");
+
+        lua_readonly_table(L, "Constants");
+    }
+}
+
+static int gamestate_score_lua(lua_State* L) {
+
+    // Setter
+    if (lua_gettop(L) > 0) {
+        int v = (int)luaL_checkinteger(L, 1);
+        g_gamestate.score = v;
+        return 0;
+    }
+
+    lua_pushinteger(L, g_gamestate.score);
+    return 1;
+}
+
+static int gamestate_lives_lua(lua_State* L) {
+    // Setter
+    if (lua_gettop(L) > 0) {
+        int v = (int)luaL_checkinteger(L, 1);
+        g_gamestate.lives = v;
+        return 0;
+    }
+
+    lua_pushinteger(L, g_gamestate.lives);
+    return 1;
+}
 
 void gamestate_init() {
 
@@ -14,6 +61,30 @@ void gamestate_init() {
     projectilepool_init(gamestate_player_projpool(), 100, PROJECTILE_POOL_OWNER_PLAYER);
     projectilepool_init(gamestate_enemy_projpool(), 350, PROJECTILE_POOL_OWNER_ENEMY);
     collectablepool_init(gamestate_collectable_pool());
+
+    if (!g_gamestate.lua_state) {
+        g_gamestate.lua_state = luaL_newstate();
+        auto L = g_gamestate.lua_state;
+        luaL_openlibs(L);
+
+        register_lua_types(L);
+
+        // Make player available globally.
+        const auto player_udata = (player_t**)lua_newuserdata(L, sizeof(player_t*));
+        *player_udata = &g_gamestate.player;
+        luaL_setmetatable(L, "PlayerMT");
+        lua_setglobal(L, "player");
+
+        // Game state data
+        {
+            lua_newtable(L);
+            lua_pushcfunction(L, gamestate_score_lua);
+            lua_setfield(L, -2, "score");
+            lua_pushcfunction(L, gamestate_lives_lua);
+            lua_setfield(L, -2, "lives");
+            lua_readonly_table(L, "Game");
+        }
+    }
 }
 
 void gamestate_destroy() {

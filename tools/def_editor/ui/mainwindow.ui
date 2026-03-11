@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabsPages">
       <property name="currentIndex">
-       <number>1</number>
+       <number>5</number>
       </property>
       <widget class="pageGameSettings" name="tab">
        <attribute name="title">
@@ -43,6 +43,11 @@
       <widget class="pageEnemies" name="tab_3">
        <attribute name="title">
         <string>Enemies</string>
+       </attribute>
+      </widget>
+      <widget class="pageScripts" name="tab_9">
+       <attribute name="title">
+        <string>Scripts</string>
        </attribute>
       </widget>
       <widget class="pageCollectables" name="tab_8">
@@ -142,6 +147,12 @@
    <class>pageCollectables</class>
    <extends>QWidget</extends>
    <header>pagecollectables.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pageScripts</class>
+   <extends>QWidget</extends>
+   <header>pagescripts.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -34,6 +34,9 @@ class Ui_MainWindow(object):
         self.tab_3 = pageEnemies()
         self.tab_3.setObjectName("tab_3")
         self.tabsPages.addTab(self.tab_3, "")
+        self.tab_9 = pageScripts()
+        self.tab_9.setObjectName("tab_9")
+        self.tabsPages.addTab(self.tab_9, "")
         self.tab_8 = pageCollectables()
         self.tab_8.setObjectName("tab_8")
         self.tabsPages.addTab(self.tab_8, "")
@@ -63,7 +66,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabsPages.setCurrentIndex(1)
+        self.tabsPages.setCurrentIndex(5)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -74,6 +77,7 @@ class Ui_MainWindow(object):
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_2), _translate("MainWindow", "Projectiles"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_7), _translate("MainWindow", "Weapon Sets"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_3), _translate("MainWindow", "Enemies"))
+        self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_9), _translate("MainWindow", "Scripts"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_8), _translate("MainWindow", "Collectables"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_4), _translate("MainWindow", "Animations"))
         self.tabsPages.setTabText(self.tabsPages.indexOf(self.tab_5), _translate("MainWindow", "Levels"))
@@ -87,4 +91,5 @@ from pagegamesettings import pageGameSettings
 from pageleveleditor import pageLevelEditor
 from pageplayer import pagePlayer
 from pageprojectiles import pageProjectiles
+from pagescripts import pageScripts
 from pageweaponsets import pageWeaponsets
