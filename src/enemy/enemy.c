@@ -78,15 +78,8 @@ void enemy_init(enemy_t* enemy, enemydef_t* def, int pool_index, shz_vec2_t init
 
 void enemy_destroy(enemy_t* enemy) {
 
-    int despawn_ev = enemy->event_sys.handlers.on_despawn;
-    if (despawn_ev != LUA_NOREF) {
-        const auto L = gamestate_lua();
-        lua_rawgeti(L, LUA_REGISTRYINDEX, despawn_ev);
-        if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-            printf("Lua error in on_despawn: %s\n", lua_tostring(L, -1));
-            lua_pop(L, 1);
-        }
-    }
+    // Trigger event
+    lua_call_event(gamestate_lua(), enemy->event_sys.handlers.on_despawn, 0, 0);
 
     // Remove all hooks
     enemy_script_destroy(enemy);
@@ -104,15 +97,7 @@ static shz_vec2_t move_to_point(enemy_t* enemy, enemy_movement_task_t* task, flo
         task->active = false;
 
         // Trigger event
-        int arrive_ev = enemy->event_sys.handlers.on_target_arrive;
-        if (arrive_ev != LUA_NOREF) {
-            const auto L = gamestate_lua();
-            lua_rawgeti(L, LUA_REGISTRYINDEX, arrive_ev);
-            if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-                printf("Lua error in on_target_arrive: %s\n", lua_tostring(L, -1));
-                lua_pop(L, 1);
-            }
-        }
+        lua_call_event(gamestate_lua(), enemy->event_sys.handlers.on_target_arrive, 0, 0);
         return shz_vec2_init(0.0f, 0.0f);
     }
 
@@ -173,12 +158,8 @@ void enemy_step(enemy_t* enemy, float delta_time) {
     const int step_ev = enemy->event_sys.handlers.on_step;
     if (step_ev != LUA_NOREF) {
         const auto L = gamestate_lua();
-        lua_rawgeti(L, LUA_REGISTRYINDEX, step_ev);
         lua_pushnumber(L, delta_time);
-        if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-            printf("Lua error in on_step: %s\n", lua_tostring(L, -1));
-            lua_pop(L, 1);
-        }
+        lua_call_event(L, step_ev, 1, 0);
     }
 
     // Script tasks
@@ -202,12 +183,8 @@ void enemy_step(enemy_t* enemy, float delta_time) {
         int collide_ev = enemy->event_sys.handlers.on_collide_boundary;
         if (collide_ev != LUA_NOREF) {
             const auto L = gamestate_lua();
-            lua_rawgeti(L, LUA_REGISTRYINDEX, collide_ev);
-            lua_pushinteger(L, (lua_Integer)boundary_hit);
-            if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-                printf("Lua error in on_collide_boundary: %s\n", lua_tostring(L, -1));
-                lua_pop(L, 1);
-            }
+            lua_pushnumber(L, boundary_hit);
+            lua_call_event(L, collide_ev, 1, 0);
         }
     }
 
@@ -235,12 +212,8 @@ void enemy_step(enemy_t* enemy, float delta_time) {
             int damage_ev = enemy->event_sys.handlers.on_damage;
             if (damage_ev != LUA_NOREF) {
                 const auto L = gamestate_lua();
-                lua_rawgeti(L, LUA_REGISTRYINDEX, damage_ev);
                 lua_pushinteger(L, (lua_Integer)p->damage);
-                if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-                    printf("Lua error in on_damage: %s\n", lua_tostring(L, -1));
-                    lua_pop(L, 1);
-                }
+                lua_call_event(L, damage_ev, 1, 0);
             }
 
             soundengine_play_sfx(p->hit_sound);

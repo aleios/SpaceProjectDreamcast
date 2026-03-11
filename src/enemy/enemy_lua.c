@@ -95,12 +95,7 @@ void enemy_script_init(enemy_t* enemy, script_t* script) {
     lua_pop(L, 2);
 
     // Call init
-    lua_rawgeti(L, LUA_REGISTRYINDEX, enemy->event_sys.handlers.init);
-    if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-        const char *err = lua_tostring(L, -1);
-        printf("Error in on_init: %s\n", err);
-        lua_pop(L, 1);
-    }
+    lua_call_event(L, enemy->event_sys.handlers.init, 0, 0);
 }
 
 void enemy_script_destroy(enemy_t* enemy) {
