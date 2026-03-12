@@ -30,7 +30,7 @@ void ui_render(ui_t* ui) {
     shz_vec4_t healthbar_pos = shz_vec4_init(0.0f, 0.0f, healthbar_size.x * 2.0f, healthbar_size.y * 2.0f);
     render_textured_quad(ui->tex, ui->healthbar_frame.uv, healthbar_pos, 0.0f);
 
-    for(int i = 0; i < g_gamestate.health; ++i) {
+    for(int i = 0; i < gamestate_get_health(); ++i) {
         shz_vec2_t healthpip_size = ui->healthpip_frame.size;
         render_textured_quad(ui->tex, ui->healthpip_frame.uv, shz_vec4_init(
             4.0f + (((healthpip_size.x * 2.0f) + 2.0f) * i),
@@ -40,7 +40,7 @@ void ui_render(ui_t* ui) {
         ), 0.0f);
     }
 
-    for(int i = 0; i < g_gamestate.lives; ++i) {
+    for(int i = 0; i < gamestate_get_lives(); ++i) {
         shz_vec2_t life_size = ui->life_frame.size;
         render_textured_quad(ui->tex, ui->life_frame.uv, shz_vec4_init(
                 0.0f + ((life_size.x * i) + 2.0f),
@@ -53,6 +53,6 @@ void ui_render(ui_t* ui) {
 
     float y = (healthbar_size.y * 2.0f + 5.0f) + ui->life_frame.size.y;
     char score_buf[50];
-    snprintf(score_buf, sizeof(score_buf), "Score: %d", g_gamestate.score);
+    snprintf(score_buf, sizeof(score_buf), "Score: %d", gamestate_get_score());
     spritefont_render(gamesettings_main_font(), score_buf, shz_vec2_init(0.0f, y), 0xFFFFFFFF);
 }

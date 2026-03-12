@@ -3,6 +3,8 @@
   "max_lives": 3,
   "main_font": "main_font",
   "playlist": [
+    "level1",
+    "level2",
     "level1"
   ]
 }

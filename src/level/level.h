@@ -121,3 +121,5 @@ void level_destroy(level_t* level);
 void level_step(level_t* level, float delta_time);
 
 bool level_finished(const level_t* level);
+
+void level_restart(level_t* level);

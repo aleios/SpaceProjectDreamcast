@@ -7,12 +7,10 @@
 #include "../sound/sound.h"
 #include "../gamesettings.h"
 #include "../globals.h"
-#include "../cache/caches.h"
 #include "../renderer/render_util.h"
-
 #include "../starfield/starfield.h"
-
 #include "../ui/ui.h"
+#include "../menus/menu.h"
 
 ui_t ui;
 
@@ -26,20 +24,41 @@ static playscreen_state_t play_state;
 static float fadeout_timer;
 static float fadeout_start;
 
+static menu_t pause_menu;
+
 static void play_screen_fade_out(float duration) {
     fadeout_timer = duration;
     fadeout_start = duration;
     play_state = PLAY_STATE_FADE_OUT;
 }
 
+static void pause_option_resume() {
+    play_state = PLAY_STATE_PLAYING;
+}
+
+static void pause_option_restart() {
+    gamestate_restart_level();
+    play_state = PLAY_STATE_PLAYING;
+}
+
+static void pause_option_quit() {
+    screens_set(SCREEN_MAINMENU);
+}
+
 void play_screen_init() {
     ui_init(&ui);
 
     play_state = PLAY_STATE_PLAYING;
+
+    menu_init(&pause_menu);
+    menu_add_button(&pause_menu, "Resume", pause_option_resume);
+    menu_add_button(&pause_menu, "Restart", pause_option_restart);
+    menu_add_button(&pause_menu, "Quit", pause_option_quit);
+
+    menu_select_first_enabled(&pause_menu);
 }
 
 void play_screen_cleanup() {
-    //spritefont_destroy(&font);
     ui_destroy(&ui);
 }
 
@@ -58,11 +77,11 @@ void play_screen_enter(void* data) {
     gamestate_init();
 
     if (!continue_playlist) {
-        g_gamestate.score = 0;
+        gamestate_set_score(0);
     }
 
     if(data) {
-        playscreen_data_t* screenData = data;
+        const playscreen_data_t* screenData = data;
 
         g_gamestate.is_playlist = screenData->is_playlist;
 
@@ -120,9 +139,28 @@ void play_screen_leave() {
 static uint32_t prev_state;
 
 void play_screen_do_play(float delta_time) {
-    if (level_finished(gamestate_level())) {
 
+    // Check if dead.
+    if (gamestate_get_health() == 0) {
+        gamestate_add_lives(-1);
+        if(gamestate_get_lives() == 0) {
+            screens_set(SCREEN_MAINMENU);
+            return;
+        }
+        // Restart level
+        gamestate_reset_stats(STATS_RESET_FLAG_SCORE | STATS_RESET_FLAG_WEAPON);
+        gamestate_set_health(gamesettings_max_health());
+        screens_set_with_data(SCREEN_LOAD, &(loadscreen_data_t){
+            .is_playlist = g_gamestate.is_playlist,
+            .level = gamesettings_get_level(g_gamestate.playlist_index), // TODO: Might not be playlist...
+            .playlist_index = g_gamestate.playlist_index
+        });
+        return;
+    }
+
+    if (level_finished(gamestate_level())) {
         play_screen_fade_out(1500.0f);
+        gamestate_commit_stats();
         // TODO: Play victory theme.
         // Fade out the screen
         // Display 'stage clear' text.
@@ -178,6 +216,9 @@ void play_screen_step(float delta_time) {
     case PLAY_STATE_FADE_OUT:
         play_screen_do_fade_out(delta_time);
         break;
+    case PLAY_STATE_PAUSED:
+        menu_step(&pause_menu, delta_time);
+        break;
     default:
         break;
     }
@@ -225,9 +266,13 @@ void play_screen_render_tr() {
 
     // State and UI rendering
     if (play_state == PLAY_STATE_PAUSED) {
-        shz_vec2_t pos = shz_vec2_init(SCREEN_HALF_WIDTH - (16.0f * 3), SCREEN_HALF_HEIGHT);
-
         render_rect(shz_vec4_init(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT), PVR_LIST_TR_POLY, 0x66000000);
+
+        menu_render(&pause_menu);
+
+        // TODO: Might add a title to menu itself...
+        auto pos = menu_get_position(&pause_menu);
+        pos.y -= 24.0f;
         spritefont_render(gamesettings_main_font(), "Paused", pos, 0xFFFFFFFF);
     }
 

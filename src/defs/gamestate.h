@@ -10,6 +10,13 @@
 #include "../util/math.h"
 #include <lua/lua.h>
 
+typedef struct GameStats {
+    int score;
+    int lives;
+    int health;
+    int current_weapon;
+} game_stats_t;
+
 typedef struct GameState {
     player_t player;
 
@@ -18,16 +25,13 @@ typedef struct GameState {
     projectilepool_t player_projectile_pool;
     collectablepool_t collectables;
 
-    level_t level;
     starfield_t starfield;
 
     // Stats
-    int score;
-    int lives;
-    int health;
+    game_stats_t stats;
+    game_stats_t prev_stats;
 
-    int current_weapon;
-
+    level_t level;
     int playlist_index;
     bool is_playlist;
 
@@ -42,6 +46,7 @@ void gamestate_destroy();
 void gamestate_reset();
 
 bool gamestate_set_level(const char* level_name, bool keep_stats);
+void gamestate_restart_level();
 
 SHZ_FORCE_INLINE player_t* gamestate_get_player() {
     return &g_gamestate.player;
@@ -75,26 +80,107 @@ SHZ_FORCE_INLINE lua_State* gamestate_lua() {
     return g_gamestate.lua_state;
 }
 
+//
+// -- Health --
+//
+SHZ_FORCE_INLINE void gamestate_set_health(int health) {
+    g_gamestate.stats.health = iclamp32(health, 0, gamesettings_max_health());
+}
+
 SHZ_FORCE_INLINE void gamestate_add_health(int health) {
-    g_gamestate.health += health;
-    g_gamestate.health = iclamp32(g_gamestate.health, 0, gamesettings_max_health());
+    auto stats = &g_gamestate.stats;
+    stats->health += health;
+    stats->health = iclamp32(stats->health, 0, gamesettings_max_health());
+}
+
+SHZ_FORCE_INLINE int gamestate_get_health() {
+    return g_gamestate.stats.health;
+}
+
+//
+// -- Lives --
+//
+SHZ_FORCE_INLINE void gamestate_set_lives(int lives) {
+    g_gamestate.stats.lives = lives;
 }
 
 SHZ_FORCE_INLINE void gamestate_add_lives(int lives) {
-    g_gamestate.lives += lives;
-    g_gamestate.lives = iclamp32(g_gamestate.lives, 0, gamesettings_max_lives());
+    auto stats = &g_gamestate.stats;
+    stats->lives += lives;
+    stats->lives = iclamp32(stats->lives, 0, gamesettings_max_lives());
+}
+
+SHZ_FORCE_INLINE int gamestate_get_lives() {
+    return g_gamestate.stats.lives;
+}
+
+//
+// -- Weapon --
+//
+SHZ_FORCE_INLINE void gamestate_set_weapon(int weapon) {
+    player_t* player = gamestate_get_player();
+    g_gamestate.stats.current_weapon = iclamp32(weapon, 0, player_get_total_weapons(player)-1);
 }
 
 SHZ_FORCE_INLINE void gamestate_add_weapon_power(int power) {
-    // TODO: All of this should probably be IN the player data.
+    auto stats = &g_gamestate.stats;
     player_t* player = gamestate_get_player();
-    g_gamestate.current_weapon += power;
-    g_gamestate.current_weapon = iclamp32(g_gamestate.current_weapon, 0, player_get_total_weapons(player)-1);
+    stats->current_weapon += power;
+    stats->current_weapon = iclamp32(stats->current_weapon, 0, player_get_total_weapons(player)-1);
+}
+
+SHZ_FORCE_INLINE int gamestate_get_weapon() {
+    return g_gamestate.stats.current_weapon;
+}
+
+//
+// -- Score --
+//
+SHZ_FORCE_INLINE void gamestate_set_score(int score) {
+    g_gamestate.stats.score = score;
 }
 
 SHZ_FORCE_INLINE void gamestate_add_score(int score) {
-    g_gamestate.score += score;
-    if (g_gamestate.score < 0){
-        g_gamestate.score = 0;
+    auto stats = &g_gamestate.stats;
+    stats->score += score;
+    if (stats->score < 0){
+        stats->score = 0;
     }
+}
+
+SHZ_FORCE_INLINE int gamestate_get_score() {
+    return g_gamestate.stats.score;
+}
+
+//
+// -- Stats --
+//
+typedef enum {
+    STATS_RESET_FLAG_SCORE = 1,
+    STATS_RESET_FLAG_LIVES = 2,
+    STATS_RESET_FLAG_HEALTH = 4,
+    STATS_RESET_FLAG_WEAPON = 8,
+    STATS_RESET_FLAG_ALL = STATS_RESET_FLAG_SCORE | STATS_RESET_FLAG_LIVES | STATS_RESET_FLAG_HEALTH | STATS_RESET_FLAG_WEAPON
+} stats_reset_flags_t;
+
+SHZ_FORCE_INLINE void gamestate_reset_stats(stats_reset_flags_t flags) {
+    if (flags & STATS_RESET_FLAG_SCORE) {
+        g_gamestate.stats.score = g_gamestate.prev_stats.score;
+    }
+
+    if (flags & STATS_RESET_FLAG_LIVES) {
+        g_gamestate.stats.lives = g_gamestate.prev_stats.lives;
+    }
+
+    if (flags & STATS_RESET_FLAG_HEALTH) {
+        g_gamestate.stats.health = g_gamestate.prev_stats.health;
+    }
+
+    if (flags & STATS_RESET_FLAG_WEAPON) {
+        g_gamestate.stats.current_weapon = g_gamestate.prev_stats.current_weapon;
+    }
+}
+
+SHZ_FORCE_INLINE void gamestate_commit_stats() {
+    g_gamestate.prev_stats = g_gamestate.stats;
 }

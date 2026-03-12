@@ -56,6 +56,15 @@ void enemypool_clear(enemypool_t* pool) {
     }
 }
 
+void enemypool_reset(enemypool_t* pool) {
+    for (int i = 0; i < pool->total; i++) {
+        enemy_destroy(pool->enemies[i]);
+        free(pool->enemies[i]);
+    }
+    pool->total = 0;
+    pool->next_uid = ENTITY_DYNAMIC_START;
+}
+
 void enemypool_step(enemypool_t* pool, float delta_time) {
 
     // Step over each enemy

@@ -15,6 +15,7 @@ void enemypool_destroy(enemypool_t* pool);
 enemy_t* enemypool_spawn(enemypool_t* pool, enemydef_t* def, shz_vec2_t initial_pos);
 void enemypool_despawn(enemypool_t* pool, enemy_t* enemy);
 void enemypool_clear(enemypool_t* pool);
+void enemypool_reset(enemypool_t* pool);
 
 void enemypool_step(enemypool_t* pool, float delta_time);
 

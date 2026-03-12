@@ -25,6 +25,8 @@ static void menu_recalc_positions(menu_t* menu) {
         item->pos.x = SCREEN_HALF_WIDTH - (menu->max_label_width / 2.0f);
         item->pos.y = SCREEN_HALF_HEIGHT - (total_option_height / 2.0f) + (font->cell_height * i);
     }
+
+    menu->position = menu->total > 0 ? menu->options[0].pos : shz_vec2_init(0.0f, 0.0f);
 }
 
 static void menu_ensure_size(menu_t* menu, int count) {

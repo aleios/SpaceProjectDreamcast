@@ -13,6 +13,8 @@ typedef struct Menu {
     float max_label_width;
 
     float delay;
+
+    shz_vec2_t position;
 } menu_t;
 
 void menu_init(menu_t* menu);
@@ -87,3 +89,7 @@ SHZ_FORCE_INLINE menuoption_t* menu_get_option(menu_t* menu, int index) {
 }
 
 void menu_select_first_enabled(menu_t* menu);
+
+SHZ_FORCE_INLINE shz_vec2_t menu_get_position(menu_t* menu) {
+    return menu->position;
+}

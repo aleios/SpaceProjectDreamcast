@@ -123,7 +123,7 @@ bool level_init(level_t* level, const char* file) {
                  if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
                      goto read_fail;
                  }
-                 ev->event.music.key = strpool_alloc(&level->strpool, str_buf);//strdup(str_buf);
+                 ev->event.music.key = strpool_alloc(&level->strpool, str_buf);
                  fs_read(level_file, &ev->event.music.fade_in, sizeof(ev->event.music.fade_in));
                  fs_read(level_file, &ev->event.music.fade_out, sizeof(ev->event.music.fade_out));
                  break;
@@ -311,4 +311,14 @@ void level_step(level_t* level, float delta_time) {
 bool level_finished(const level_t* level) {
     return level->current_event >= level->total_events &&
            enemypool_active(gamestate_enemy_pool()) == 0;
+}
+
+void level_restart(level_t* level) {
+    level->current_event = 0;
+    level->total_tasks = 0;
+    level->is_blocked = false;
+
+    level->current_pos = 0.0f;
+
+    starfield_set_speed(gamestate_starfield(), STARFIELD_DEFAULT_SPEED);
 }

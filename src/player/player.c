@@ -161,19 +161,7 @@ void player_destroy(player_t* player) {
 void player_explode(player_t* player) {
 
     soundengine_play_sfx(player->boom);
-
-    g_gamestate.lives -= 1;
-    if(g_gamestate.lives == 0) {
-        screens_set(SCREEN_MAINMENU);
-        return;
-    }
-    // Restart level
-    g_gamestate.health = 10;
-    screens_set_with_data(SCREEN_LOAD, &(loadscreen_data_t){
-        .is_playlist = g_gamestate.is_playlist,
-        .level = gamesettings_get_level(g_gamestate.playlist_index), // TODO: Might not be playlist...
-        .playlist_index = g_gamestate.playlist_index
-    });
+    gamestate_set_health(0);
 }
 
 SHZ_FORCE_INLINE void player_check_collision(player_t* player) {
@@ -184,8 +172,8 @@ SHZ_FORCE_INLINE void player_check_collision(player_t* player) {
         projectile_t* p = &projpool->projectiles[i];
 
         if(collider_test_circle(&player->collider, &p->collider)) {
-            g_gamestate.health -= p->damage;
-            if(g_gamestate.health <= 0) {
+            gamestate_add_health(-p->damage);
+            if(gamestate_get_health() == 0) {
                 player_explode(player);
             }
             soundengine_play_sfx(p->hit_sound);
@@ -207,7 +195,7 @@ SHZ_FORCE_INLINE void player_check_collision(player_t* player) {
             // Destroy enemy
             enemypool_despawn(enemy_pool, enemy);
 
-            // Take away a life, explode, set invul frames.
+            // Take away a life, explode.
             player_explode(player);
 
             break;
@@ -269,7 +257,7 @@ void player_step(player_t* player, float delta_time) {
         player->transform.pos.y = new_y;
     }
 
-    weaponset_t* weapon = player_get_weaponset(player, g_gamestate.current_weapon);
+    weaponset_t* weapon = player_get_weaponset(player, gamestate_get_weapon());
     if (weapon) {
         weaponset_set_firing(weapon, acc.firing);
         weaponset_step(weapon, gamestate_player_projpool(), player_get_position(player), delta_time);
@@ -301,12 +289,12 @@ int player_health_lua(lua_State* L) {
     // Setter
     if (lua_gettop(L) >= 2) {
         const auto nh = (int)luaL_checkinteger(L, 2);
-        g_gamestate.health = nh;
+        gamestate_set_health(nh);
         return 0;
     }
 
     // Getter
-    lua_pushinteger(L, g_gamestate.health);
+    lua_pushinteger(L, gamestate_get_health());
     return 1;
 }
 

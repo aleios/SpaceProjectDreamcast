@@ -35,11 +35,11 @@ static int gamestate_score_lua(lua_State* L) {
     // Setter
     if (lua_gettop(L) > 0) {
         int v = (int)luaL_checkinteger(L, 1);
-        g_gamestate.score = v;
+        gamestate_set_score(v);
         return 0;
     }
 
-    lua_pushinteger(L, g_gamestate.score);
+    lua_pushinteger(L, gamestate_get_score());
     return 1;
 }
 
@@ -47,11 +47,11 @@ static int gamestate_lives_lua(lua_State* L) {
     // Setter
     if (lua_gettop(L) > 0) {
         int v = (int)luaL_checkinteger(L, 1);
-        g_gamestate.lives = v;
+        gamestate_set_lives(v);
         return 0;
     }
 
-    lua_pushinteger(L, g_gamestate.lives);
+    lua_pushinteger(L, gamestate_get_lives());
     return 1;
 }
 
@@ -98,24 +98,24 @@ void gamestate_destroy() {
 }
 
 static void gamestate_reset_pools() {
-    enemypool_clear(gamestate_enemy_pool());
+    enemypool_reset(gamestate_enemy_pool());
     projectilepool_clear(gamestate_player_projpool());
     projectilepool_clear(gamestate_enemy_projpool());
     collectablepool_clear(gamestate_collectable_pool());
 }
 
 void gamestate_reset() {
-    //gamestate_reset_pools();
-    g_gamestate.score = 0;
-    g_gamestate.lives = gamesettings_max_lives();
-    g_gamestate.health = gamesettings_max_health();
     g_gamestate.playlist_index = 0;
-    g_gamestate.current_weapon = 0;
+    g_gamestate.stats = (game_stats_t){
+        .score = 0,
+        .lives = gamesettings_max_lives(),
+        .health =  gamesettings_max_health(),
+        .current_weapon = 0
+    };
+    gamestate_commit_stats();
 }
 
 bool gamestate_set_level(const char* level_name, bool keep_stats) {
-
-    //gamestate_reset_pools();
 
     // Find level
     if (!level_init(&g_gamestate.level, level_name)) {
@@ -134,4 +134,20 @@ bool gamestate_set_level(const char* level_name, bool keep_stats) {
     player_set_position(gamestate_get_player(), shz_vec2_init(SCREEN_HALF_WIDTH, SCREEN_HEIGHT - 64.0f));
 
     return true;
+}
+
+void gamestate_restart_level() {
+    gamestate_reset_stats(STATS_RESET_FLAG_ALL);
+    gamestate_reset_pools();
+    level_restart(&g_gamestate.level);
+
+    char mus_path[256];
+    path_build_cd(mus_path, sizeof(mus_path), "music", g_gamestate.level.initial_music, "adx");
+    soundengine_play_mus_ex(mus_path, true, 0.0f, 0.0f);
+
+    // Preload all the levels enemy defs.
+
+    // Preload all the levels projectile defs.
+
+    player_set_position(gamestate_get_player(), shz_vec2_init(SCREEN_HALF_WIDTH, SCREEN_HEIGHT - 64.0f));
 }
