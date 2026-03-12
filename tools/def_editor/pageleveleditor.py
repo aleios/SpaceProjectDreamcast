@@ -134,7 +134,7 @@ class pageLevelEditor(QWidget, Ui_pageLevelEditor):
             res = dlg.exec()
 
             if res:
-                new_music = dlg.tbInitialMusic.text()
+                new_music = dlg.cbInitialMusic.currentText()
                 new_speed = dlg.sbScrollSpeed.value()
 
                 if level_data.get('initial_music') != new_music:
