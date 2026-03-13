@@ -63,77 +63,17 @@ void play_screen_cleanup() {
 }
 
 void play_screen_enter(void* data) {
-
-    bool continue_playlist = false;
-    if (data) {
-        playscreen_data_t* screenData = data;
-        if (screenData->is_playlist && g_gamestate.is_playlist) {
-            continue_playlist = true;
-        }
-    }
-
     play_state = PLAY_STATE_PLAYING;
     fadeout_timer = 0.0f;
-    gamestate_init();
 
-    if (!continue_playlist) {
-        gamestate_set_score(0);
-    }
-
-    if(data) {
-        const playscreen_data_t* screenData = data;
-
-        g_gamestate.is_playlist = screenData->is_playlist;
-
-        // TODO: All the level loading shit needs to go into `load_screen`.
-        if (g_gamestate.is_playlist) {
-            if (!continue_playlist) {
-                g_gamestate.playlist_index = 0;
-            }
-            
-            if (g_gamesettings.total_levels > 0) {
-                const char* level = gamesettings_get_level(g_gamestate.playlist_index);
-                if (!gamestate_set_level(level, continue_playlist)) {
-                    printf("Failed to load playlist level: %s\n", level);
-                    screens_set(SCREEN_MAINMENU);
-                    return;
-                }
-            } else {
-                printf("Playlist empty!\n");
-                screens_set(SCREEN_MAINMENU);
-                return;
-            }
-        } else {
-            printf("Level selected: %s\n", screenData->level);
-
-            if (!gamestate_set_level(screenData->level, false)) {
-                printf("Failed to load level: %s\n", screenData->level);
-                screens_set(SCREEN_MAINMENU);
-                return;
-            }
-        }
-    } else {
-        printf("No data. Default level\n");
-
-        g_gamestate.is_playlist = false;
-        if (!gamestate_set_level("level1", false)) {
-            printf("Failed to load level1\n");
-            screens_set(SCREEN_MAINMENU);
-            return;
-        }
-    }
-
-    starfield_init(gamestate_starfield(), 100, 300);
+    gamestate_setup_playfield();
 }
 
 void play_screen_leave() {
 
     soundengine_stop_mus();
-
     starfield_destroy(gamestate_starfield());
     gamestate_destroy();
-
-    printf("Leaving play screen.\n");
 }
 
 static uint32_t prev_state;
@@ -150,11 +90,12 @@ void play_screen_do_play(float delta_time) {
         // Restart level
         gamestate_reset_stats(STATS_RESET_FLAG_SCORE | STATS_RESET_FLAG_WEAPON);
         gamestate_set_health(gamesettings_max_health());
-        screens_set_with_data(SCREEN_LOAD, &(loadscreen_data_t){
-            .is_playlist = g_gamestate.is_playlist,
-            .level = gamesettings_get_level(g_gamestate.playlist_index), // TODO: Might not be playlist...
-            .playlist_index = g_gamestate.playlist_index
-        });
+
+        if (g_gamestate.is_playlist) {
+            gamestate_load_playlist_level(g_gamestate.playlist_index);
+        } else {
+            gamestate_load_level(g_gamestate.next_level);
+        }
         return;
     }
 
@@ -187,20 +128,10 @@ void play_screen_do_fade_out(float delta_time) {
 
     fadeout_timer -= delta_time;
     if (fadeout_timer <= 0.0f) {
-        if (g_gamestate.is_playlist) {
-            printf("Loading next index\n");
-            g_gamestate.playlist_index++;
-            if (g_gamestate.playlist_index < g_gamesettings.total_levels) {
-                const char* level = gamesettings_get_level(g_gamestate.playlist_index);
-                screens_set_with_data(SCREEN_LOAD, &(loadscreen_data_t){
-                    .level = level,
-                    .is_playlist = true,
-                    .playlist_index = g_gamestate.playlist_index
-                });
-            } else {
-                printf("Playlist finished!\n");
-                screens_set(SCREEN_MAINMENU);
-            }
+
+        int next_level = gamestate_next_level();
+        if (next_level >= 0) {
+            gamestate_load_playlist_level(next_level);
         } else {
             screens_set(SCREEN_MAINMENU);
         }

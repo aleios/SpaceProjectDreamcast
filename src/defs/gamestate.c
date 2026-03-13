@@ -7,6 +7,8 @@
 #include "direction.h"
 #include <lua/lualib.h>
 
+#include "../screens/screens.h"
+
 gamestate_t g_gamestate;
 
 static void register_lua_types(lua_State* L) {
@@ -115,25 +117,16 @@ void gamestate_reset() {
     gamestate_commit_stats();
 }
 
-bool gamestate_set_level(const char* level_name, bool keep_stats) {
-
-    // Find level
-    if (!level_init(&g_gamestate.level, level_name)) {
-        return false;
-    }
+void gamestate_setup_playfield() {
 
     char mus_path[256];
     path_build_cd(mus_path, sizeof(mus_path), "music", g_gamestate.level.initial_music, "adx");
     soundengine_play_mus_ex(mus_path, true, 0.0f, 0.0f);
 
-    // Preload all the levels enemy defs.
-
-    // Preload all the levels projectile defs.
-
     player_init(&g_gamestate.player);
     player_set_position(gamestate_get_player(), shz_vec2_init(SCREEN_HALF_WIDTH, SCREEN_HEIGHT - 64.0f));
 
-    return true;
+    starfield_init(gamestate_starfield(), 100, 300);
 }
 
 void gamestate_restart_level() {
@@ -145,9 +138,25 @@ void gamestate_restart_level() {
     path_build_cd(mus_path, sizeof(mus_path), "music", g_gamestate.level.initial_music, "adx");
     soundengine_play_mus_ex(mus_path, true, 0.0f, 0.0f);
 
-    // Preload all the levels enemy defs.
-
-    // Preload all the levels projectile defs.
-
     player_set_position(gamestate_get_player(), shz_vec2_init(SCREEN_HALF_WIDTH, SCREEN_HEIGHT - 64.0f));
+}
+
+void gamestate_load_level(const char* level_name) {
+    strlcpy(g_gamestate.next_level, level_name, NextLevelStrLen);
+    g_gamestate.is_playlist = false;
+    g_gamestate.playlist_index = 0;
+    screens_set(SCREEN_LOAD);
+}
+
+void gamestate_load_playlist_level(int index) {
+    const char* level = gamesettings_get_level(index);
+
+    if (!level) {
+        screens_set(SCREEN_MAINMENU);
+    }
+
+    strlcpy(g_gamestate.next_level, level, NextLevelStrLen);
+    g_gamestate.is_playlist = true;
+    g_gamestate.playlist_index = index;
+    screens_set(SCREEN_LOAD);
 }

@@ -11,18 +11,12 @@
 
 void mainmenu_start_select() {
     gamestate_reset();
-    screens_set_with_data(SCREEN_LOAD, &(loadscreen_data_t){
-        .is_playlist = true,
-        .level = gamesettings_get_level(0)
-    });
+    gamestate_load_playlist_level(0);
 }
 
 void mainmenu_level_select() {
     gamestate_reset();
-    screens_set_with_data(SCREEN_LOAD, &(loadscreen_data_t){
-        .level = "level1",
-        .is_playlist = false
-    });
+    gamestate_load_level("level2");
 }
 
 void mainmenu_options_select() {

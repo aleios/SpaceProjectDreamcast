@@ -17,6 +17,7 @@ typedef struct GameStats {
     int current_weapon;
 } game_stats_t;
 
+static constexpr int NextLevelStrLen = 256;
 typedef struct GameState {
     player_t player;
 
@@ -35,6 +36,8 @@ typedef struct GameState {
     int playlist_index;
     bool is_playlist;
 
+    char next_level[NextLevelStrLen];
+
     lua_State* lua_state;
 } gamestate_t;
 
@@ -44,9 +47,6 @@ void gamestate_init();
 void gamestate_destroy();
 
 void gamestate_reset();
-
-bool gamestate_set_level(const char* level_name, bool keep_stats);
-void gamestate_restart_level();
 
 SHZ_FORCE_INLINE player_t* gamestate_get_player() {
     return &g_gamestate.player;
@@ -183,4 +183,22 @@ SHZ_FORCE_INLINE void gamestate_reset_stats(stats_reset_flags_t flags) {
 
 SHZ_FORCE_INLINE void gamestate_commit_stats() {
     g_gamestate.prev_stats = g_gamestate.stats;
+}
+
+//
+// -- Level Loading --
+//
+
+void gamestate_setup_playfield();
+void gamestate_restart_level();
+
+void gamestate_load_level(const char* level_name);
+void gamestate_load_playlist_level(int index);
+
+static inline int gamestate_next_level() {
+    if (g_gamestate.is_playlist) {
+        int next_idx = g_gamestate.playlist_index + 1;
+        return next_idx < gamesettings_total_levels() ? next_idx : -1;
+    }
+    return -1;
 }
