@@ -17,12 +17,13 @@ typedef struct SoundEffect {
     uint32_t handle;
 } soundeffect_t;
 
+static constexpr int MusicKeyLen = 256;
 typedef struct SoundEngine {
     float fading_in;
     float fade_in_duration;
     float fading_out;
     float fade_out_duration;
-    char current_music_key[256];
+    char current_music_key[MusicKeyLen];
     bool should_play;
     bool is_looping;
 
@@ -53,7 +54,7 @@ void soundengine_cleanup() {
 }
 
 void soundengine_play_mus_ex(const char* key, bool loop, float fade_in_time, float fade_out_time) {
-    shz_memcpy(g_soundEngine.current_music_key, key, sizeof(g_soundEngine.current_music_key));
+    strlcpy(g_soundEngine.current_music_key, key, MusicKeyLen);
 
     g_soundEngine.should_play = true;
     g_soundEngine.is_looping = loop;
