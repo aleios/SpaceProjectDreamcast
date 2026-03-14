@@ -129,9 +129,7 @@ static void enemy_do_movement(enemy_t* enemy, float delta_time) {
             break;
         }
         case MOVE_DIRECTIONAL: {
-            shz_sincos_t sc = shz_sincosf(move_task->dir.angle);
-            shz_vec2_t dir = shz_vec2_init(sc.cos, sc.sin);
-            velocity = shz_vec2_scale(dir, step_speed);
+            velocity = shz_vec2_scale(shz_vec2_from_angle(move_task->dir.angle), step_speed);
             break;
         }
         case MOVE_PLAYER_TARGET: {
