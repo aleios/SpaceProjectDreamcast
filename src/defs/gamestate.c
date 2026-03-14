@@ -126,7 +126,9 @@ void gamestate_setup_playfield() {
     player_init(&g_gamestate.player);
     player_set_position(gamestate_get_player(), shz_vec2_init(SCREEN_HALF_WIDTH, SCREEN_HEIGHT - 64.0f));
 
-    starfield_init(gamestate_starfield(), 100, 300);
+    if (level_starfield_enabled(gamestate_level())) {
+        starfield_init(gamestate_starfield(), 100, 300, level_starfield_speed(gamestate_level()));
+    }
 }
 
 void gamestate_restart_level() {

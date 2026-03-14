@@ -13,3 +13,6 @@ class LevelSettingsDialog(QDialog, Ui_levelSettingsDialog):
         if idx >= 0:
             self.cbInitialMusic.setCurrentIndex(idx)
         self.sbScrollSpeed.setValue(current_settings.get('scroll_speed', 0))
+
+        self.cbStarfieldEnabled.setChecked(current_settings.get('starfield_enabled', True))
+        self.sbStarfieldSpeed.setValue(current_settings.get('starfield_speed', 0.08))

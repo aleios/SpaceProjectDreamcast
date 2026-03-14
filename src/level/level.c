@@ -39,14 +39,14 @@ static bool level_task_starfield_speed(level_t* level, struct LevelTask* task, f
 
     const float easing = shz_sinf(t * SHZ_F_PI);
 
-    const float current_speed = shz_lerpf(STARFIELD_DEFAULT_SPEED, task->starfield.speed, easing);
+    const float current_speed = shz_lerpf(level->starfield_speed, task->starfield.speed, easing);
     starfield_set_speed(gamestate_starfield(), current_speed);
 
     if (task->starfield.accumulator >= task->starfield.duration) {
         if (task->starfield.block) {
             level->is_blocked = false;
         }
-        starfield_set_speed(gamestate_starfield(), STARFIELD_DEFAULT_SPEED);
+        starfield_set_speed(gamestate_starfield(), level->starfield_speed);
         return true;
     }
     return false;
@@ -171,6 +171,19 @@ bool level_init(level_t* level, const char* file) {
                 goto read_fail;
             }
         }
+
+        // -- Starfield --
+        uint8_t starfield_enabled;
+        if (!READUTIL_READ_VALIDATE(level_file, starfield_enabled)) {
+            goto read_fail;
+        }
+        level->starfield_enabled = starfield_enabled;
+
+        float starfield_speed;
+        if (!READUTIL_READ_VALIDATE(level_file, starfield_speed)) {
+            goto read_fail;
+        }
+        level->starfield_speed = starfield_speed;
 
         fs_close(level_file);
         return true;
@@ -321,5 +334,5 @@ void level_restart(level_t* level) {
 
     level->current_pos = 0.0f;
 
-    starfield_set_speed(gamestate_starfield(), STARFIELD_DEFAULT_SPEED);
+    starfield_set_speed(gamestate_starfield(), level->starfield_speed);
 }

@@ -58,6 +58,8 @@ def parse_level(input_file, output_fname):
     initial_music = data.get("initial_music", "")
     scroll_speed = data.get("scroll_speed", 0.2)
     events = data.get("events", [])
+    starfield_enabled = data.get("starfield_enabled", True)
+    starfield_speed = data.get("starfield_speed", 0.08)
 
     fd, temp_path = tempfile.mkstemp(dir=os.path.dirname(output_fname))
     try:
@@ -98,6 +100,9 @@ def parse_level(input_file, output_fname):
 
                 writer = writers[ev_type]
                 writer(output_file, event_data)
+
+            helpers.write_ubyte(output_file, starfield_enabled)
+            helpers.write_float(output_file, starfield_speed)
 
         # Replace with true file.
         os.replace(temp_path, output_fname)

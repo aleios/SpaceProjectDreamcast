@@ -83,5 +83,7 @@
         "def": "boss"
       }
     }
-  ]
+  ],
+  "starfield_enabled": true,
+  "starfield_speed": 0.09
 }

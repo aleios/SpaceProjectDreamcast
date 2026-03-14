@@ -133,9 +133,12 @@ class pageLevelEditor(QWidget, Ui_pageLevelEditor):
             dlg = LevelSettingsDialog(level_data, self)
             res = dlg.exec()
 
+            # TODO: What in the hell is even this.
             if res:
                 new_music = dlg.cbInitialMusic.currentText()
                 new_speed = dlg.sbScrollSpeed.value()
+                new_starfield_enabled = dlg.cbStarfieldEnabled.isChecked()
+                new_starfield_speed = dlg.sbStarfieldSpeed.value()
 
                 if level_data.get('initial_music') != new_music:
                     mus_idx = defsdb.levels.index(row, LevelsModel.COL_MUSIC)
@@ -145,3 +148,11 @@ class pageLevelEditor(QWidget, Ui_pageLevelEditor):
                     speed_idx = defsdb.levels.index(row, LevelsModel.COL_SPEED)
                     defsdb.levels.setData(speed_idx, new_speed, Qt.ItemDataRole.EditRole)
                     self.gvLevelEditor.update_display()
+
+                if level_data.get('starfield_enabled') != new_starfield_enabled:
+                    sf_enabled_idx = defsdb.levels.index(row, LevelsModel.COL_STARFIELD_ENABLED)
+                    defsdb.levels.setData(sf_enabled_idx, new_starfield_enabled, Qt.ItemDataRole.EditRole)
+
+                if level_data.get('starfield_speed') != new_starfield_speed:
+                    sf_speed_idx = defsdb.levels.index(row, LevelsModel.COL_STARFIELD_SPEED)
+                    defsdb.levels.setData(sf_speed_idx, new_starfield_speed, Qt.ItemDataRole.EditRole)

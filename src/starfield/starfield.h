@@ -3,7 +3,7 @@
 #include <sh4zam/shz_sh4zam.h>
 
 #define STARFIELD_LAYERS 3
-#define STARFIELD_DEFAULT_SPEED 0.08f
+//#define STARFIELD_DEFAULT_SPEED 0.08f
 typedef struct StarfieldLayer {
     shz_vec2_t* stars;
     int total_stars;
@@ -16,7 +16,7 @@ typedef struct Starfield {
     pvr_sprite_hdr_t hdr;
 } starfield_t;
 
-void starfield_init(starfield_t* field, int min_stars, int max_stars);
+void starfield_init(starfield_t* field, int min_stars, int max_stars, float base_speed);
 void starfield_destroy(starfield_t* field);
 
 void starfield_step(starfield_t* field, float delta_time);

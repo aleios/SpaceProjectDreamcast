@@ -113,6 +113,9 @@ typedef struct Level {
 
     leveltask_t task_queue[LEVEL_MAX_TASKS];
     int total_tasks;
+
+    bool starfield_enabled;
+    float starfield_speed;
 } level_t;
 
 bool level_init(level_t* level, const char* file);
@@ -123,3 +126,11 @@ void level_step(level_t* level, float delta_time);
 bool level_finished(const level_t* level);
 
 void level_restart(level_t* level);
+
+SHZ_FORCE_INLINE bool level_starfield_enabled(level_t* level) {
+    return level->starfield_enabled;
+}
+
+SHZ_FORCE_INLINE float level_starfield_speed(level_t* level) {
+    return level->starfield_speed;
+}

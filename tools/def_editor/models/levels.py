@@ -52,7 +52,7 @@ class LevelEventsModel(QAbstractListModel):
         return None
 
 class LevelsModel(QAbstractTableModel):
-    COL_NAME, COL_MUSIC, COL_SPEED, COL_MODIFIED, COL_EVENTS = range(5)
+    COL_NAME, COL_MODIFIED, COL_MUSIC, COL_SPEED, COL_EVENTS, COL_STARFIELD_ENABLED, COL_STARFIELD_SPEED = range(7)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -62,7 +62,7 @@ class LevelsModel(QAbstractTableModel):
         return len(self.levels)
 
     def columnCount(self, parent=QModelIndex()):
-        return 5 # Name, Music, Speed, Modified, Events
+        return 7 # Name, Music, Speed, Modified, Events
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid() or not (0 <= index.row() < len(self.levels)):
@@ -73,10 +73,12 @@ class LevelsModel(QAbstractTableModel):
 
         if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
             if col == self.COL_NAME: return item['name']
+            if col == self.COL_MODIFIED: return item['modified']
             if col == self.COL_MUSIC: return item['initial_music']
             if col == self.COL_SPEED: return item['scroll_speed']
-            if col == self.COL_MODIFIED: return item['modified']
             if col == self.COL_EVENTS: return item['events']
+            if col == self.COL_STARFIELD_ENABLED: return item['starfield_enabled']
+            if col == self.COL_STARFIELD_SPEED: return item['starfield_speed']
         return None
 
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
@@ -85,16 +87,20 @@ class LevelsModel(QAbstractTableModel):
             col = index.column()
             item = self.levels[row]
 
-            if col == self.COL_MUSIC:
-                item['initial_music'] = value
-            elif col == self.COL_SPEED:
-                item['scroll_speed'] = float(value)
-            elif col == self.COL_NAME:
+            if col == self.COL_NAME:
                 item['name'] = value
             elif col == self.COL_MODIFIED:
                 item['modified'] = bool(value)
                 self.dataChanged.emit(index, index, [role])
                 return True
+            elif col == self.COL_MUSIC:
+                item['initial_music'] = value
+            elif col == self.COL_SPEED:
+                item['scroll_speed'] = float(value)
+            elif col == self.COL_STARFIELD_ENABLED:
+                item['starfield_enabled'] = bool(value)
+            elif col == self.COL_STARFIELD_SPEED:
+                item['starfield_speed'] = float(value)
             else:
                 return False
 
@@ -122,7 +128,9 @@ class LevelsModel(QAbstractTableModel):
             "initial_music": "hope",
             "scroll_speed": 0.2,
             "modified": True,
-            "events": []
+            "events": [],
+            "starfield_enabled": True,
+            "starfield_speed": 0.08
         })
         self.endInsertRows()
 
@@ -140,6 +148,8 @@ class LevelsModel(QAbstractTableModel):
                         "initial_music": data.get("initial_music", ""),
                         "scroll_speed": data.get("scroll_speed", 0.2),
                         "events": data.get("events", []),
+                        "starfield_enabled": data.get("starfield_enabled", True),
+                        "starfield_speed": data.get("starfield_speed", 0.08),
                         "modified": False
                     })
                 except json.JSONDecodeError:
@@ -187,7 +197,9 @@ class LevelsModel(QAbstractTableModel):
                     "initial_music": item['initial_music'],
                     "scroll_speed": item['scroll_speed'],
                     "preloads": preloads,
-                    "events": sorted_events
+                    "events": sorted_events,
+                    "starfield_enabled": item['starfield_enabled'],
+                    "starfield_speed": item['starfield_speed']
                 }
                 with open(file_path, "w") as f:
                     json.dump(out_data, f, indent=2, separators=(',', ': '))

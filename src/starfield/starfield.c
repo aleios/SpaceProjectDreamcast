@@ -16,8 +16,8 @@ static uint32_t wang_hash(uint32_t x) {
 #define STARFIELD_LAYER_INCREMENT 0.035f
 #define STARFIELD_JITTER_AMPLITUDE 0.015f
 
-void starfield_init(starfield_t* field, int min_stars, int max_stars) {
-    field->base_speed = STARFIELD_DEFAULT_SPEED;
+void starfield_init(starfield_t* field, int min_stars, int max_stars, float base_speed) {
+    field->base_speed = base_speed;
 
     for(int i = 0; i < STARFIELD_LAYERS; ++i) {
         starfield_layer_t* layer = &field->layers[i];
@@ -43,7 +43,9 @@ void starfield_init(starfield_t* field, int min_stars, int max_stars) {
 void starfield_destroy(starfield_t* field) {
 
     for (int i = 0; i < STARFIELD_LAYERS; ++i) {
-        free(field->layers[i].stars);
+        if (field->layers[i].stars) {
+            free(field->layers[i].stars);
+        }
         field->layers[i].stars = nullptr;
         field->layers[i].total_stars = 0;
     }
