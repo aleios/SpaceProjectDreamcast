@@ -99,78 +99,79 @@ bool level_init(level_t* level, const char* file) {
         level->total_events = num_events;
 
         level->events = malloc(sizeof(levelevent_timepair_t) * num_events);
-         for(int ev_id = 0; ev_id < level->total_events; ++ev_id) {
-             levelevent_timepair_t* ev = &level->events[ev_id];
+        for(int ev_id = 0; ev_id < level->total_events; ++ev_id) {
+            levelevent_timepair_t* ev = &level->events[ev_id];
 
-             // Read position
-             fs_read(level_file, &ev->pos, sizeof(ev->pos));
+         // Read position
+         fs_read(level_file, &ev->pos, sizeof(ev->pos));
 
-             // Read event type
-             uint8_t opcode;
-             fs_read(level_file, &opcode, sizeof(opcode));
-             ev->event.type = (leveleventtype_t)opcode;
+         // Read event type
+         uint8_t opcode;
+         fs_read(level_file, &opcode, sizeof(opcode));
+         ev->event.type = (leveleventtype_t)opcode;
 
-             switch(ev->event.type) {
-             case LEVEL_EVENT_SPAWN: {
-                 if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
-                     printf("Failed to read spawn definition from level file: %s\n", path_buf);
-                     goto read_fail;
-                 }
-                 ev->event.spawn.def = enemydefcache_get(str_buf);
-                 break;
-             }
-             case LEVEL_EVENT_MUSIC: {
-                 if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
-                     goto read_fail;
-                 }
-                 ev->event.music.key = strpool_alloc(&level->strpool, str_buf);
-                 fs_read(level_file, &ev->event.music.fade_in, sizeof(ev->event.music.fade_in));
-                 fs_read(level_file, &ev->event.music.fade_out, sizeof(ev->event.music.fade_out));
-                 break;
-             }
-             case LEVEL_EVENT_DELAY: {
-                 fs_read(level_file, &ev->event.delay.duration, sizeof(ev->event.delay.duration));
-                 break;
-             }
-             case LEVEL_EVENT_WAITCLEAR: {
-                 fs_read(level_file, &ev->event.waitclear.timeout, sizeof(ev->event.waitclear.timeout));
-                 break;
-             }
-             case LEVEL_EVENT_STARFIELD_SPEED: {
-                 fs_read(level_file, &ev->event.starfield.speed, sizeof(ev->event.starfield.speed));
-                 fs_read(level_file, &ev->event.starfield.duration, sizeof(ev->event.starfield.duration));
-                 uint8_t block;
-                 fs_read(level_file, &block, sizeof(block));
-                 ev->event.starfield.block = block != 0;
+        switch(ev->event.type) {
+            case LEVEL_EVENT_SPAWN: {
+                if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
+                    printf("Failed to read spawn definition from level file: %s\n", path_buf);
+                    goto read_fail;
+                }
+                ev->event.spawn.def = enemydefcache_get(str_buf);
+                break;
+            }
+            case LEVEL_EVENT_MUSIC: {
+                if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
+                    goto read_fail;
+                }
+                ev->event.music.key = strpool_alloc(&level->strpool, str_buf);
+                fs_read(level_file, &ev->event.music.fade_in, sizeof(ev->event.music.fade_in));
+                fs_read(level_file, &ev->event.music.fade_out, sizeof(ev->event.music.fade_out));
+                break;
+            }
+            case LEVEL_EVENT_DELAY: {
+                fs_read(level_file, &ev->event.delay.duration, sizeof(ev->event.delay.duration));
+                break;
+            }
+            case LEVEL_EVENT_WAITCLEAR: {
+                fs_read(level_file, &ev->event.waitclear.timeout, sizeof(ev->event.waitclear.timeout));
+                break;
+            }
+            case LEVEL_EVENT_STARFIELD_SPEED: {
+                fs_read(level_file, &ev->event.starfield.speed, sizeof(ev->event.starfield.speed));
+                fs_read(level_file, &ev->event.starfield.duration, sizeof(ev->event.starfield.duration));
+                uint8_t block;
+                fs_read(level_file, &block, sizeof(block));
+                ev->event.starfield.block = block != 0;
 
-                 //printf("Starfield speed: %f, duration: %f, block: %d\n", ev->event.starfield.speed, ev->event.starfield.duration, ev->event.starfield.block);
-                 break;
-             }
-             case LEVEL_EVENT_CLEAR: {
-                 uint8_t player_proj, enemy_proj, enemies, collectables;
-                 fs_read(level_file, &player_proj, sizeof(player_proj));
-                 fs_read(level_file, &enemy_proj, sizeof(enemy_proj));
-                 fs_read(level_file, &enemies, sizeof(enemies));
-                 fs_read(level_file, &collectables, sizeof(collectables));
-                 ev->event.clear.player_projectiles = player_proj != 0;
-                 ev->event.clear.enemy_projectiles = enemy_proj != 0;
-                 ev->event.clear.enemies = enemies != 0;
-                 ev->event.clear.collectables = collectables != 0;
-                 break;
-             }
-             case LEVEL_EVENT_SPAWN_COLLECTABLE: {
-                 if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
-                     printf("Failed to read collectable spawn definition from level file: %s\n", path_buf);
-                     goto read_fail;
-                 }
-                 ev->event.collectable.def = collectabledefcache_get(str_buf);
-                 break;
-             }
-             default:
-                 printf("Failed to read level. Invalid opcode (%d).\n", opcode);
-                 goto read_fail;
-             }
-         }
+                //printf("Starfield speed: %f, duration: %f, block: %d\n", ev->event.starfield.speed, ev->event.starfield.duration, ev->event.starfield.block);
+                break;
+            }
+            case LEVEL_EVENT_CLEAR: {
+                uint8_t player_proj, enemy_proj, enemies, collectables;
+                fs_read(level_file, &player_proj, sizeof(player_proj));
+                fs_read(level_file, &enemy_proj, sizeof(enemy_proj));
+                fs_read(level_file, &enemies, sizeof(enemies));
+                fs_read(level_file, &collectables, sizeof(collectables));
+                ev->event.clear.player_projectiles = player_proj != 0;
+                ev->event.clear.enemy_projectiles = enemy_proj != 0;
+                ev->event.clear.enemies = enemies != 0;
+                ev->event.clear.collectables = collectables != 0;
+                break;
+            }
+            case LEVEL_EVENT_SPAWN_COLLECTABLE: {
+                if (!readutil_readstr(level_file, str_buf, sizeof(str_buf))) {
+                    printf("Failed to read collectable spawn definition from level file: %s\n", path_buf);
+                    goto read_fail;
+                }
+                ev->event.collectable.def = collectabledefcache_get(str_buf);
+                break;
+            }
+            default:
+                printf("Failed to read level. Invalid opcode (%d).\n", opcode);
+                goto read_fail;
+            }
+        }
+
         fs_close(level_file);
         return true;
 read_fail:
