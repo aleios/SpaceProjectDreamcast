@@ -22,8 +22,10 @@ void load_screen_enter(void* data) {
     // Delay for 2s to display title card.
     load_timer = 2000.0f;
 
-    // Initialize level
+    // Ensure gamestate pools and script system are initialized.
     gamestate_init();
+
+    // Initialize level
     if (!level_init(&g_gamestate.level, g_gamestate.next_level)) {
         screens_set(SCREEN_MAINMENU);
     }

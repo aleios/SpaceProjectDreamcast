@@ -193,6 +193,7 @@ void level_destroy(level_t* level) {
     }
 
     free(level->events);
+    level->events = nullptr;
     strpool_destroy(&level->strpool);
 
     level->initial_music = nullptr;
@@ -321,4 +322,10 @@ void level_restart(level_t* level) {
     level->current_pos = 0.0f;
 
     starfield_set_speed(gamestate_starfield(), STARFIELD_DEFAULT_SPEED);
+}
+
+void level_play_initial_music(level_t* level) {
+    char mus_path[256];
+    path_build_cd(mus_path, sizeof(mus_path), "music", level->initial_music, "adx");
+    soundengine_play_mus_ex(mus_path, true, 0.0f, 0.0f);
 }

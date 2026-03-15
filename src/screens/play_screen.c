@@ -70,9 +70,7 @@ void play_screen_enter(void* data) {
 }
 
 void play_screen_leave() {
-
     soundengine_stop_mus();
-    starfield_destroy(gamestate_starfield());
     gamestate_destroy();
 }
 

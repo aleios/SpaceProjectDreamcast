@@ -39,6 +39,8 @@ typedef struct GameState {
     char next_level[NextLevelStrLen];
 
     lua_State* lua_state;
+
+    bool initialized;
 } gamestate_t;
 
 extern gamestate_t g_gamestate;

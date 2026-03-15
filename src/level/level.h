@@ -123,3 +123,5 @@ void level_step(level_t* level, float delta_time);
 bool level_finished(const level_t* level);
 
 void level_restart(level_t* level);
+
+void level_play_initial_music(level_t* level);

@@ -59,51 +59,55 @@ static int gamestate_lives_lua(lua_State* L) {
 
 void gamestate_init() {
 
+    if (g_gamestate.initialized) {
+        return;
+    }
+
+    // Initialize pools
     enemypool_init(gamestate_enemy_pool(), 20);
     projectilepool_init(gamestate_player_projpool(), 100, PROJECTILE_POOL_OWNER_PLAYER);
     projectilepool_init(gamestate_enemy_projpool(), 350, PROJECTILE_POOL_OWNER_ENEMY);
     collectablepool_init(gamestate_collectable_pool());
 
-    if (!g_gamestate.lua_state) {
-        g_gamestate.lua_state = luaL_newstate();
-        auto L = g_gamestate.lua_state;
-        luaL_openlibs(L);
+    player_init(&g_gamestate.player);
 
-        register_lua_types(L);
+    // Setup Lua state
+    g_gamestate.lua_state = luaL_newstate();
+    auto L = g_gamestate.lua_state;
+    luaL_openlibs(L);
 
-        // Make player available globally.
-        const auto player_udata = (player_t**)lua_newuserdata(L, sizeof(player_t*));
-        *player_udata = &g_gamestate.player;
-        luaL_setmetatable(L, "PlayerMT");
-        lua_setglobal(L, "player");
+    register_lua_types(L);
 
-        // Game state data
-        {
-            lua_newtable(L);
-            lua_pushcfunction(L, gamestate_score_lua);
-            lua_setfield(L, -2, "score");
-            lua_pushcfunction(L, gamestate_lives_lua);
-            lua_setfield(L, -2, "lives");
-            lua_readonly_table(L, "Game");
-        }
+    // Make player available globally.
+    const auto player_udata = (player_t**)lua_newuserdata(L, sizeof(player_t*));
+    *player_udata = &g_gamestate.player;
+    luaL_setmetatable(L, "PlayerMT");
+    lua_setglobal(L, "player");
+
+    // Game state data
+    {
+        lua_newtable(L);
+        lua_pushcfunction(L, gamestate_score_lua);
+        lua_setfield(L, -2, "score");
+        lua_pushcfunction(L, gamestate_lives_lua);
+        lua_setfield(L, -2, "lives");
+        lua_readonly_table(L, "Game");
     }
+
+    g_gamestate.initialized = true;
+}
+
+static void gamestate_reset_pools() {
+    projectilepool_clear(gamestate_player_projpool());
+    projectilepool_clear(gamestate_enemy_projpool());
+    enemypool_reset(gamestate_enemy_pool());
+    collectablepool_clear(gamestate_collectable_pool());
 }
 
 void gamestate_destroy() {
     level_destroy(&g_gamestate.level);
-    player_destroy(&g_gamestate.player);
-
-    projectilepool_destroy(gamestate_enemy_projpool());
-    projectilepool_destroy(gamestate_player_projpool());
-    enemypool_destroy(&g_gamestate.enemies);
-    collectablepool_destroy(&g_gamestate.collectables);
-}
-
-static void gamestate_reset_pools() {
-    enemypool_reset(gamestate_enemy_pool());
-    projectilepool_clear(gamestate_player_projpool());
-    projectilepool_clear(gamestate_enemy_projpool());
-    collectablepool_clear(gamestate_collectable_pool());
+    starfield_destroy(gamestate_starfield());
+    gamestate_reset_pools();
 }
 
 void gamestate_reset() {
@@ -118,14 +122,8 @@ void gamestate_reset() {
 }
 
 void gamestate_setup_playfield() {
-
-    char mus_path[256];
-    path_build_cd(mus_path, sizeof(mus_path), "music", g_gamestate.level.initial_music, "adx");
-    soundengine_play_mus_ex(mus_path, true, 0.0f, 0.0f);
-
-    player_init(&g_gamestate.player);
+    level_play_initial_music(gamestate_level());
     player_set_position(gamestate_get_player(), shz_vec2_init(SCREEN_HALF_WIDTH, SCREEN_HEIGHT - 64.0f));
-
     starfield_init(gamestate_starfield(), 100, 300);
 }
 
