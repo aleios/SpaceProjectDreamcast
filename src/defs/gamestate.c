@@ -130,11 +130,7 @@ void gamestate_setup_playfield() {
 void gamestate_restart_level() {
     gamestate_reset_stats(STATS_RESET_FLAG_ALL);
     gamestate_reset_pools();
-    level_restart(&g_gamestate.level);
-
-    char mus_path[256];
-    path_build_cd(mus_path, sizeof(mus_path), "music", g_gamestate.level.initial_music, "adx");
-    soundengine_play_mus_ex(mus_path, true, 0.0f, 0.0f);
+    level_restart(gamestate_level());
 
     player_set_position(gamestate_get_player(), shz_vec2_init(SCREEN_HALF_WIDTH, SCREEN_HEIGHT - 64.0f));
 }

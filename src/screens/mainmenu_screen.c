@@ -38,9 +38,7 @@ void mainmenu_screen_cleanup() {
 }
 
 void mainmenu_screen_enter(void* data) {
-    char mus_path[256];
-    path_build_cd(mus_path, sizeof(mus_path), "music", "synth_kobra", "adx");
-    soundengine_play_mus(mus_path, true);
+    soundengine_play_mus("synth_kobra", true);
 
     menu_select_first_enabled(&main_menu);
 }

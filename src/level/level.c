@@ -217,9 +217,7 @@ static void level_process_event(level_t* level, levelevent_timepair_t* pair) {
         break;
     }
     case LEVEL_EVENT_MUSIC: {
-        char mus_path[256];
-        path_build_cd(mus_path, sizeof(mus_path), "music", ev->music.key, "adx");
-        soundengine_play_mus_ex(mus_path, true, ev->music.fade_in, ev->music.fade_out);
+        soundengine_play_mus_ex(ev->music.key, true, ev->music.fade_in, ev->music.fade_out);
         break;
     }
     case LEVEL_EVENT_DELAY: {
@@ -322,10 +320,10 @@ void level_restart(level_t* level) {
     level->current_pos = 0.0f;
 
     starfield_set_speed(gamestate_starfield(), STARFIELD_DEFAULT_SPEED);
+
+    level_play_initial_music(level);
 }
 
 void level_play_initial_music(level_t* level) {
-    char mus_path[256];
-    path_build_cd(mus_path, sizeof(mus_path), "music", level->initial_music, "adx");
-    soundengine_play_mus_ex(mus_path, true, 0.0f, 0.0f);
+    soundengine_play_mus_ex(level->initial_music, true, 0.0f, 0.0f);
 }

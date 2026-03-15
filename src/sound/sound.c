@@ -119,7 +119,9 @@ void soundengine_step(float delta_time) {
 
     if (g_soundEngine.should_play) {
         adx_stop();
-        if (!adx_dec(g_soundEngine.current_music_key, g_soundEngine.is_looping)) {
+        char mus_path[512];
+        path_build_cd(mus_path, sizeof(mus_path), "music", g_soundEngine.current_music_key, "adx");
+        if (!adx_dec(mus_path, g_soundEngine.is_looping)) {
             g_soundEngine.should_play = false;
             g_soundEngine.fading_in = 0.0f;
             return;
