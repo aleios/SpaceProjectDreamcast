@@ -27,8 +27,8 @@ static resourcecache_entry_t* resourcecache_find_entry(resourcecache_t* cache, c
     if (!cache || !cache->entries || !key)
         return nullptr;
 
-    const uint32_t hash = resourcecache_get_hash(key);
-    uint32_t idx  = resourcecache_get_index(cache, hash);
+    const auto hash = resourcecache_get_hash(key);
+    auto idx  = resourcecache_get_index(cache, hash);
 
     for (;;) {
         const auto entry = &cache->entries[idx];
