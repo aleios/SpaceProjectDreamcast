@@ -33,10 +33,7 @@ static resourcecache_entry_t* resourcecache_find_entry(resourcecache_t* cache, c
     for (;;) {
         const auto entry = &cache->entries[idx];
 
-        if (!entry->key)
-            return entry;
-
-        if (strcmp(entry->key, key) == 0)
+        if (!entry->key || strcmp(entry->key, key) == 0)
             return entry;
 
         idx++;
