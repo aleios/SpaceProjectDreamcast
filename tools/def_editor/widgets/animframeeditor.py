@@ -24,6 +24,7 @@ class AnimFrameEditor(QGraphicsView):
         self.origin_plus = []
 
     def set_texture(self, tex):
+        from tools.def_editor.models.sprites import make_texture_path
         scene = self._scene
         if not scene:
             print("Error: No scene.")
@@ -31,7 +32,7 @@ class AnimFrameEditor(QGraphicsView):
 
         scene.clear()
 
-        self.tex_path = os.path.join(defsdb.assets_path, "sprites", f"{tex}.png")
+        self.tex_path = make_texture_path(tex)#os.path.join(defsdb.assets_path, "sprites", f"{tex}.png")
         self.texture = QPixmap(self.tex_path)
 
         if not self.texture.isNull():

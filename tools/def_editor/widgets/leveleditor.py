@@ -1,31 +1,68 @@
-from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsItem, QMenu
-from PyQt6.QtGui import QPen, QBrush, QColor, QTransform
-from PyQt6.QtCore import Qt, QTimer, QPoint, QElapsedTimer, pyqtSignal
+from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsItem, QMenu, QStyleOption, QStyle
+from PyQt6.QtGui import QPen, QBrush, QColor, QTransform, QPixmap
+from PyQt6.QtCore import Qt, QTimer, QPoint, QElapsedTimer, pyqtSignal, QRectF
 
 from tools.def_editor import defsdb
 from tools.def_editor.models.levels import LevelsModel
+from tools.def_editor.models.sprites import make_texture_path
 
+pixmap_cache = {}
 
 class EventGraphicsItem(QGraphicsRectItem):
     def __init__(self, event, parent):
-        super().__init__(-4, -4, 8, 8)
         self.event = event
         self.editor = parent
         self._ignore_changes = False
 
+        self.pixmap = None
+        self.frame = QRectF(0, 0, 8, 8)
+
+        ev_data = self.event['event']
+        ev_type = ev_data['type']
+
+        if ev_type == 'spawn':
+            def_name = self.event['event']['def']
+            enemy_def = defsdb.enemy_defs.find_by_name(def_name)
+            if enemy_def is not None:
+                anim = defsdb.animations.find_by_name(enemy_def['animation'])
+
+                tex_key = anim['texture']
+                tex_path = make_texture_path(tex_key)
+
+                # Find based on the idle key
+                idle_key = enemy_def['idle_key']
+                clips = anim['clips']
+                idle_clip = None
+                for x in clips:
+                    if x['name'] == idle_key:
+                        idle_clip = x
+
+                anim_frame = idle_clip['frames'][0]
+
+                # TODO: Probably need the clip origin...
+                self.frame = QRectF(anim_frame[0], anim_frame[1], anim_frame[2], anim_frame[3])
+
+                self.pixmap = pixmap_cache.get(tex_key, None)
+                if not self.pixmap:
+                    self.pixmap = pixmap_cache[tex_key] = QPixmap(tex_path)
+
+
+        super().__init__(-self.frame.width() / 2.0, -self.frame.height() / 2.0, self.frame.width(), self.frame.height())
         self.setFlags(
             QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
             QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
             QGraphicsItem.GraphicsItemFlag.ItemSendsGeometryChanges
         )
-        self.setBrush(QBrush(QColor(255, 0, 0)))
-        self.setPen(QPen(Qt.GlobalColor.white, 1))
+
+        if not self.pixmap:
+            self.setBrush(QBrush(QColor(255, 0, 0)))
+        self.setPen(QPen(Qt.GlobalColor.white, 1.0, Qt.PenStyle.SolidLine))
 
     def set_active(self, active):
         if active:
-            self.setBrush(QBrush(QColor(255, 255, 0))) # yellow = active
+            self.setPen(QPen(QColor(255, 255, 0), 1.0, Qt.PenStyle.SolidLine))
         else:
-            self.setBrush(QBrush(QColor(255, 0, 0))) # red = inactive
+            self.setPen(QPen(QColor(255, 255, 255), 1.0, Qt.PenStyle.SolidLine))
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -66,6 +103,17 @@ class EventGraphicsItem(QGraphicsRectItem):
                     return new_pos
 
         return super().itemChange(change, value)
+    def paint(self, painter, option, widget):
+
+        if self.pixmap:
+            painter.drawPixmap(
+                self.rect(),
+                self.pixmap,
+                self.frame
+            )
+        # Remove that stupid dashed line
+        option.state &= ~QStyle.StateFlag.State_Selected
+        super().paint(painter, option, widget)
 
 class LevelEditor(QGraphicsView):
     eventSelected = pyqtSignal(int)
@@ -415,6 +463,14 @@ class LevelEditor(QGraphicsView):
                 if is_major:
                     painter.drawText(self.tick_margin_x + tick_len + 4, int(y)+2, f"{t}px")
 
+    def draw_timeline_info(self, painter):
+        # Get current scroll speed
+        scroll_speed = 0.0
+        if self.model and self.level_row >= 0:
+            idx = defsdb.levels.index(self.level_row, LevelsModel.COL_SPEED)
+            if idx.isValid():
+                scroll_speed = defsdb.levels.data(idx, Qt.ItemDataRole.EditRole) or 0.0
+
         # Current timeline position
         if scroll_speed > 0.0:
             label_text = f"{int(self.current_pos)} px ({int(self.current_pos / scroll_speed)}ms)"
@@ -453,6 +509,10 @@ class LevelEditor(QGraphicsView):
         spawn_y = self.world_to_screen_y(self.current_pos)
         painter.drawLine(0, int(spawn_y), 640, int(spawn_y))
 
+    def drawForeground(self, painter, rect):
+        super().drawForeground(painter, rect)
+
+        self.draw_timeline_info(painter)
 
     def drawBackground(self, painter, rect):
         super().drawBackground(painter, rect)

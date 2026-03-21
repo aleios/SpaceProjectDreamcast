@@ -69,6 +69,7 @@ typedef struct LevelEvent {
 typedef struct LevelEventTimePair {
     levelevent_t event;
     shz_vec2_t pos;
+    float activation_offset;
 } levelevent_timepair_t;
 
 typedef enum LevelTaskType {

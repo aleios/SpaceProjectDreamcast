@@ -394,3 +394,9 @@ class AnimationModel(QAbstractTableModel):
     def exists(self, key):
         from tools.def_editor import defsdb
         return bool([x for x in self._data_list if x['name'] == key]) or os.path.isfile(defsdb.assets_path + "/animations/" + key + ".json")
+
+    def find_by_name(self, name):
+        for x in self._data_list:
+            if x['name'] == name:
+                return x
+        return None
