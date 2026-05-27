@@ -11,3 +11,4 @@ build
 .idea
 
 tools/def_editor/settings.json
+tools/def_editor/ui/*.py
