@@ -20,47 +20,47 @@
       <property name="currentIndex">
        <number>5</number>
       </property>
-      <widget class="pageGameSettings" name="tab">
+      <widget class="pageGameSettings" name="tabGameSettings">
        <attribute name="title">
         <string>Game Settings</string>
        </attribute>
       </widget>
-      <widget class="pagePlayer" name="tab_6">
+      <widget class="pagePlayer" name="tabPlayer">
        <attribute name="title">
         <string>Player</string>
        </attribute>
       </widget>
-      <widget class="pageProjectiles" name="tab_2">
+      <widget class="pageProjectiles" name="tabProjectiles">
        <attribute name="title">
         <string>Projectiles</string>
        </attribute>
       </widget>
-      <widget class="pageWeaponsets" name="tab_7">
+      <widget class="pageWeaponsets" name="tabWeaponsets">
        <attribute name="title">
         <string>Weapon Sets</string>
        </attribute>
       </widget>
-      <widget class="pageEnemies" name="tab_3">
+      <widget class="pageEnemies" name="tabEnemies">
        <attribute name="title">
         <string>Enemies</string>
        </attribute>
       </widget>
-      <widget class="pageScripts" name="tab_9">
+      <widget class="pageScripts" name="tabScripts">
        <attribute name="title">
         <string>Scripts</string>
        </attribute>
       </widget>
-      <widget class="pageCollectables" name="tab_8">
+      <widget class="pageCollectables" name="tabCollectables">
        <attribute name="title">
         <string>Collectables</string>
        </attribute>
       </widget>
-      <widget class="pageAnimations" name="tab_4">
+      <widget class="pageAnimations" name="tabAnimations">
        <attribute name="title">
         <string>Animations</string>
        </attribute>
       </widget>
-      <widget class="pageLevelEditor" name="tab_5">
+      <widget class="pageLevelEditor" name="tabLevelEditor">
        <attribute name="title">
         <string>Levels</string>
        </attribute>

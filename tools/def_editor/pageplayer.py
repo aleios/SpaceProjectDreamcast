@@ -2,9 +2,10 @@ from PyQt6.QtCore import QModelIndex, Qt
 from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QInputDialog
 
 from tools.def_editor import defsdb
+from tools.def_editor.util import TabsFinderMixin
 from ui.Player import Ui_pagePlayer
 
-class pagePlayer(QWidget, Ui_pagePlayer):
+class pagePlayer(QWidget, Ui_pagePlayer, TabsFinderMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
@@ -78,19 +79,9 @@ class pagePlayer(QWidget, Ui_pagePlayer):
         if not weapon_name:
             return
 
-        # Find the main window and then try to switch to weapon sets tab
-        parent = self.parent()
-        while parent and not hasattr(parent, 'tabsPages'):
-            parent = parent.parent()
-
-        if parent:
-            parent.tabsPages.setCurrentIndex(3) # TODO: Not exactly the most stable index in the world.
-            from pageweaponsets import pageWeaponsets
-            for i in range(parent.tabsPages.count()):
-                widget = parent.tabsPages.widget(i)
-                if isinstance(widget, pageWeaponsets):
-                    widget.select_weaponset(weapon_name)
-                    break
+        # Navigate user to weaponset tab and then select the weaponset on the tab
+        from pageweaponsets import pageWeaponsets
+        self.navigate_to_tab(pageWeaponsets, lambda w: w.select_weaponset(weapon_name))
 
     def add_weapon_set(self):
         items = []

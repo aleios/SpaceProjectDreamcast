@@ -37,6 +37,11 @@ class pageScripts(QWidget, Ui_pageScripts):
         else:
             self.stackedControls.setCurrentIndex(0)
 
+    def select_script_by_index(self, index):
+        idx = defsdb.scripts.index(index, 0)
+        if idx.isValid():
+            self.lvScripts.setCurrentIndex(idx)
+
     def new_script(self):
         val, res = QInputDialog.getText(self, "Add script...", "Name")
         val = val.strip()

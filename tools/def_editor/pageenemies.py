@@ -4,11 +4,12 @@ from PyQt6.QtWidgets import QWidget, QInputDialog, QMessageBox, QDataWidgetMappe
 from tools.def_editor import defsdb
 from tools.def_editor.models import ClipListModel, BlankFieldProxyModel
 from tools.def_editor.models.enemy import TOTAL_WEAPON_SLOTS
+from tools.def_editor.util import TabsFinderMixin
 from tools.def_editor.widgets.datacombobox import DataComboBox
 from ui.Enemies import Ui_pageEnemies
 
 
-class pageEnemies(QWidget, Ui_pageEnemies):
+class pageEnemies(QWidget, Ui_pageEnemies, TabsFinderMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
@@ -64,6 +65,8 @@ class pageEnemies(QWidget, Ui_pageEnemies):
 
         # Add enemies
         self.btnAddEnemy.clicked.connect(self.add_enemy)
+
+        self.btnScriptSource.clicked.connect(self.view_script_source)
 
     def on_animation_changed(self, index):
         if index < 0 or self.cbAnimation.signalsBlocked():
@@ -164,3 +167,9 @@ class pageEnemies(QWidget, Ui_pageEnemies):
             self.controlStack.setCurrentIndex(1)
         else:
             self.controlStack.setCurrentIndex(0)
+
+    def view_script_source(self):
+        script_id = self.cbScript.currentIndex()
+        if script_id >= 0:
+            from pagescripts import pageScripts
+            self.navigate_to_tab(pageScripts, lambda w: w.select_script_by_index(script_id))
