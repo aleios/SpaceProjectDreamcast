@@ -25,6 +25,11 @@ def parse_collectable(input_file, output_fname):
         helpers.write_byte(output_file, settings.get('weapon', 0))
         helpers.write_short(output_file, settings.get('score', 0))
 
+        script_data = settings.get('script', '')
+        script_len = len(script_data)
+        helpers.write_uint(output_file, script_len)
+        output_file.write(script_data.encode('latin-1'))
+
 def main():
     input_fname = sys.argv[-2]
     output_fname = sys.argv[-1]

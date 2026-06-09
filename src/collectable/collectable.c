@@ -23,6 +23,8 @@ void collectable_init(collectable_t* collectable, collectabledef_t* def) {
     collectable->sfx = def->sfx;
 
     collectable->speed = def->speed;
+
+    collectable->script = &def->script;
 }
 
 void collectable_destroy(collectable_t* collectable) {

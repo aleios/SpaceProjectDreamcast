@@ -57,6 +57,17 @@ static int gamestate_lives_lua(lua_State* L) {
     return 1;
 }
 
+static int gamestate_weaponpower_lua(lua_State* L) {
+    // Setter
+    if (lua_gettop(L) > 0) {
+        int v = (int)luaL_checkinteger(L, 1);
+        gamestate_set_weapon(v);
+        return 0;
+    }
+    lua_pushinteger(L, gamestate_get_weapon());
+    return 1;
+}
+
 void gamestate_init() {
 
     enemypool_init(gamestate_enemy_pool(), 20);
@@ -84,6 +95,8 @@ void gamestate_init() {
             lua_setfield(L, -2, "score");
             lua_pushcfunction(L, gamestate_lives_lua);
             lua_setfield(L, -2, "lives");
+            lua_pushcfunction(L, gamestate_weaponpower_lua);
+            lua_setfield(L, -2, "weaponpower");
             lua_readonly_table(L, "Game");
         }
     }

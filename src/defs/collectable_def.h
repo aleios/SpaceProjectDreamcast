@@ -1,5 +1,6 @@
 #pragma once
 #include "../components/animation.h"
+#include "../scripting/script.h"
 
 typedef struct CollectableDef {
     animation_t* anim;
@@ -14,6 +15,8 @@ typedef struct CollectableDef {
     int lives;
     int weapon;
     int score;
+
+    script_t script;
 } collectabledef_t;
 
 bool collectabledef_init(collectabledef_t *def, const char* key);

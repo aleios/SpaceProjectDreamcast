@@ -20,6 +20,9 @@ def write_ushort(output_file, val):
 def write_short(output_file, val):
     output_file.write(struct.pack("<h", val))
 
+def write_uint(output_file, val):
+    output_file.write(struct.pack("<I", val))
+
 def write_magicnum(output_file, magicnum):
     output_file.write(magicnum.encode())
 

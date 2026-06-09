@@ -128,7 +128,6 @@ class DefModel(QAbstractTableModel):
                 for k in META_KEYS: save_data.pop(k, None)
 
                 self.process_item(save_data)
-                
                 with open(path, "w") as f:
                     json.dump(save_data, f, indent=2, separators=(',', ': '))
                 

@@ -96,7 +96,6 @@ int main(int argc, char** argv) {
     vid_set_mode(DM_640x480, PM_RGB565);
     pvr_init(&pvr_params);
     pvr_set_bg_color(0.05f, 0.05f, 0.05f);
-    vid_border_color(10, 10, 10);
 
     gamesettings_load();
     soundengine_init();
@@ -112,7 +111,6 @@ int main(int argc, char** argv) {
 
     uint64_t last_time = timer_ns_gettime64();
     for(;;) {
-
         // -- Delta time (ms) --
         uint64_t current_time = timer_ns_gettime64();
         float delta_time = (float)(current_time - last_time);
