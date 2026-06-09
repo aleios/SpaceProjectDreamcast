@@ -152,6 +152,20 @@
                </property>
               </widget>
              </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>Script</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QPushButton" name="btnEditScript">
+               <property name="text">
+                <string>Edit Source</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

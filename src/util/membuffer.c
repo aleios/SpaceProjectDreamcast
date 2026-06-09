@@ -26,6 +26,10 @@ void membuffer_init(membuffer_t* buf, int initial_capacity) {
 }
 
 void membuffer_destroy(membuffer_t* buf) {
+    if (!buf) {
+        return;
+    }
+
     if (buf->data) {
         free(buf->data);
     }

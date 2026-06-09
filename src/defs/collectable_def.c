@@ -86,7 +86,28 @@ bool collectabledef_init(collectabledef_t *def, const char* key) {
     }
     def->score = score;
 
+    // Load script
+    uint32_t script_size;
+    if (!READUTIL_READ_VALIDATE(file, script_size)) {
+        goto error_close;
+    }
+    if (script_size > 0) {
+        membuffer_t script_buffer;
+        membuffer_init(&script_buffer, script_size+1);
 
+        auto read_bytes = fs_read(file, script_buffer.data, script_size);
+        if (read_bytes < 0 || read_bytes < script_size) {
+            membuffer_destroy(&script_buffer);
+            goto error_close;
+        }
+        script_buffer.data[read_bytes] = '\0';
+
+        if (!script_init_from_memory(&def->script, &script_buffer)) {
+            membuffer_destroy(&script_buffer);
+            goto error_close;
+        }
+        membuffer_destroy(&script_buffer);
+    }
     fs_close(file);
     return true;
 error_close:
@@ -96,6 +117,8 @@ error_close:
 }
 
 void collectabledef_destroy(collectabledef_t* def) {
+
+    script_destroy(&def->script);
 
     animcache_release(def->anim);
     def->anim = nullptr;

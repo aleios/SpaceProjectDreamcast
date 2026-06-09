@@ -21,6 +21,7 @@ typedef struct Collectable {
     int lives;
     int weapon;
     int score;
+    script_t* script;
 } collectable_t;
 
 void collectable_init(collectable_t* collectable, collectabledef_t* def);

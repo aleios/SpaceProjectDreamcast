@@ -8,5 +8,6 @@
   "weapon": 0,
   "speed": 0.1,
   "pickup_sound": "pickup",
-  "score": 0
+  "score": 0,
+  "script": "if player:health() == 10 then\n\tplayer:health(2)\nend"
 }

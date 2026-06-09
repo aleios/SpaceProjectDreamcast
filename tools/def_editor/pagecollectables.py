@@ -1,8 +1,9 @@
-from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QMessageBox, QInputDialog
+from PyQt6.QtWidgets import QWidget, QDataWidgetMapper, QMessageBox, QInputDialog, QDialog
 from PyQt6.QtCore import Qt
 
 from tools.def_editor import defsdb
 from models import CollectablesModel, ClipListModel, OptionalComboProxyModel
+from scripteditordialog import ScriptEditorDialog
 from ui.Collectables import Ui_pageCollectables
 
 class pageCollectables(QWidget, Ui_pageCollectables):
@@ -35,6 +36,8 @@ class pageCollectables(QWidget, Ui_pageCollectables):
         self.mapper.addMapping(self.sbLives, CollectablesModel.COL_EFFECT_LIVES)
         self.mapper.addMapping(self.sbWeaponPower, CollectablesModel.COL_EFFECT_WEAPON)
         self.mapper.addMapping(self.sbScore, CollectablesModel.COL_EFFECT_SCORE)
+
+        self.btnEditScript.clicked.connect(self.edit_script)
 
         self.mapper.setCurrentIndex(0)
         self.sfx_model.set_row(0)
@@ -84,3 +87,13 @@ class pageCollectables(QWidget, Ui_pageCollectables):
         proj_idx = self.lvCollectables.currentIndex()
         if proj_idx.isValid():
             defsdb.projectile_defs.set_animation(proj_idx.row(), self.cbAnimation.currentText())
+
+    def edit_script(self):
+        proj_idx = self.lvCollectables.currentIndex()
+        if proj_idx.isValid():
+            script = defsdb.collectable_defs.get_script(proj_idx.row())
+            script_dialog = ScriptEditorDialog(self)
+            script_dialog.set_script(script)
+            if script_dialog.exec():
+                new_script = script_dialog.get_script()
+                defsdb.collectable_defs.set_script(proj_idx.row(), new_script)

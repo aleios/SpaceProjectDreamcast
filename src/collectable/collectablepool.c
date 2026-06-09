@@ -83,6 +83,16 @@ void collectablepool_step(collectablepool_t* pool, float delta_time) {
             gamestate_add_weapon_power(c->weapon);
             gamestate_add_score(c->score);
 
+            // Apply scripted effect
+            const auto L = gamestate_lua();
+            const int top = lua_gettop(L);
+            if (script_load(c->script)) {
+                if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+                    printf("Lua error: %s\n", lua_tostring(L, -1));
+                    lua_settop(L, top);
+                }
+            }
+
             soundengine_play_sfx(c->sfx);
 
             // Despawn

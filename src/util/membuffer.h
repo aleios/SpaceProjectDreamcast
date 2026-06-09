@@ -15,6 +15,10 @@ void membuffer_write(membuffer_t* buf, const char* data, int len);
 
 void membuffer_shrink(membuffer_t* buf);
 
+SHZ_FORCE_INLINE bool membuffer_valid(membuffer_t* buf) {
+    return buf->data != nullptr && buf->capacity != 0;
+}
+
 SHZ_FORCE_INLINE int membuffer_len(membuffer_t* buf) {
     return buf->len;
 }

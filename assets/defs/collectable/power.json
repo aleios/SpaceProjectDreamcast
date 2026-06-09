@@ -8,5 +8,6 @@
   "weapon": 1,
   "speed": 0.1,
   "pickup_sound": "pickup",
-  "score": 200
+  "score": 200,
+  "script": ""
 }
